@@ -1,0 +1,329 @@
+<?php
+require_once 'db.php';
+// Fetch notices for marquee
+$marqueeSql = "SELECT title FROM notices 
+               ORDER BY published_at DESC, created_at DESC 
+               LIMIT 5";
+$marqueeResult = $conn->query($marqueeSql);
+$marqueeNotices = [];
+if ($marqueeResult && $marqueeResult->num_rows > 0) {
+    while ($row = $marqueeResult->fetch_assoc()) {
+        $marqueeNotices[] = htmlspecialchars($row['title']);
+    }
+}
+if (empty($marqueeNotices)) {
+    $marqueeNotices = ['Welcome to SCTI - Sindhuli Community Technical Institute'];
+}
+$marqueeText = implode(' | ', $marqueeNotices);
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCTI Programs & Admission</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  .section {
+    padding: 40px 0;
+  }
+
+  .bg-grey {
+    background: #f2f2f2;
+  }
+
+  /* ===== TOP HEADER ===== */
+  .top-header {
+    background: #00264d;
+    color: white;
+    padding: 8px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: #004080;
+  }
+
+  .header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+  }
+
+  .menu ul {
+    list-style: none;
+    display: flex;
+  }
+
+  .menu ul li {
+    margin-left: 20px;
+  }
+
+  .menu ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .menu-toggle {
+    display: none;
+    font-size: 26px;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: block;
+    }
+
+    .menu {
+      display: none;
+      width: 100%;
+    }
+
+    .menu ul {
+      flex-direction: column;
+      background: #004080;
+      text-align: center;
+    }
+
+    .menu ul li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .menu.show {
+      display: block;
+    }
+  }
+
+  .container {
+    width: 90%;
+    margin: auto;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: #2c3e50;
+  }
+
+  .accordion {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+
+  .accordion button {
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+    transition: 0.3s;
+  }
+
+  .accordion button:hover {
+    background-color: #2980b9;
+  }
+
+  .accordion button.active {
+    background-color: #2980b9;
+  }
+
+  .panel {
+    padding: 0 18px;
+    background-color: #f9f9f9;
+    display: none;
+    overflow: hidden;
+  }
+
+  .panel ul {
+    margin: 15px 0;
+    list-style-type: disc;
+    margin-left: 20px;
+  }
+
+  .panel p {
+    text-align: justify;
+    margin-bottom: 10px;
+  }
+
+  .eligibility,
+  .why-choose {
+    background-color: #e3f2fd;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+  }
+
+  .eligibility ul,
+  .why-choose ul {
+    list-style-type: square;
+    margin-left: 20px;
+  }
+
+  .duration,
+  .assessment {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+</style>
+</head>
+
+<body>
+
+  <!-- ===== TOP HEADER ===== -->
+  <div class="top-header">
+    <marquee>
+      <?php echo $marqueeText; ?>
+    </marquee>
+  </div>
+
+  <!-- ===== HEADER & MENU ===== -->
+  <header class="header">
+    <div class="container header-flex">
+
+      <div class="logo">
+        <img src="scti logo.jpeg" alt="SCTI Logo">
+      </div>
+
+      <div class="menu-toggle" id="menu-toggle">
+        <i class="fa fa-bars"></i>
+      </div>
+
+      <nav class="menu" id="menu">
+        <ul>
+          <li><a href="index.php">Home</a></li>
+          <li><a href="Programs.php">Programs</a></li>
+          <li><a href="Gallery.php">Gallery</a></li>
+          <li><a href="Notice Board.php">Notice Board</a></li>
+          <li><a href="Contact Us.php">Contact Us</a></li>
+        </ul>
+      </nav>
+
+    </div>
+  </header>
+  <div class="container">
+    <h1>SCTI Programs & Admission</h1>
+
+    <!-- Accordion for Courses -->
+    <div class="accordion">
+      <button>Diploma in Animal Husbandry, Health, and Management</button>
+      <div class="panel">
+        <h3>Course Content:</h3>
+        <ul>
+          <li>Animal nutrition and feeding</li>
+          <li>Veterinary science basics</li>
+          <li>Livestock management and breeding</li>
+          <li>Animal health and disease prevention</li>
+          <li>Farm management and economics</li>
+        </ul>
+        <p class="duration">Duration: 3 years</p>
+        <p class="assessment">Assessment: Internal (50%) + External (50%)</p>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button>B.Tech. Ed. in Information Technology</button>
+      <div class="panel">
+        <h3>Course Content:</h3>
+        <ul>
+          <li>Programming and software development</li>
+          <li>Database management and cloud computing</li>
+          <li>Network security and cybersecurity</li>
+          <li>Educational technology integration</li>
+          <li>IT project management</li>
+        </ul>
+        <p class="duration">Duration: 4 years</p>
+        <p class="assessment">Assessment: Internal (30%) + External (70%)</p>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button>B.Tech. Ed. in Civil Engineering</button>
+      <div class="panel">
+        <h3>Course Content:</h3>
+        <ul>
+          <li>Advanced structural analysis and design</li>
+          <li>Transportation and highway engineering</li>
+          <li>Environmental engineering and sustainability</li>
+          <li>Construction technology and management</li>
+          <li>Pedagogical approaches in engineering education</li>
+        </ul>
+        <p class="duration">Duration: 4 years</p>
+        <p class="assessment">Assessment: Internal (30%) + External (70%)</p>
+      </div>
+    </div>
+
+    <!-- Eligibility & Admission -->
+    <div class="eligibility">
+      <h2>Eligibility & Admission</h2>
+      <p>Join our community of technical professionals</p>
+      <ul>
+        <li>Minimum SEE GPA of 2.0 or equivalent for Diploma programs</li>
+        <li>Minimum +2 or equivalent for B.Tech. Ed. programs</li>
+        <li>Strong foundation in Mathematics and Science</li>
+        <li>Interest in technical and vocational fields</li>
+      </ul>
+    </div>
+
+    <!-- Why Choose SCTI -->
+    <div class="why-choose">
+      <h2>Why Choose SCTI?</h2>
+      <ul>
+        <li>Industry-aligned curriculum</li>
+        <li>Hands-on training with modern equipment</li>
+        <li>Experienced faculty and industry experts</li>
+        <li>Career guidance and job placement support</li>
+        <li>Focus on practical and technical skills</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const accordions = document.querySelectorAll(".accordion button");
+
+    accordions.forEach(button => {
+      button.addEventListener("click", () => {
+        const panel = button.nextElementSibling;
+        button.classList.toggle("active");
+        if (panel.style.display === "block") {
+          panel.style.display = "none";
+        } else {
+          panel.style.display = "block";
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

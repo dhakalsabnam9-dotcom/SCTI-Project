@@ -1,0 +1,144 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'teacher') {
+    header("Location: login-simple.php");
+    exit();
+}
+
+$fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Dashboard - SCTI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="top-header">
+  <marquee>Welcome to Teacher Dashboard</marquee>
+</div>
+
+<header class="header">
+  <div class="container header-flex">
+    <div class="logo">
+      <img src="scti logo.jpeg" alt="SCTI Logo">
+    </div>
+    <div class="admin-info">
+      <span><i class="fa fa-chalkboard-teacher"></i> <?php echo htmlspecialchars($fullName); ?></span>
+      <a href="logout.php" class="logout-btn"><i class="fa fa-sign-out"></i> Logout</a>
+    </div>
+  </div>
+</header>
+
+<section class="admin-section">
+  <div class="container">
+    
+    <div class="dashboard-header">
+      <h2><i class="fa fa-chalkboard-teacher"></i> Teacher Dashboard</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <i class="fa fa-book-open"></i>
+        </div>
+        <div class="stat-info">
+          <h3>4</h3>
+          <p>Courses Teaching</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <i class="fa fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3>120</h3>
+          <p>Total Students</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <i class="fa fa-clipboard-check"></i>
+        </div>
+        <div class="stat-info">
+          <h3>8</h3>
+          <p>Pending Grades</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <i class="fa fa-calendar-alt"></i>
+        </div>
+        <div class="stat-info">
+          <h3>3</h3>
+          <p>Classes Today</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <h3 style="padding: 20px;">My Classes</h3>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Students</th>
+            <th>Schedule</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>IT101</td>
+            <td>Programming Fundamentals</td>
+            <td>35</td>
+            <td>Mon, Wed, Fri - 9:00 AM</td>
+            <td>
+              <button class="btn-icon btn-view"><i class="fa fa-eye"></i></button>
+              <button class="btn-icon btn-edit"><i class="fa fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td>IT201</td>
+            <td>Advanced Programming</td>
+            <td>28</td>
+            <td>Tue, Thu - 10:30 AM</td>
+            <td>
+              <button class="btn-icon btn-view"><i class="fa fa-eye"></i></button>
+              <button class="btn-icon btn-edit"><i class="fa fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td>IT301</td>
+            <td>Software Engineering</td>
+            <td>32</td>
+            <td>Mon, Wed - 2:00 PM</td>
+            <td>
+              <button class="btn-icon btn-view"><i class="fa fa-eye"></i></button>
+              <button class="btn-icon btn-edit"><i class="fa fa-edit"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <p>© 2025 Sindhuli Community Technical Institute (SCTI)</p>
+</footer>
+
+</body>
+</html>

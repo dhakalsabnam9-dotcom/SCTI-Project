@@ -1,0 +1,134 @@
+========================================
+SCTI SCHOOL MANAGEMENT SYSTEM
+NAVIGATION SETUP - UPDATED
+========================================
+
+✅ HOME PAGE IS NOW THE LANDING PAGE!
+
+========================================
+HOW IT WORKS NOW
+========================================
+
+Landing Page:
+http://localhost/scti-school/
+→ Shows the homepage with banner, courses, teachers, etc.
+
+Navigation Bar (Top):
+- Home → index.html
+- Programs → Programs.html
+- Gallery → Gallery.html
+- Notice Board → Notice Board.html
+- Contact Us → Contact Us.html
+- Login → login-simple.php (Click to login!)
+
+========================================
+LOGIN FLOW
+========================================
+
+1. User visits homepage
+2. Clicks "Login" in navbar
+3. Login page appears
+4. Enter credentials
+5. Redirects to dashboard
+
+========================================
+DASHBOARDS
+========================================
+
+After Login, users go to:
+
+ADMIN (admin/admin123):
+→ Admin-Notice-Board.html
+- Manage notices
+- View statistics
+- Add/Edit/Delete notices
+
+TEACHER (teacher/teacher123):
+→ teacher-dashboard.php
+- View classes
+- Manage students
+- Check schedules
+
+STUDENT (student/student123):
+→ student-dashboard.php
+- View courses
+- Check grades
+- See attendance
+
+========================================
+NAVIGATION STRUCTURE
+========================================
+
+Public Pages (No Login Required):
+✅ Home (index.html)
+✅ Programs
+✅ Gallery
+✅ Notice Board
+✅ Contact Us
+
+Login Required:
+✅ Admin Dashboard
+✅ Teacher Dashboard
+✅ Student Dashboard
+
+========================================
+URL REFERENCE
+========================================
+
+Homepage:
+http://localhost/scti-school/
+
+Login Page:
+http://localhost/scti-school/login-simple.php
+
+Admin Dashboard:
+http://localhost/scti-school/Admin-Notice-Board.html
+
+Teacher Dashboard:
+http://localhost/scti-school/teacher-dashboard.php
+
+Student Dashboard:
+http://localhost/scti-school/student-dashboard.php
+
+========================================
+TESTING STEPS
+========================================
+
+1. Open: http://localhost/scti-school/
+   ✅ Should show homepage with banner
+
+2. Click "Login" in navbar
+   ✅ Should go to login page
+
+3. Login with admin/admin123
+   ✅ Should redirect to Admin dashboard
+
+4. Click "Logout"
+   ✅ Should return to login page
+
+5. Navigate using top menu
+   ✅ All links should work
+
+========================================
+FEATURES
+========================================
+
+✅ Homepage as landing page
+✅ Working navigation bar
+✅ Login accessible from navbar
+✅ Three user types with dashboards
+✅ Logout functionality
+✅ Session management
+✅ Responsive design
+
+========================================
+QUICK START
+========================================
+
+Open browser:
+http://localhost/scti-school/
+
+Browse the site, then click "Login" when ready!
+
+© 2025 SCTI - School Management System
+========================================

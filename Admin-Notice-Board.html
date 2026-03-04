@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Notice Board Management | SCTI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ===== TOP HEADER ===== -->
+<div class="top-header">
+  <marquee>
+    Admin Panel - Notice Board Management System
+  </marquee>
+</div>
+
+<!-- ===== HEADER & MENU ===== -->
+<header class="header">
+  <div class="container header-flex">
+
+    <div class="logo">
+      <img src="scti logo.jpeg" alt="SCTI Logo">
+    </div>
+
+    <div class="admin-info">
+      <span><i class="fa fa-user-shield"></i> Admin Panel</span>
+      <a href="Login.html" class="logout-btn"><i class="fa fa-sign-out"></i> Logout</a>
+    </div>
+
+  </div>
+</header>
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+<section class="admin-section">
+  <div class="container">
+    
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h2><i class="fa fa-bullhorn"></i> Notice Board Management</h2>
+      <button class="btn-primary" onclick="showAddForm()">
+        <i class="fa fa-plus"></i> Add New Notice
+      </button>
+    </div>
+
+    <!-- Add/Edit Notice Form -->
+    <div class="notice-form-container" id="noticeFormContainer" style="display: none;">
+      <div class="form-card">
+        <div class="form-header">
+          <h3 id="formTitle"><i class="fa fa-edit"></i> Add New Notice</h3>
+          <button class="close-btn" onclick="closeForm()">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+
+        <form id="noticeForm" class="admin-form">
+          <input type="hidden" id="noticeId" value="">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="noticeTitle">
+                <i class="fa fa-heading"></i> Notice Title *
+              </label>
+              <input 
+                type="text" 
+                id="noticeTitle" 
+                placeholder="Enter notice title"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="noticeDate">
+                <i class="fa fa-calendar"></i> Date *
+              </label>
+              <input 
+                type="date" 
+                id="noticeDate" 
+                required
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="noticeCategory">
+              <i class="fa fa-tag"></i> Category *
+            </label>
+            <select id="noticeCategory" required>
+              <option value="">Select Category</option>
+              <option value="admission">Admission</option>
+              <option value="exam">Examination</option>
+              <option value="event">Event</option>
+              <option value="holiday">Holiday</option>
+              <option value="general">General</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="noticeDescription">
+              <i class="fa fa-align-left"></i> Description *
+            </label>
+            <textarea 
+              id="noticeDescription" 
+              rows="4" 
+              placeholder="Enter notice description"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="noticeStatus">
+                <i class="fa fa-toggle-on"></i> Status
+              </label>
+              <select id="noticeStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="noticePriority">
+                <i class="fa fa-star"></i> Priority
+              </label>
+              <select id="noticePriority">
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-success">
+              <i class="fa fa-save"></i> Save Notice
+            </button>
+            <button type="button" class="btn-secondary" onclick="closeForm()">
+              <i class="fa fa-times"></i> Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <i class="fa fa-bullhorn"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="totalNotices">0</h3>
+          <p>Total Notices</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <i class="fa fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="activeNotices">0</h3>
+          <p>Active Notices</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <i class="fa fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="urgentNotices">0</h3>
+          <p>Urgent Notices</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <i class="fa fa-calendar-day"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="todayNotices">0</h3>
+          <p>Today's Notices</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <div class="filter-section">
+      <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search notices..."
+          onkeyup="filterNotices()"
+        >
+      </div>
+
+      <div class="filter-controls">
+        <select id="categoryFilter" onchange="filterNotices()">
+          <option value="">All Categories</option>
+          <option value="admission">Admission</option>
+          <option value="exam">Examination</option>
+          <option value="event">Event</option>
+          <option value="holiday">Holiday</option>
+          <option value="general">General</option>
+          <option value="urgent">Urgent</option>
+        </select>
+
+        <select id="statusFilter" onchange="filterNotices()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Notices Table -->
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="noticesTableBody">
+          <!-- Notices will be dynamically loaded here -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p>© 2025 Sindhuli Community Technical Institute (SCTI) - Admin Panel</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+  // Sample data storage (in real app, this would be a database)
+  let notices = [
+    {
+      id: 1,
+      title: "Admission Open",
+      date: "2025-11-01",
+      category: "admission",
+      description: "Applications for 2025/26 academic year are now open.",
+      status: "active",
+      priority: "high"
+    },
+    {
+      id: 2,
+      title: "Orientation Program",
+      date: "2025-11-10",
+      category: "event",
+      description: "Scheduled on Nov 10, 2025 for all new students.",
+      status: "active",
+      priority: "normal"
+    },
+    {
+      id: 3,
+      title: "Classes Begin",
+      date: "2025-11-12",
+      category: "general",
+      description: "Nov 12, 2025. Please check your timetable online.",
+      status: "active",
+      priority: "normal"
+    },
+    {
+      id: 4,
+      title: "Sports Week",
+      date: "2025-12-20",
+      category: "event",
+      description: "Dec 20–25, 2025. Registration for events is open.",
+      status: "active",
+      priority: "normal"
+    }
+  ];
+
+  let editingId = null;
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    loadNotices();
+    updateStatistics();
+  });
+
+  // Show Add Form
+  function showAddForm() {
+    document.getElementById('noticeFormContainer').style.display = 'block';
+    document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus"></i> Add New Notice';
+    document.getElementById('noticeForm').reset();
+    document.getElementById('noticeId').value = '';
+    editingId = null;
+  }
+
+  // Close Form
+  function closeForm() {
+    document.getElementById('noticeFormContainer').style.display = 'none';
+    document.getElementById('noticeForm').reset();
+    editingId = null;
+  }
+
+  // Load Notices
+  function loadNotices() {
+    const tbody = document.getElementById('noticesTableBody');
+    tbody.innerHTML = '';
+
+    notices.forEach(notice => {
+      const row = createNoticeRow(notice);
+      tbody.appendChild(row);
+    });
+  }
+
+  // Create Notice Row
+  function createNoticeRow(notice) {
+    const tr = document.createElement('tr');
+    
+    const priorityClass = notice.priority === 'urgent' ? 'badge-danger' : 
+                         notice.priority === 'high' ? 'badge-warning' : 'badge-info';
+    
+    const statusClass = notice.status === 'active' ? 'badge-success' : 'badge-secondary';
+
+    tr.innerHTML = `
+      <td>${notice.id}</td>
+      <td><strong>${notice.title}</strong></td>
+      <td>${formatDate(notice.date)}</td>
+      <td><span class="badge badge-primary">${notice.category}</span></td>
+      <td><span class="badge ${priorityClass}">${notice.priority}</span></td>
+      <td><span class="badge ${statusClass}">${notice.status}</span></td>
+      <td class="action-buttons">
+        <button class="btn-icon btn-edit" onclick="editNotice(${notice.id})" title="Edit">
+          <i class="fa fa-edit"></i>
+        </button>
+        <button class="btn-icon btn-delete" onclick="deleteNotice(${notice.id})" title="Delete">
+          <i class="fa fa-trash"></i>
+        </button>
+        <button class="btn-icon btn-view" onclick="viewNotice(${notice.id})" title="View">
+          <i class="fa fa-eye"></i>
+        </button>
+      </td>
+    `;
+
+    return tr;
+  }
+
+  // Format Date
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  // Form Submit
+  document.getElementById('noticeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const notice = {
+      id: editingId || notices.length + 1,
+      title: document.getElementById('noticeTitle').value,
+      date: document.getElementById('noticeDate').value,
+      category: document.getElementById('noticeCategory').value,
+      description: document.getElementById('noticeDescription').value,
+      status: document.getElementById('noticeStatus').value,
+      priority: document.getElementById('noticePriority').value
+    };
+
+    if (editingId) {
+      // Update existing notice
+      const index = notices.findIndex(n => n.id === editingId);
+      notices[index] = notice;
+      alert('Notice updated successfully!');
+    } else {
+      // Add new notice
+      notices.push(notice);
+      alert('Notice added successfully!');
+    }
+
+    loadNotices();
+    updateStatistics();
+    closeForm();
+  });
+
+  // Edit Notice
+  function editNotice(id) {
+    const notice = notices.find(n => n.id === id);
+    if (!notice) return;
+
+    editingId = id;
+    document.getElementById('noticeId').value = id;
+    document.getElementById('noticeTitle').value = notice.title;
+    document.getElementById('noticeDate').value = notice.date;
+    document.getElementById('noticeCategory').value = notice.category;
+    document.getElementById('noticeDescription').value = notice.description;
+    document.getElementById('noticeStatus').value = notice.status;
+    document.getElementById('noticePriority').value = notice.priority;
+
+    document.getElementById('formTitle').innerHTML = '<i class="fa fa-edit"></i> Edit Notice';
+    document.getElementById('noticeFormContainer').style.display = 'block';
+  }
+
+  // Delete Notice
+  function deleteNotice(id) {
+    if (confirm('Are you sure you want to delete this notice?')) {
+      notices = notices.filter(n => n.id !== id);
+      loadNotices();
+      updateStatistics();
+      alert('Notice deleted successfully!');
+    }
+  }
+
+  // View Notice
+  function viewNotice(id) {
+    const notice = notices.find(n => n.id === id);
+    if (!notice) return;
+
+    alert(`Title: ${notice.title}\nDate: ${formatDate(notice.date)}\nCategory: ${notice.category}\nDescription: ${notice.description}\nStatus: ${notice.status}\nPriority: ${notice.priority}`);
+  }
+
+  // Filter Notices
+  function filterNotices() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+
+    const filtered = notices.filter(notice => {
+      const matchesSearch = notice.title.toLowerCase().includes(searchTerm) || 
+                           notice.description.toLowerCase().includes(searchTerm);
+      const matchesCategory = !categoryFilter || notice.category === categoryFilter;
+      const matchesStatus = !statusFilter || notice.status === statusFilter;
+
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+
+    const tbody = document.getElementById('noticesTableBody');
+    tbody.innerHTML = '';
+    filtered.forEach(notice => {
+      tbody.appendChild(createNoticeRow(notice));
+    });
+  }
+
+  // Update Statistics
+  function updateStatistics() {
+    const today = new Date().toISOString().split('T')[0];
+    
+    document.getElementById('totalNotices').textContent = notices.length;
+    document.getElementById('activeNotices').textContent = notices.filter(n => n.status === 'active').length;
+    document.getElementById('urgentNotices').textContent = notices.filter(n => n.priority === 'urgent').length;
+    document.getElementById('todayNotices').textContent = notices.filter(n => n.date === today).length;
+  }
+</script>
+
+</body>
+</html>

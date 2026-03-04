@@ -1,0 +1,103 @@
+========================================
+SCTI SCHOOL MANAGEMENT SYSTEM
+HOW TO RUN - SIMPLE VERSION
+========================================
+
+✅ WORKING VERSION (NO PHP SERVER NEEDED!)
+========================================
+
+FILE TO OPEN: login-test.html
+
+JUST DOUBLE-CLICK: login-test.html
+
+It will open in your browser and work immediately!
+
+========================================
+LOGIN CREDENTIALS
+========================================
+
+ADMIN:
+- User Type: Administrator
+- Username: admin
+- Password: admin123
+→ Goes to: Admin Notice Board
+
+TEACHER:
+- User Type: Teacher
+- Username: teacher
+- Password: teacher123
+→ Goes to: Teacher Dashboard
+
+STUDENT:
+- User Type: Student
+- Username: student
+- Password: student123
+→ Goes to: Student Dashboard
+
+========================================
+FILES CREATED
+========================================
+
+✅ login-test.html - Login page (WORKS WITHOUT SERVER!)
+✅ student-dashboard.html - Student dashboard
+✅ teacher-dashboard.html - Teacher dashboard
+✅ Admin-Notice-Board.html - Admin dashboard
+
+========================================
+FEATURES
+========================================
+
+✅ Login with 3 user types
+✅ Different dashboards for each user
+✅ Logout functionality
+✅ Session management (using localStorage)
+✅ Professional design
+✅ Responsive layout
+✅ Works on any browser
+
+========================================
+QUICK START
+========================================
+
+1. Open your project folder
+2. Double-click "login-test.html"
+3. Login with credentials above
+4. Explore the dashboards!
+
+========================================
+TROUBLESHOOTING
+========================================
+
+Q: Login page doesn't show properly?
+A: Make sure style.css is in the same folder
+
+Q: Images not showing?
+A: Check that logo files are in the same folder
+
+Q: Can't login?
+A: Make sure you select the correct User Type
+   Username and password are case-sensitive
+
+Q: Logout not working?
+A: Click the logout button in the top right
+
+========================================
+NEXT STEPS
+========================================
+
+For production with database:
+- Use login.php instead
+- Import database-setup.sql
+- Configure config.php
+
+For now, just use login-test.html!
+
+========================================
+SUPPORT
+========================================
+
+All credentials are shown on the login page.
+Just open login-test.html and start testing!
+
+© 2025 SCTI - School Management System
+========================================

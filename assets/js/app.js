@@ -82,8 +82,10 @@ function handleLoginSubmit(e) {
   })
   .then(response => response.text())
   .then(data => {
+    console.log('Login response:', data); // Debug log
+    
     // Check if login was successful (redirect happened)
-    if (data.includes('Invalid username') || data.includes('All fields are required')) {
+    if (data.includes('Invalid username') || data.includes('Invalid password') || data.includes('All fields are required') || data.includes('alert-danger')) {
       // Extract error message
       const parser = new DOMParser();
       const doc = parser.parseFromString(data, 'text/html');
@@ -109,6 +111,7 @@ function handleLoginSubmit(e) {
     }
   })
   .catch(error => {
+    console.error('Login error:', error); // Debug log
     messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> An error occurred. Please try again.</div>';
   });
   

@@ -276,12 +276,26 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <p>Active Notices</p>
       </div>
     </div>
+    
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/view-contacts.php'">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+        <i class="fa fa-envelope"></i>
+      </div>
+      <div class="stat-info">
+        <h3 id="contactCount">0</h3>
+        <p>Contact Messages</p>
+      </div>
+    </div>
   </div>
 
   <!-- Quick Actions -->
   <div class="quick-actions">
     <h2><i class="fa fa-bolt"></i> Quick Actions</h2>
     <div class="action-grid">
+      <a href="../pages/view-contacts.php" class="action-btn" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+        <i class="fa fa-envelope"></i>
+        <span>View Contact Messages</span>
+      </a>
       <a href="../admin/Admin-Notice-Board.html" class="action-btn">
         <i class="fa fa-bullhorn"></i>
         <span>Manage Notices</span>
@@ -367,6 +381,20 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 <footer class="footer" style="margin-top: 40px;">
   <p>© 2025 Sindhuli Community Technical Institute (SCTI) - Admin Panel</p>
 </footer>
+
+<script>
+  // Fetch contact messages count
+  fetch('../pages/get-contact-count.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('contactCount').textContent = data.count;
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching contact count:', error);
+    });
+</script>
 
 </body>
 </html>

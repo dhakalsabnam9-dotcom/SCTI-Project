@@ -26,8 +26,42 @@ function loadPage(pageName) {
 // Contact form handler
 function handleContactSubmit(e) {
   e.preventDefault();
-  alert('Thank you for contacting us! We will get back to you soon.');
-  e.target.reset();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('.submit-btn');
+  const originalBtnText = submitBtn.innerHTML;
+  
+  // Disable button and show loading
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...';
+  
+  // Send AJAX request
+  fetch('pages/contact-submit.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message
+      alert('✓ ' + data.message);
+      form.reset();
+    } else {
+      // Show error message
+      alert('✗ ' + data.message);
+    }
+  })
+  .catch(error => {
+    alert('✗ An error occurred. Please try again later.');
+    console.error('Error:', error);
+  })
+  .finally(() => {
+    // Re-enable button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  });
+  
   return false;
 }
 

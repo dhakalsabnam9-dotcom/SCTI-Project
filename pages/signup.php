@@ -2,18 +2,10 @@
 session_start();
 
 // Database configuration
-$host = 'localhost';
-$dbname = 'scti_school';
-$username = 'root';
-$password = '';
+require_once('../includes/config.php');
 
-// Create database connection
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
+// Get database connection
+$conn = getDBConnection();
 
 // Initialize variables
 $error = '';
@@ -122,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 header("Location: ../dashboards/teacher-dashboard.php");
                                 break;
                             case 'admin':
-                                header("Location: ../admin/Admin-Notice-Board.html");
+                                header("Location: ../dashboards/admin-dashboard.php");
                                 break;
                         }
                         exit();

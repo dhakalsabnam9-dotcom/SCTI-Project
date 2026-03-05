@@ -1,30 +1,14 @@
 <?php
 session_start();
 
+// Database configuration
+require_once('../includes/config.php');
+
+// Get database connection
+$conn = getDBConnection();
+
 // Initialize variables
 $error = '';
-
-// Simple hardcoded credentials (for testing without database)
-$users = [
-    'admin' => [
-        'password' => 'admin123',
-        'type' => 'admin',
-        'name' => 'Administrator',
-        'redirect' => '../admin/Admin-Notice-Board.html'
-    ],
-    'teacher' => [
-        'password' => 'teacher123',
-        'type' => 'teacher',
-        'name' => 'Teacher',
-        'redirect' => '../dashboards/teacher-dashboard.php'
-    ],
-    'student' => [
-        'password' => 'student123',
-        'type' => 'student',
-        'name' => 'Student',
-        'redirect' => '../dashboards/student-dashboard.php'
-    ]
-];
 
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -37,23 +21,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($username) || empty($password) || empty($userType)) {
         $error = "All fields are required!";
     } else {
-        // Check credentials
-        if (isset($users[$username]) && $users[$username]['password'] === $password && $users[$username]['type'] === $userType) {
-            // Set session variables
-            $_SESSION['user_id'] = 1;
-            $_SESSION['username'] = $username;
-            $_SESSION['user_type'] = $userType;
-            $_SESSION['full_name'] = $users[$username]['name'];
-            $_SESSION['logged_in'] = true;
-            
-            // Redirect to dashboard
-            header("Location: " . $users[$username]['redirect']);
-            exit();
-        } else {
-            $error = "Invalid username, password, or user type!";
+        
+        // Determine table based on user type
+        $table = '';
+        $redirect = '';
+        switch($userType) {
+            case 'student':
+                $table = 'students';
+                $redirect = '../dashboards/student-dashboard.php';
+                break;
+            case 'teacher':
+                $table = 'teachers';
+                $redirect = '../dashboards/teacher-dashboard.php';
+                break;
+            case 'admin':
+                $table = 'admins';
+                $redirect = '../dashboards/admin-dashboard.php';
+                break;
+            default:
+                $error = "Invalid user type!";
+        }
+        
+        if (empty($error)) {
+            try {
+                // Query database for user
+                $stmt = $conn->prepare("SELECT * FROM $table WHERE username = :username LIMIT 1");
+                $stmt->bindParam(':username', $username);
+                $stmt->execute();
+                
+                if ($stmt->rowCount() > 0) {
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    // Verify password
+                    if (password_verify($password, $user['password'])) {
+                        // Password is correct - set session variables
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['user_type'] = $userType;
+                        $_SESSION['full_name'] = $user['full_name'];
+                        $_SESSION['email'] = $user['email'];
+                        $_SESSION['logged_in'] = true;
+                        
+                        // Redirect to appropriate dashboard
+                        header("Location: " . $redirect);
+                        exit();
+                    } else {
+                        $error = "Invalid username or password!";
+                    }
+                } else {
+                    $error = "Invalid username or password!";
+                }
+                
+            } catch(PDOException $e) {
+                $error = "Login error: " . $e->getMessage();
+            }
         }
     }
 }
+
+$conn = null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -127,11 +153,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <nav class="menu" id="menu">
       <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="Programs.html">Programs</a></li> 
-        <li><a href="Gallery.html">Gallery</a></li>
-        <li><a href="Notice Board.html">Notice Board</a></li>
-        <li><a href="Contact Us.html">Contact Us</a></li>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#programs">Programs</a></li> 
+        <li><a href="../index.html#gallery">Gallery</a></li>
+        <li><a href="../index.html#notices">Notice Board</a></li>
+        <li><a href="../index.html#contact">Contact Us</a></li>
         <li><a href="login-simple.php">Login</a></li>
         <li><a href="signup.php">Sign Up</a></li>
       </ul>
@@ -154,12 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <form class="login-form" method="POST" action="login-simple.php">
         
         <div class="credentials-info">
-          <strong><i class="fa fa-info-circle"></i> Test Credentials:</strong>
-          <ul>
-            <li><strong>Admin:</strong> username: admin, password: admin123</li>
-            <li><strong>Teacher:</strong> username: teacher, password: teacher123</li>
-            <li><strong>Student:</strong> username: student, password: student123</li>
-          </ul>
+          <strong><i class="fa fa-info-circle"></i> Login Information:</strong>
+          <p>Use the username and password you created during signup. If you don't have an account, please register first.</p>
         </div>
         
         <?php if (!empty($error)): ?>

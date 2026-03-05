@@ -133,6 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <li><a href="Notice Board.html">Notice Board</a></li>
         <li><a href="Contact Us.html">Contact Us</a></li>
         <li><a href="login-simple.php">Login</a></li>
+        <li><a href="signup.php">Sign Up</a></li>
       </ul>
     </nav>
 
@@ -218,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </button>
 
         <div class="login-footer">
-          <p>Don't have an account? <a href="#">Register Here</a></p>
+          <p>Don't have an account? <a href="signup.php">Register Here</a></p>
         </div>
 
       </form>

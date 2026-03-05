@@ -33,7 +33,7 @@ if (isset($_COOKIE['remember_token'])) {
 session_unset();
 session_destroy();
 
-// Redirect to login page
-header("Location: login.php?logout=success");
+// Redirect to home page
+header("Location: ../index.html");
 exit();
 ?>

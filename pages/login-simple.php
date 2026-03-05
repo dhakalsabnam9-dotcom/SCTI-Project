@@ -98,34 +98,96 @@ $conn = null;
     .alert {
       padding: 15px;
       margin-bottom: 20px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 14px;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .alert-danger {
-      background: #f8d7da;
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
       color: #721c24;
-      border: 1px solid #f5c6cb;
+      border-left: 4px solid #dc3545;
+      box-shadow: 0 2px 10px rgba(220, 53, 69, 0.2);
     }
     
     .credentials-info {
-      background: #d1ecf1;
+      background: linear-gradient(135deg, #d1ecf1, #bee5eb);
       color: #0c5460;
-      padding: 15px;
+      padding: 18px;
       margin-bottom: 20px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 13px;
-      border: 1px solid #bee5eb;
+      border-left: 4px solid #17a2b8;
+      box-shadow: 0 2px 10px rgba(23, 162, 184, 0.2);
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     .credentials-info strong {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    
+    .credentials-info p {
+      line-height: 1.6;
+      margin: 0;
     }
     
     .credentials-info ul {
       margin: 5px 0;
       padding-left: 20px;
+    }
+    
+    /* Enhanced form styling */
+    .login-box {
+      animation: fadeInUp 0.5s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .form-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #004080;
+      box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .form-group label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      display: block;
+      transition: color 0.3s;
     }
     
     /* Password field with eye icon */
@@ -135,6 +197,7 @@ $conn = null;
     
     .password-wrapper input {
       padding-right: 45px;
+      transition: all 0.3s;
     }
     
     .password-toggle {
@@ -145,11 +208,131 @@ $conn = null;
       cursor: pointer;
       color: #666;
       font-size: 18px;
-      transition: color 0.3s;
+      transition: all 0.3s;
+      z-index: 10;
     }
     
     .password-toggle:hover {
       color: #004080;
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    .password-toggle:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+    
+    /* Enhanced button */
+    .login-btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .login-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .login-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(0, 64, 128, 0.3);
+    }
+    
+    /* Input focus effects */
+    .form-group input,
+    .form-group select {
+      transition: all 0.3s;
+    }
+    
+    .form-group input:hover,
+    .form-group select:hover {
+      border-color: #0059b3;
+    }
+    
+    /* Form options enhancement */
+    .form-options {
+      animation: fadeIn 0.5s ease-out 0.2s both;
+    }
+    
+    .remember-me {
+      transition: all 0.3s;
+    }
+    
+    .remember-me:hover {
+      color: #004080;
+    }
+    
+    .forgot-password {
+      position: relative;
+      transition: all 0.3s;
+    }
+    
+    .forgot-password::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #004080;
+      transition: width 0.3s;
+    }
+    
+    .forgot-password:hover::after {
+      width: 100%;
+    }
+    
+    /* Login footer enhancement */
+    .login-footer {
+      animation: fadeIn 0.5s ease-out 0.3s both;
+    }
+    
+    .login-footer a {
+      position: relative;
+      transition: all 0.3s;
+    }
+    
+    .login-footer a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #004080;
+      transition: width 0.3s;
+    }
+    
+    .login-footer a:hover::after {
+      width: 100%;
+    }
+    
+    /* Responsive enhancements */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 0 15px;
+      }
+      
+      .password-toggle {
+        font-size: 16px;
+      }
+      
+      .credentials-info {
+        font-size: 12px;
+      }
     }
   </style>
 </head>

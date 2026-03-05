@@ -3,6 +3,13 @@ function loadPage(pageName) {
   const contentArea = document.getElementById('content-area');
   contentArea.innerHTML = pages[pageName] || pages.home;
   
+  // Initialize signup validation if on signup page
+  if (pageName === 'signup') {
+    setTimeout(() => {
+      initSignupValidation();
+    }, 100);
+  }
+  
   // Scroll to top smoothly
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
@@ -84,14 +91,51 @@ function handleSignupSubmit(e) {
   // Client-side validation
   const password = formData.get('password');
   const confirmPassword = formData.get('confirmPassword');
+  const email = formData.get('email');
   
-  if (password !== confirmPassword) {
-    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Passwords do not match!</div>';
+  // Validate all fields
+  if (!formData.get('userType') || !formData.get('fullName') || !formData.get('username') || !email || !password || !confirmPassword) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Please fill in all fields!</div>';
     return false;
   }
   
-  if (password.length < 6) {
-    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Password must be at least 6 characters long!</div>';
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Please enter a valid email address!</div>';
+    return false;
+  }
+  
+  // Validate password length
+  if (password.length < 7 || password.length > 12) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Password must be between 7 and 12 characters!</div>';
+    return false;
+  }
+  
+  // Validate password requirements
+  if (!/[A-Z]/.test(password)) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Password must contain at least one uppercase letter!</div>';
+    return false;
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Password must contain at least one lowercase letter!</div>';
+    return false;
+  }
+  
+  if (!/[0-9]/.test(password)) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Password must contain at least one number!</div>';
+    return false;
+  }
+  
+  if (!/[!@#$%^&*]/.test(password)) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Password must contain at least one special character (!@#$%^&*)!</div>';
+    return false;
+  }
+  
+  // Check passwords match
+  if (password !== confirmPassword) {
+    messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> Passwords do not match!</div>';
     return false;
   }
   

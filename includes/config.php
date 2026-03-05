@@ -1,7 +1,7 @@
 <?php
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'scti_school');
+define('DB_NAME', 'scti_db');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 

@@ -22,20 +22,51 @@ date_default_timezone_set('Asia/Kathmandu');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database Connection Function
-function getDBConnection() {
-    try {
-        $conn = new PDO(
-            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
-            DB_USER,
-            DB_PASS
-        );
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        return $conn;
-    } catch(PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
+// Database Connection Singleton
+class Database {
+    private static $instance = null;
+    private $connection;
+    
+    // Private constructor to prevent direct instantiation
+    private function __construct() {
+        try {
+            $this->connection = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USER,
+                DB_PASS
+            );
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {
+            die("Connection failed: " . $e->getMessage());
+        }
     }
+    
+    // Prevent cloning of the instance
+    private function __clone() {}
+    
+    // Prevent unserialization of the instance
+    public function __wakeup() {
+        throw new Exception("Cannot unserialize singleton");
+    }
+    
+    // Get the singleton instance
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    // Get the PDO connection
+    public function getConnection() {
+        return $this->connection;
+    }
+}
+
+// Helper function for backward compatibility
+function getDBConnection() {
+    return Database::getInstance()->getConnection();
 }
 
 // Check if user is logged in

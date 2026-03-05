@@ -6,6 +6,15 @@
   font-family: Arial, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 120px;
+}
+
+body {
+  min-height: 100vh;
+}
+
 .container {
   width: 90%;
   margin: auto;
@@ -29,40 +38,57 @@
 /* ===== HEADER ===== */
 .header {
   background: #004080;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .header-flex {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 15px 0;
+  min-height: 100px;
 }
 
-.logo img {
-  width: 120px;
-}
 /* ===== LOGO CIRCLE FIX ===== */
 .logo img {
-    width: 80px;              /* adjust size if needed */
+    width: 80px;
     height: 80px;
-    border-radius: 50%;       /* makes it circular */
-    object-fit: cover;        /* prevents distortion */
-    border: 2px solid #fff;   /* optional border */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    display: block;
 }
-
 
 .menu ul {
   list-style: none;
   display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .menu ul li {
-  margin-left: 20px;
+  margin-left: 25px;
+}
+
+.menu ul li:first-child {
+  margin-left: 0;
 }
 
 .menu ul li a {
   color: white;
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.3s;
+  padding: 8px 0;
+  display: block;
+}
+
+.menu ul li a:hover {
+  color: #ffd700;
 }
 
 .menu-toggle {
@@ -164,17 +190,35 @@
   .menu {
     display: none;
     width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #004080;
   }
 
   .menu ul {
     flex-direction: column;
     background: #004080;
     text-align: center;
+    width: 100%;
+    padding: 0;
   }
 
   .menu ul li {
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+  }
+
+  .menu ul li:first-child {
+    margin-left: 0;
+  }
+
+  .menu ul li a {
+    padding: 15px;
+    display: block;
+    width: 100%;
   }
 
   .menu.show {
@@ -184,6 +228,10 @@
   .flex,
   .campus-flex {
     flex-direction: column;
+  }
+  
+  .header-flex {
+    position: relative;
   }
 }
 

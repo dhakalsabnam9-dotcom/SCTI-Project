@@ -127,6 +127,30 @@ $conn = null;
       margin: 5px 0;
       padding-left: 20px;
     }
+    
+    /* Password field with eye icon */
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .password-wrapper input {
+      padding-right: 45px;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+    
+    .password-toggle:hover {
+      color: #004080;
+    }
   </style>
 </head>
 
@@ -220,13 +244,16 @@ $conn = null;
           <label for="password">
             <i class="fa fa-lock"></i> Password
           </label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            placeholder="Enter your password"
-            required
-          >
+          <div class="password-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Enter your password"
+              required
+            >
+            <i class="fa fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+          </div>
         </div>
 
         <div class="form-options">
@@ -260,6 +287,22 @@ $conn = null;
   document.getElementById("menu-toggle").onclick = function () {
     document.getElementById("menu").classList.toggle("show");
   };
+  
+  // Toggle password visibility
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePassword');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.classList.remove('fa-eye');
+      toggleIcon.classList.add('fa-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.classList.remove('fa-eye-slash');
+      toggleIcon.classList.add('fa-eye');
+    }
+  }
 </script>
 
 </body>

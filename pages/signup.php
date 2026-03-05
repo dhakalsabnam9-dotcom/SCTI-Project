@@ -24,12 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validate inputs
     if (empty($userType) || empty($username) || empty($email) || empty($password) || empty($confirmPassword) || empty($fullName)) {
         $error = "All fields are required!";
-    } elseif ($password !== $confirmPassword) {
-        $error = "Passwords do not match!";
-    } elseif (strlen($password) < 6) {
-        $error = "Password must be at least 6 characters long!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email format!";
+    } elseif ($password !== $confirmPassword) {
+        $error = "Passwords do not match!";
+    } elseif (strlen($password) < 7 || strlen($password) > 12) {
+        $error = "Password must be between 7 and 12 characters!";
+    } elseif (!preg_match('/[A-Z]/', $password)) {
+        $error = "Password must contain at least one uppercase letter!";
+    } elseif (!preg_match('/[a-z]/', $password)) {
+        $error = "Password must contain at least one lowercase letter!";
+    } elseif (!preg_match('/[0-9]/', $password)) {
+        $error = "Password must contain at least one number!";
+    } elseif (!preg_match('/[!@#$%^&*]/', $password)) {
+        $error = "Password must contain at least one special character (!@#$%^&*)!";
     } else {
         
         // Determine table based on user type
@@ -162,6 +170,80 @@ $conn = null;
       color: #155724;
       border: 1px solid #c3e6cb;
     }
+    
+    /* Password field with eye icon */
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .password-wrapper input {
+      padding-right: 45px;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+    
+    .password-toggle:hover {
+      color: #004080;
+    }
+    
+    /* Password strength indicator */
+    .password-strength {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    
+    .strength-bar {
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    
+    .strength-bar-fill {
+      height: 100%;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+    
+    .strength-weak { background: #dc3545; width: 33%; }
+    .strength-medium { background: #ffc107; width: 66%; }
+    .strength-strong { background: #28a745; width: 100%; }
+    
+    /* Validation messages */
+    .validation-list {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    
+    .validation-list li {
+      padding: 3px 0;
+      color: #666;
+    }
+    
+    .validation-list li.valid {
+      color: #28a745;
+    }
+    
+    .validation-list li.invalid {
+      color: #dc3545;
+    }
+    
+    .validation-list li i {
+      margin-right: 5px;
+    }
   </style>
 </head>
 
@@ -284,26 +366,46 @@ $conn = null;
           <label for="password">
             <i class="fa fa-lock"></i> Password
           </label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            placeholder="Create a password (min 6 characters)"
-            required
-          >
+          <div class="password-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Create a password (7-12 characters)"
+              required
+            >
+            <i class="fa fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility('password', 'togglePassword')"></i>
+          </div>
+          <div class="password-strength" id="passwordStrength" style="display: none;">
+            <div class="strength-bar">
+              <div class="strength-bar-fill" id="strengthBar"></div>
+            </div>
+            <span id="strengthText"></span>
+          </div>
+          <ul class="validation-list" id="passwordValidation">
+            <li id="lengthCheck"><i class="fa fa-circle"></i> 7-12 characters</li>
+            <li id="uppercaseCheck"><i class="fa fa-circle"></i> At least one uppercase letter</li>
+            <li id="lowercaseCheck"><i class="fa fa-circle"></i> At least one lowercase letter</li>
+            <li id="numberCheck"><i class="fa fa-circle"></i> At least one number</li>
+            <li id="specialCheck"><i class="fa fa-circle"></i> At least one special character (!@#$%^&*)</li>
+          </ul>
         </div>
 
         <div class="form-group">
           <label for="confirmPassword">
             <i class="fa fa-lock"></i> Confirm Password
           </label>
-          <input 
-            type="password" 
-            id="confirmPassword" 
-            name="confirmPassword" 
-            placeholder="Confirm your password"
-            required
-          >
+          <div class="password-wrapper">
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              placeholder="Confirm your password"
+              required
+            >
+            <i class="fa fa-eye password-toggle" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')"></i>
+          </div>
+          <span id="matchMessage" style="font-size: 12px; margin-top: 5px; display: block;"></span>
         </div>
 
         <button type="submit" class="login-btn">
@@ -330,6 +432,183 @@ $conn = null;
   document.getElementById("menu-toggle").onclick = function () {
     document.getElementById("menu").classList.toggle("show");
   };
+  
+  // Toggle password visibility
+  function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
+  
+  // Password validation
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  
+  // Validation checks
+  const checks = {
+    length: { element: document.getElementById('lengthCheck'), regex: /^.{7,12}$/ },
+    uppercase: { element: document.getElementById('uppercaseCheck'), regex: /[A-Z]/ },
+    lowercase: { element: document.getElementById('lowercaseCheck'), regex: /[a-z]/ },
+    number: { element: document.getElementById('numberCheck'), regex: /[0-9]/ },
+    special: { element: document.getElementById('specialCheck'), regex: /[!@#$%^&*]/ }
+  };
+  
+  // Real-time password validation
+  passwordInput.addEventListener('input', function() {
+    const password = this.value;
+    let validCount = 0;
+    
+    // Show strength indicator
+    document.getElementById('passwordStrength').style.display = 'block';
+    
+    // Check each validation rule
+    for (let key in checks) {
+      const check = checks[key];
+      const isValid = check.regex.test(password);
+      
+      if (isValid) {
+        check.element.classList.remove('invalid');
+        check.element.classList.add('valid');
+        check.element.querySelector('i').classList.remove('fa-circle');
+        check.element.querySelector('i').classList.add('fa-check-circle');
+        validCount++;
+      } else {
+        check.element.classList.remove('valid');
+        check.element.classList.add('invalid');
+        check.element.querySelector('i').classList.remove('fa-check-circle');
+        check.element.querySelector('i').classList.add('fa-circle');
+      }
+    }
+    
+    // Update strength bar
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    strengthBar.className = 'strength-bar-fill';
+    
+    if (validCount <= 2) {
+      strengthBar.classList.add('strength-weak');
+      strengthText.textContent = 'Weak';
+      strengthText.style.color = '#dc3545';
+    } else if (validCount <= 4) {
+      strengthBar.classList.add('strength-medium');
+      strengthText.textContent = 'Medium';
+      strengthText.style.color = '#ffc107';
+    } else {
+      strengthBar.classList.add('strength-strong');
+      strengthText.textContent = 'Strong';
+      strengthText.style.color = '#28a745';
+    }
+    
+    // Check password match
+    checkPasswordMatch();
+  });
+  
+  // Check password match
+  confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+  
+  function checkPasswordMatch() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    const matchMessage = document.getElementById('matchMessage');
+    
+    if (confirmPassword === '') {
+      matchMessage.textContent = '';
+      return;
+    }
+    
+    if (password === confirmPassword) {
+      matchMessage.innerHTML = '<i class="fa fa-check-circle" style="color: #28a745;"></i> Passwords match';
+      matchMessage.style.color = '#28a745';
+    } else {
+      matchMessage.innerHTML = '<i class="fa fa-times-circle" style="color: #dc3545;"></i> Passwords do not match';
+      matchMessage.style.color = '#dc3545';
+    }
+  }
+  
+  // Form validation before submit
+  document.querySelector('.login-form').addEventListener('submit', function(e) {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    const email = document.getElementById('email').value;
+    
+    // Check all fields are filled
+    const requiredFields = ['userType', 'fullName', 'username', 'email', 'password', 'confirmPassword'];
+    for (let field of requiredFields) {
+      const input = document.getElementById(field);
+      if (!input.value.trim()) {
+        e.preventDefault();
+        alert('Please fill in all fields!');
+        input.focus();
+        return false;
+      }
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      e.preventDefault();
+      alert('Please enter a valid email address!');
+      document.getElementById('email').focus();
+      return false;
+    }
+    
+    // Validate password length
+    if (password.length < 7 || password.length > 12) {
+      e.preventDefault();
+      alert('Password must be between 7 and 12 characters!');
+      passwordInput.focus();
+      return false;
+    }
+    
+    // Validate password requirements
+    if (!/[A-Z]/.test(password)) {
+      e.preventDefault();
+      alert('Password must contain at least one uppercase letter!');
+      passwordInput.focus();
+      return false;
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      e.preventDefault();
+      alert('Password must contain at least one lowercase letter!');
+      passwordInput.focus();
+      return false;
+    }
+    
+    if (!/[0-9]/.test(password)) {
+      e.preventDefault();
+      alert('Password must contain at least one number!');
+      passwordInput.focus();
+      return false;
+    }
+    
+    if (!/[!@#$%^&*]/.test(password)) {
+      e.preventDefault();
+      alert('Password must contain at least one special character (!@#$%^&*)!');
+      passwordInput.focus();
+      return false;
+    }
+    
+    // Check passwords match
+    if (password !== confirmPassword) {
+      e.preventDefault();
+      alert('Passwords do not match!');
+      confirmPasswordInput.focus();
+      return false;
+    }
+    
+    return true;
+  });
 </script>
 
 </body>

@@ -44,16 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     
     try {
-        // Get IP address and user agent
-        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '';
-        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        
         // Insert contact message into database
         $stmt = $conn->prepare("
             INSERT INTO contacts 
-            (name, email, phone, subject, message, status, ip_address, user_agent) 
+            (name, email, phone, subject, message, status) 
             VALUES 
-            (:name, :email, :phone, :subject, :message, 'new', :ip_address, :user_agent)
+            (:name, :email, :phone, :subject, :message, 'new')
         ");
         
         $stmt->bindParam(':name', $name);
@@ -61,8 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(':phone', $phone);
         $stmt->bindParam(':subject', $subject);
         $stmt->bindParam(':message', $message);
-        $stmt->bindParam(':ip_address', $ipAddress);
-        $stmt->bindParam(':user_agent', $userAgent);
         
         if ($stmt->execute()) {
             $response['success'] = true;

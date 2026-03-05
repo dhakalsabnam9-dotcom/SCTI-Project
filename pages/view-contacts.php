@@ -320,9 +320,6 @@ $conn = null;
               <i class="fa fa-clock"></i>
               <?php echo date('F j, Y - g:i A', strtotime($contact['created_at'])); ?>
             </div>
-            <div>
-              <i class="fa fa-map-marker-alt"></i> IP: <?php echo htmlspecialchars($contact['ip_address']); ?>
-            </div>
           </div>
         </div>
       <?php endforeach; ?>

@@ -98,10 +98,10 @@ const programsPage = `
       </div>
 
       <div style="text-align: center; margin-top: 40px;">
-        <a href="signup.php" class="cta-button">
+        <a href="#" onclick="loadPage('signup'); return false;" class="cta-button">
           <i class="fa fa-user-plus"></i> Apply Now
         </a>
-        <a href="#contact" onclick="loadPage('contact'); return false;" class="cta-button cta-button-outline">
+        <a href="#" onclick="loadPage('contact'); return false;" class="cta-button cta-button-outline">
           <i class="fa fa-envelope"></i> Contact Us
         </a>
       </div>

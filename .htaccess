@@ -1,17 +1,25 @@
-# Set index.html as default landing page (MUST BE FIRST)
-DirectoryIndex index.html
+# Set index.php as the default directory index
+DirectoryIndex index.php index.html
 
 # Enable PHP error reporting (disable in production)
 php_flag display_errors on
 php_value error_reporting E_ALL
 
-# Security settings
-<Files "config.php">
-    Order allow,deny
-    Deny from all
-</Files>
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
 
-<Files "database-setup.sql">
-    Order allow,deny
-    Deny from all
-</Files>
+# Prevent directory browsing
+Options -Indexes
+
+# Enable URL rewriting
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirect index.html to index.php
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+index\.html [NC]
+    RewriteRule ^index\.html$ index.php [R=301,L]
+</IfModule>

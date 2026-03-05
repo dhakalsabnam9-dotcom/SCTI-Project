@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in and is student
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
-    header('Location: ../index.html');
+    header('Location: ../index.php');
     exit();
 }
 

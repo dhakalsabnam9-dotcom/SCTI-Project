@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="assets/css/style.css?v=2">
 </head>
 
 <body>
@@ -29,7 +29,7 @@
   <div class="container header-flex">
 
     <div class="logo">
-      <img src="scti logo.jpeg" alt="SCTI Logo">
+      <img src="assets/images/scti logo.jpeg" alt="SCTI Logo">
     </div>
 
     <div class="menu-toggle" id="menu-toggle">
@@ -73,7 +73,7 @@
     home: `
       <!-- ===== BANNER ===== -->
       <div class="banner">
-        <img src="banner.png" alt="SCTI Banner">
+        <img src="assets/images/banner.png" alt="SCTI Banner">
       </div>
 
       <!-- ===== NOTICE & EVENTS ===== -->
@@ -104,7 +104,7 @@
       <section class="section bg-grey">
         <div class="container campus-flex">
           <div class="campus-img">
-            <img src="work.jpg" alt="Campus Image">
+            <img src="assets/images/work.jpg" alt="Campus Image">
           </div>
           <div class="campus-text">
             <h2>Campus Information</h2>
@@ -138,17 +138,17 @@
           <h2>Meet Our Teachers</h2>
           <div class="teacher-grid">
             <div class="teacher">
-              <img src="tej.png">
+              <img src="assets/images/tej.png">
               <h4>Tej Bikram Thapa</h4>
               <p>Chairman</p>
             </div>
             <div class="teacher">
-              <img src="santosh.png">
+              <img src="assets/images/santosh.png">
               <h4>Santosh Sapkota</h4>
               <p>Administrative</p>
             </div>
             <div class="teacher">
-              <img src="bibek sir.jpg">
+              <img src="assets/images/bibek sir.jpg">
               <h4>Bibek Bhandari</h4>
               <p>Invigilator</p>
             </div>
@@ -315,7 +315,7 @@
 
           <div class="gallery-grid">
             <div class="gallery-item">
-              <img src="img 2.jpg" alt="Workshop">
+              <img src="assets/images/img 2.jpg" alt="Workshop">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-tools"></i>
@@ -325,7 +325,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="img 3.jpg" alt="Lab Practice">
+              <img src="assets/images/img 3.jpg" alt="Lab Practice">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-flask"></i>
@@ -335,7 +335,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="img 4.jpg" alt="Graduation">
+              <img src="assets/images/img 4.jpg" alt="Graduation">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-graduation-cap"></i>
@@ -345,7 +345,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="img5.jpg" alt="Sports Week">
+              <img src="assets/images/img5.jpg" alt="Sports Week">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-trophy"></i>
@@ -355,7 +355,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="work.jpg" alt="Project Exhibition">
+              <img src="assets/images/work.jpg" alt="Project Exhibition">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-project-diagram"></i>
@@ -365,7 +365,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="img1.jpg" alt="Campus Life">
+              <img src="assets/images/img1.jpg" alt="Campus Life">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-university"></i>
@@ -375,7 +375,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="img 2.jpg" alt="Cultural Event">
+              <img src="assets/images/img 2.jpg" alt="Cultural Event">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-music"></i>
@@ -385,7 +385,7 @@
             </div>
 
             <div class="gallery-item">
-              <img src="img 3.jpg" alt="Field Visit">
+              <img src="assets/images/img 3.jpg" alt="Field Visit">
               <div class="gallery-overlay">
                 <div class="gallery-text">
                   <i class="fa fa-map-marked-alt"></i>
@@ -791,7 +791,7 @@
     messageDiv.innerHTML = '<div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Logging in...</div>';
     
     // Send AJAX request
-    fetch('login-simple.php', {
+    fetch('pages/login-simple.php', {
       method: 'POST',
       body: formData
     })
@@ -814,11 +814,11 @@
         const userType = formData.get('userType');
         setTimeout(() => {
           if (userType === 'admin') {
-            window.location.href = 'Admin-Notice-Board.html';
+            window.location.href = 'admin/Admin-Notice-Board.html';
           } else if (userType === 'teacher') {
-            window.location.href = 'teacher-dashboard.php';
+            window.location.href = 'dashboards/teacher-dashboard.php';
           } else if (userType === 'student') {
-            window.location.href = 'student-dashboard.php';
+            window.location.href = 'dashboards/student-dashboard.php';
           }
         }, 1000);
       }
@@ -855,7 +855,7 @@
     messageDiv.innerHTML = '<div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Creating account...</div>';
     
     // Send AJAX request
-    fetch('signup.php', {
+    fetch('pages/signup.php', {
       method: 'POST',
       body: formData
     })

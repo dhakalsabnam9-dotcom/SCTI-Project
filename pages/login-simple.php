@@ -10,19 +10,19 @@ $users = [
         'password' => 'admin123',
         'type' => 'admin',
         'name' => 'Administrator',
-        'redirect' => 'Admin-Notice-Board.html'
+        'redirect' => '../admin/Admin-Notice-Board.html'
     ],
     'teacher' => [
         'password' => 'teacher123',
         'type' => 'teacher',
         'name' => 'Teacher',
-        'redirect' => 'teacher-dashboard.php'
+        'redirect' => '../dashboards/teacher-dashboard.php'
     ],
     'student' => [
         'password' => 'student123',
         'type' => 'student',
         'name' => 'Student',
-        'redirect' => 'student-dashboard.php'
+        'redirect' => '../dashboards/student-dashboard.php'
     ]
 ];
 
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
   
   <style>
     .alert {
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <div class="container header-flex">
 
     <div class="logo">
-      <img src="scti logo.jpeg" alt="SCTI Logo">
+      <img src="../assets/images/scti logo.jpeg" alt="SCTI Logo">
     </div>
 
     <div class="menu-toggle" id="menu-toggle">

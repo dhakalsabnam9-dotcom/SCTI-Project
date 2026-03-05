@@ -116,13 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         // Redirect based on user type
                         switch($userType) {
                             case 'student':
-                                header("Location: student-dashboard.php");
+                                header("Location: ../dashboards/student-dashboard.php");
                                 break;
                             case 'teacher':
-                                header("Location: teacher-dashboard.php");
+                                header("Location: ../dashboards/teacher-dashboard.php");
                                 break;
                             case 'admin':
-                                header("Location: Admin-Notice-Board.html");
+                                header("Location: ../admin/Admin-Notice-Board.html");
                                 break;
                         }
                         exit();
@@ -149,7 +149,7 @@ $conn = null;
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
   
   <style>
     .alert {
@@ -187,7 +187,7 @@ $conn = null;
   <div class="container header-flex">
 
     <div class="logo">
-      <img src="scti logo.jpeg" alt="SCTI Logo">
+      <img src="../assets/images/scti logo.jpeg" alt="SCTI Logo">
     </div>
 
     <div class="menu-toggle" id="menu-toggle">

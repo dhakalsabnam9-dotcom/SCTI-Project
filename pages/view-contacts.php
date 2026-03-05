@@ -16,7 +16,7 @@ $conn = getDBConnection();
 // Fetch all contact messages
 try {
     $stmt = $conn->prepare("
-        SELECT * FROM contact_messages 
+        SELECT * FROM contacts 
         ORDER BY created_at DESC
     ");
     $stmt->execute();

@@ -15,7 +15,7 @@ $response = [
 
 try {
     // Count total contact messages
-    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM contact_messages");
+    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM contacts");
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     

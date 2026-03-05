@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // Insert contact message into database
         $stmt = $conn->prepare("
-            INSERT INTO contact_messages 
+            INSERT INTO contacts 
             (name, email, phone, subject, message, status, ip_address, user_agent) 
             VALUES 
             (:name, :email, :phone, :subject, :message, 'new', :ip_address, :user_agent)

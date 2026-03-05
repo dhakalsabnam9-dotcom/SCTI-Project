@@ -1,5 +1,5 @@
-# Set index.html as default landing page
-DirectoryIndex index.html index.php
+# Set index.html as default landing page (MUST BE FIRST)
+DirectoryIndex index.html
 
 # Enable PHP error reporting (disable in production)
 php_flag display_errors on

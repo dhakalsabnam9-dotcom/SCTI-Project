@@ -6,176 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
-  <style>
-    /* ===== RESET ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    body {
-      line-height: 1.6;
-      background: #f5f5f5;
-      color: #333;
-    }
-
-    /* ===== CONTAINER ===== */
-    .container {
-      width: 90%;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    /* ===== TOP HEADER ===== */   
-.top-header {
-  background: #00264d;
-  color: white;
-  padding: 8px;
-}
-
-
-    /* ===== HEADER ===== */
-    .header {
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .header-flex {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0;
-    }
-
-    /* ===== LOGO ===== */
-    .logo img {
-      width: 80px;
-    }
-
-    /* ===== MENU ===== */
-    .menu ul {
-      list-style: none;
-      display: flex;
-    }
-
-    .menu ul li {
-      margin-left: 25px;
-    }
-
-    .menu ul li a {
-      text-decoration: none;
-      color: #333;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    .menu ul li a:hover {
-      color: #8b0000;
-    }
-
-    /* ===== MENU TOGGLE ===== */
-    .menu-toggle {
-      display: none;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    /* ===== SECTION ===== */
-    .section {
-      padding: 40px 0;
-    }
-
-    .section h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #8b0000;
-    }
-
-    /* ===== NOTICE BOARD ===== */
-    .notice-list {
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .notice-list ul {
-      list-style: none;
-    }
-
-    .notice-list ul li {
-      padding: 12px 0;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .notice-list ul li:last-child {
-      border-bottom: none;
-    }
-
-    /* ===== FOOTER ===== */
-    .footer {
-      background: #8b0000;
-      color: #fff;
-      text-align: center;
-      padding: 15px 0;
-      margin-top: 40px;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .menu ul {
-        flex-direction: column;
-        background: #ffffff;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        width: 200px;
-        display: none;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      }
-
-      .menu ul li {
-        margin: 0;
-        border-bottom: 1px solid #eee;
-      }
-
-      .menu ul li a {
-        display: block;
-        padding: 12px;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      .menu.show ul {
-        display: block;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .logo img {
-        width: 65px;
-      }
-
-      .section h2 {
-        font-size: 22px;
-      }
-
-      .notice-list {
-        padding: 18px;
-      }
-
-      .top-header {
-        font-size: 12px;
-      }
-    }
-  </style>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -187,7 +21,7 @@
   </marquee>
 </div>
 
-<!-- ===== HEADER ===== -->
+<!-- ===== HEADER & MENU ===== -->
 <header class="header">
   <div class="container header-flex">
 
@@ -202,31 +36,90 @@
     <nav class="menu" id="menu">
       <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="About Us.html">About Us</a></li>
+        <li><a href="Programs.html">Programs</a></li> 
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a href="Notice Board.html">Notice Board</a></li>
         <li><a href="Contact Us.html">Contact Us</a></li>
+        <li><a href="login-simple.php">Login</a></li>
+        <li><a href="signup.php">Sign Up</a></li>
       </ul>
     </nav>
 
   </div>
 </header>
 
-<!-- ===== NOTICE BOARD ===== -->
+<!-- ===== NOTICE BOARD SECTION ===== -->
 <section class="section">
   <div class="container">
-    <h2>Notice Board</h2>
+    <h2 style="text-align: center; margin-bottom: 30px; color: #004080;">
+      <i class="fa fa-bullhorn"></i> Notice Board
+    </h2>
 
-    <div class="notice-list">
-      <ul>
-        <li><b>Admission Open:</b> Applications for 2025/26 academic year are now open.</li>
-        <li><b>Orientation Program:</b> Scheduled on Nov 10, 2025 for all new students.</li>
-        <li><b>Classes Begin:</b> Nov 12, 2025. Please check your timetable online.</li>
-        <li><b>Sports Week:</b> Dec 20–25, 2025. Registration for events is open.</li>
-        <li><b>AI Workshop:</b> Sept 14, 2025 – Limited seats, register soon.</li>
-        <li><b>Project Exhibition:</b> June 10, 2025 – Showcasing student projects.</li>
-      </ul>
+    <div class="notice-grid">
+      
+      <!-- Notice 1 -->
+      <div class="notice-card urgent">
+        <div class="notice-badge">Urgent</div>
+        <div class="notice-date">
+          <i class="fa fa-calendar"></i> 2025/26
+        </div>
+        <h3>Admission Open</h3>
+        <p>Applications for 2025/26 academic year are now open. Submit your forms before the deadline.</p>
+        <a href="#" class="notice-link">Read More <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Notice 2 -->
+      <div class="notice-card">
+        <div class="notice-date">
+          <i class="fa fa-calendar"></i> Nov 10, 2025
+        </div>
+        <h3>Orientation Program</h3>
+        <p>Scheduled on Nov 10, 2025 for all new students. Attendance is mandatory.</p>
+        <a href="#" class="notice-link">Read More <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Notice 3 -->
+      <div class="notice-card">
+        <div class="notice-date">
+          <i class="fa fa-calendar"></i> Nov 12, 2025
+        </div>
+        <h3>Classes Begin</h3>
+        <p>Nov 12, 2025. Please check your timetable online and prepare accordingly.</p>
+        <a href="#" class="notice-link">Read More <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Notice 4 -->
+      <div class="notice-card">
+        <div class="notice-date">
+          <i class="fa fa-calendar"></i> Dec 20–25, 2025
+        </div>
+        <h3>Sports Week</h3>
+        <p>Dec 20–25, 2025. Registration for events is open. Join us for exciting competitions!</p>
+        <a href="#" class="notice-link">Read More <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Notice 5 -->
+      <div class="notice-card">
+        <div class="notice-date">
+          <i class="fa fa-calendar"></i> Sept 14, 2025
+        </div>
+        <h3>AI Workshop</h3>
+        <p>Sept 14, 2025 – Limited seats available. Register soon to secure your spot.</p>
+        <a href="#" class="notice-link">Read More <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Notice 6 -->
+      <div class="notice-card">
+        <div class="notice-date">
+          <i class="fa fa-calendar"></i> June 10, 2025
+        </div>
+        <h3>Project Exhibition</h3>
+        <p>June 10, 2025 – Showcasing student projects. All are welcome to attend.</p>
+        <a href="#" class="notice-link">Read More <i class="fa fa-arrow-right"></i></a>
+      </div>
+
     </div>
+
   </div>
 </section>
 

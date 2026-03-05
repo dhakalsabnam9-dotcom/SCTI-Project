@@ -1,337 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCTI - Contact </title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --form-blue: #3498db;
-            --form-bg: #f4f4f4;
-            --text-dark: #333;
-            --border-color: #ccc;
-            --error-color: #e74c3c;
-            --success-color: #2ecc71;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-            line-height: 1.6;
-            background-color: var(--form-bg);
-
-        }
-
-        .contact-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .contact-container h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-
-        .contact-container p {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            /* Ensures padding doesn't affect total width */
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--form-blue);
-        }
-
-        .validation-message {
-            color: var(--error-color);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
-            /* Hidden by default */
-        }
-
-        .form-group.success input {
-            border-color: var(--success-color);
-        }
-
-        .form-group.error input {
-            border-color: var(--error-color);
-        }
-
-        .submit-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background-color: #2c3e50;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background-color: #3498db;
-        }
-
-        @media (max-width: 600px) {
-            .contact-container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-        }
-        
-    /* ===== TOP HEADER ===== */
-.top-header {
-  background: #00264d;
-  color: white;
-  padding: 8px;
-}
-  /* ===== HEADER ===== */
-    .header {
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    .header-flex {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0;
-    }
-
-    /* ===== LOGO ===== */
-    .logo img {
-      width: 80px;
-    }
-    /* ===== MENU ===== */
-    .menu ul {
-      list-style: none;
-      display: flex;
-    }
-
-    .menu ul li {
-      margin-left: 25px;
-    }
-
-    .menu ul li a {
-      text-decoration: none;
-      color: #333;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    .menu ul li a:hover {
-      color: #8b0000;
-    }
-.menu-toggle {
-  display: none;
-  font-size: 26px;
-  color: white;
-  cursor: pointer;
-}
-    </style>
+    <title>Contact Us - SCTI</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="top-header">
-        <marquee>
-            Examination Notification | Genius 2025 | Enrollment Open 2025–26
-        </marquee>
+<!-- ===== TOP HEADER ===== -->
+<div class="top-header">
+  <marquee>
+    Examination Notification | Genius 2025 | Enrollment Open 2025–26
+  </marquee>
+</div>
+
+<!-- ===== HEADER & MENU ===== -->
+<header class="header">
+  <div class="container header-flex">
+
+    <div class="logo">
+      <img src="scti logo.jpeg" alt="SCTI Logo">
     </div>
 
-    <!-- ===== HEADER & MENU ===== -->
-    <header class="header">
-        <div class="container header-flex">
+    <div class="menu-toggle" id="menu-toggle">
+      <i class="fa fa-bars"></i>
+    </div>
 
-            <div class="logo">
-                <img src="scti logo.jpeg" alt="SCTI Logo">
-            </div>
+    <nav class="menu" id="menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="Programs.html">Programs</a></li> 
+        <li><a href="Gallery.html">Gallery</a></li>
+        <li><a href="Notice Board.html">Notice Board</a></li>
+        <li><a href="Contact Us.html">Contact Us</a></li>
+        <li><a href="login-simple.php">Login</a></li>
+        <li><a href="signup.php">Sign Up</a></li>
+      </ul>
+    </nav>
 
-            <div class="menu-toggle" id="menu-toggle">
-                <i class="fa fa-bars"></i>
-            </div>
+  </div>
+</header>
 
-            <nav class="menu" id="menu">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="Programs.html">Programs</a></li>
-                    <li><a href="Gallery.html">Gallery</a></li>
-                    <li><a href="Notice Board.html">Notice Board</a></li>
-                    <li><a href="Contact Us.html">Contact Us</a></li>
-                </ul>
-            </nav>
+<!-- ===== CONTACT SECTION ===== -->
+<section class="section">
+  <div class="container">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #004080;">
+      <i class="fa fa-envelope"></i> Contact Us
+    </h2>
 
+    <div class="contact-wrapper">
+      
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <h3>Get In Touch</h3>
+        <p>We would love to hear from you! Reach out to us for any inquiries.</p>
+
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fa fa-map-marker-alt"></i>
+          </div>
+          <div class="contact-details">
+            <h4>Address</h4>
+            <p>Kamalamai Municipality, Sindhuli<br>Province 3, Nepal</p>
+          </div>
         </div>
-    </header>
 
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fa fa-phone"></i>
+          </div>
+          <div class="contact-details">
+            <h4>Phone</h4>
+            <p>+977-9841234567<br>+977-9841234568</p>
+          </div>
+        </div>
 
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fa fa-envelope"></i>
+          </div>
+          <div class="contact-details">
+            <h4>Email</h4>
+            <p>info@scti.edu.np<br>admin@scti.edu.np</p>
+          </div>
+        </div>
 
-    <main class="contact-container">
-        <h1>Contact Us</h1>
-        <p>We would love to hear from you! Please fill out the form below to get in touch with our team.</p>
-        <form id="contact-form">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-                <div class="validation-message" id="name-error">Please enter a valid name.</div>
-            </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fa fa-clock"></i>
+          </div>
+          <div class="contact-details">
+            <h4>Office Hours</h4>
+            <p>Sunday - Friday: 10:00 AM - 5:00 PM<br>Saturday: Closed</p>
+          </div>
+        </div>
 
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                <div class="validation-message" id="email-error">Please enter a valid email address.</div>
-            </div>
+      </div>
 
-            <div class="form-group">
-                <label for="number">Phone Number:</label>
-                <input type="tel" id="number" name="number" required>
-                <div class="validation-message" id="number-error">Please enter a valid phone number.</div>
-            </div>
+      <!-- Contact Form -->
+      <div class="contact-form-wrapper">
+        <h3>Send Us a Message</h3>
+        <form id="contactForm" class="contact-form">
+          
+          <div class="form-group">
+            <label for="name">
+              <i class="fa fa-user"></i> Full Name
+            </label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              placeholder="Enter your full name"
+              required
+            >
+            <span class="error-message" id="nameError"></span>
+          </div>
 
-            <div class="form-group">
-                <label for="message">Your Message:</label>
-                <textarea id="message" name="message" rows="5" required></textarea>
-                <div class="validation-message" id="message-error">Please enter your message.</div>
-            </div>
+          <div class="form-group">
+            <label for="email">
+              <i class="fa fa-envelope"></i> Email Address
+            </label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="Enter your email"
+              required
+            >
+            <span class="error-message" id="emailError"></span>
+          </div>
 
-            <button type="submit" class="submit-btn">Send Message</button>
+          <div class="form-group">
+            <label for="phone">
+              <i class="fa fa-phone"></i> Phone Number
+            </label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              placeholder="Enter your phone number"
+              required
+            >
+            <span class="error-message" id="phoneError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">
+              <i class="fa fa-tag"></i> Subject
+            </label>
+            <input 
+              type="text" 
+              id="subject" 
+              name="subject" 
+              placeholder="Enter subject"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="message">
+              <i class="fa fa-comment"></i> Message
+            </label>
+            <textarea 
+              id="message" 
+              name="message" 
+              rows="5" 
+              placeholder="Enter your message"
+              required
+            ></textarea>
+            <span class="error-message" id="messageError"></span>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <i class="fa fa-paper-plane"></i> Send Message
+          </button>
+
         </form>
+      </div>
 
-    </main>
+    </div>
 
+  </div>
+</section>
 
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p>© 2025 Sindhuli Community Technical Institute (SCTI)</p>
+</footer>
 
-    <script>
-        // Fetches and inserts the navbar HTML
-        fetch('/html/navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('navbar-container').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading navbar:', error));
+<!-- ===== JS ===== -->
+<script>
+  document.getElementById("menu-toggle").onclick = function () {
+    document.getElementById("menu").classList.toggle("show");
+  };
 
-        // Fetches and inserts the footer HTML
-        fetch('/html/footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer-container').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading footer:', error));
+  // Contact Form Validation
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+    
+    let isValid = true;
+    
+    // Name validation
+    const name = document.getElementById('name').value.trim();
+    if (name === '') {
+      document.getElementById('nameError').textContent = 'Name is required';
+      isValid = false;
+    }
+    
+    // Email validation
+    const email = document.getElementById('email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      document.getElementById('emailError').textContent = 'Please enter a valid email';
+      isValid = false;
+    }
+    
+    // Phone validation
+    const phone = document.getElementById('phone').value.trim();
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone.replace(/[-\s]/g, ''))) {
+      document.getElementById('phoneError').textContent = 'Please enter a valid 10-digit phone number';
+      isValid = false;
+    }
+    
+    // Message validation
+    const message = document.getElementById('message').value.trim();
+    if (message === '') {
+      document.getElementById('messageError').textContent = 'Message is required';
+      isValid = false;
+    }
+    
+    if (isValid) {
+      alert('Thank you for contacting us! We will get back to you soon.');
+      this.reset();
+    }
+  });
+</script>
 
-        // Form Validation Logic
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('contact-form');
-            const nameInput = document.getElementById('name');
-            const emailInput = document.getElementById('email');
-            const numberInput = document.getElementById('number');
-            const messageInput = document.getElementById('message');
-
-            const validateEmail = (email) => {
-                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return re.test(String(email).toLowerCase());
-            };
-
-            const validateNumber = (number) => {
-                // Allows for numbers with optional dashes, spaces, or parentheses
-                const re = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-                return re.test(String(number));
-            };
-
-            const validateForm = () => {
-                let isValid = true;
-
-                // Name validation
-                if (nameInput.value.trim() === '') {
-                    nameInput.parentElement.classList.add('error');
-                    document.getElementById('name-error').style.display = 'block';
-                    isValid = false;
-                } else {
-                    nameInput.parentElement.classList.remove('error');
-                    document.getElementById('name-error').style.display = 'none';
-                }
-
-                // Email validation
-                if (!validateEmail(emailInput.value.trim())) {
-                    emailInput.parentElement.classList.add('error');
-                    document.getElementById('email-error').style.display = 'block';
-                    isValid = false;
-                } else {
-                    emailInput.parentElement.classList.remove('error');
-                    document.getElementById('email-error').style.display = 'none';
-                }
-
-                // Phone number validation
-                if (!validateNumber(numberInput.value.trim())) {
-                    numberInput.parentElement.classList.add('error');
-                    document.getElementById('number-error').style.display = 'block';
-                    isValid = false;
-                } else {
-                    numberInput.parentElement.classList.remove('error');
-                    document.getElementById('number-error').style.display = 'none';
-                }
-
-                // Message validation
-                if (messageInput.value.trim() === '') {
-                    messageInput.parentElement.classList.add('error');
-                    document.getElementById('message-error').style.display = 'block';
-                    isValid = false;
-                } else {
-                    messageInput.parentElement.classList.remove('error');
-                    document.getElementById('message-error').style.display = 'none';
-                }
-
-                return isValid;
-            };
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault(); // Prevent default form submission
-                if (validateForm()) {
-                    // Form is valid, you can now send the data to a server
-                    alert('Form submitted successfully!');
-                    form.reset(); // Clear the form
-                } else {
-                    alert('Please correct the errors in the form.');
-                }
-            });
-        });
-    </script>
 </body>
-
 </html>

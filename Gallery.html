@@ -3,250 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - SCTI Gallery</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        /* ===== Reset & Common Styles ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { font-family: Arial, sans-serif; font-size: 14px; color: #333; }
-        .container { width: 1100px; margin: 0 auto; }
-        .width-100 { width: 100%; }
-        .width-25 { width: 25%; float: left; }
-        .width-50 { width: 50%; float: left; }
-        .width-75 { width: 75%; float: left; }
-
-        /* ===== Header Top ===== */
-        .header { background: #68bb59; color: #fff; padding: 5px 0; }
-        .header .container { display: flex; flex-wrap: wrap; align-items: center; }
-        .header ul { list-style: none; display: flex; justify-content: flex-end; }
-        .header ul li { margin-left: 15px; }
-        .header a { color: #fff; text-decoration: none; font-size: 13px; }
-        .notification { display: block; color: #fff; font-weight: bold; }
-
-        /* ===== Logo & Menu ===== */
-        .logo img { width: 100%; max-width: 180px; }
-        .head-menu ul { list-style: none; display: flex; justify-content: flex-end; }
-        .head-menu ul li { margin-left: 20px; }
-        .head-menu ul li a { text-decoration: none; color: #333; font-weight: bold; }
-        .menu-toggle { display: none; font-size: 24px; cursor: pointer; }  
-        .logo img {
-  width: 120px;
-}
-/* ===== LOGO CIRCLE FIX ===== */
-.logo img {
-    width: 80px;              /* adjust size if needed */
-    height: 80px;
-    border-radius: 50%;       /* makes it circular */
-    object-fit: cover;        /* prevents distortion */
-    border: 2px solid #fff;   /* optional border */
-}
-
-        /* ===== Gallery Section ===== */
-        .main-section { padding: 50px 0; background: #f9f9f9; }
-        .heading-text { text-align: center; font-size: 28px; margin-bottom: 10px; }
-        .heading-border { display: block; width: 60px; height: 3px; background: #68bb59; margin: 0 auto 30px auto; }
-        .gallery { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
-        .gallery .width-25 { width: calc(25% - 15px); overflow: hidden; }
-        .gallery .width-25 img { width: 100%; height: 200px; object-fit: cover; display: block; border-radius: 5px; }
-
-        /* ===== Responsive Styles ===== */
-        @media (max-width: 1024px) { .container { width: 90%; } }
-
-        @media (max-width: 768px) {
-            .width-25, .width-50, .width-75 { width: 100%; float: none; }
-            .gallery .width-25 { width: 48%; }
-            .gallery .width-25 img { height: 180px; }
-
-            /* Hamburger menu */
-            .menu-toggle { display: block; color: #333; float: right; margin-top: 10px; }
-            .head-menu ul { display: none; flex-direction: column; width: 100%; background: #f1f1f1; margin-top: 10px; border-radius: 5px; }
-            .head-menu ul li { margin: 10px 0; text-align: center; }
-            .head-menu ul.active { display: flex; }
-        }
-
-        @media (max-width: 480px) {
-            .gallery .width-25 { width: 100%; }
-            .gallery .width-25 img { height: 150px; }
-            .heading-text { font-size: 22px; }
-            .notification { font-size: 12px; }
-        }
-
-
-        /* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-.container {
-  width: 90%;
-  margin: auto;
-}
-
-.section {
-  padding: 40px 0;
-}
-
-.bg-grey {
-  background: #f2f2f2;
-}
-
-/* ===== TOP HEADER ===== */
-.top-header {
-  background: #00264d;
-  color: white;
-  padding: 8px;
-}
-
-/* ===== HEADER ===== */
-.header {
-  background: #004080;
-}
-
-.header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo img {
-  width: 120px;
-}
-/* ===== LOGO CIRCLE FIX ===== */
-.logo img {
-    width: 80px;              /* adjust size if needed */
-    height: 80px;
-    border-radius: 50%;       /* makes it circular */
-    object-fit: cover;        /* prevents distortion */
-    border: 2px solid #fff;   /* optional border */
-}
-
-
-.menu ul {
-  list-style: none;
-  display: flex;
-}
-
-.menu ul li {
-  margin-left: 20px;
-}
-
-.menu ul li a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.menu-toggle {
-  display: none;
-  font-size: 26px;
-  color: white;
-  cursor: pointer;
-}
-   
-   /* ===== GALLERY SECTION ===== */
-.gallery {
-  padding: 60px 20px;
-  background: #f8f9fa;
-  text-align: center; /* gallery section भित्र सबै center */
-}
-
-/* ===== CENTER H2 ===== */
-.gallery h2 {
-  font-size: 32px;
-  margin-bottom: 40px; /* images माथि space */
-  color: #222;
-  display: inline-block; /* underline/design संग सजिलो */
-  position: relative;
-  text-align: center; /* heading text center */
-}
-
-/* Optional underline design */
-.gallery h2::after {
-  content: "";
-  width: 80px;
-  height: 4px;
-  background: #ff6b00;
-  display: block;
-  margin: 10px auto 0; /* automatic center */
-  border-radius: 5px;
-}
-
-/* ===== GRID LAYOUT ===== */
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto; /* gallery center */
-}
-
-/* ===== GALLERY ITEM ===== */
-.gallery-item {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-}
-
-.gallery-item img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.gallery-item:hover img {
-  transform: scale(1.1);
-}
-
-/* ===== OVERLAY ===== */
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: 20px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.gallery-item:hover .overlay {
-  opacity: 1;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .gallery h2 {
-    font-size: 26px;
-    margin-bottom: 30px;
-  }
-
-  .gallery-item img {
-    height: 200px;
-  }
-}
-
-@media (max-width: 480px) {
-  .gallery h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-
-  .gallery-item img {
-    height: 170px;
-  }
-}
-
-   
-   </style>
+    <title>Gallery - SCTI</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <!-- ===== TOP HEADER ===== -->
@@ -271,63 +36,123 @@
     <nav class="menu" id="menu">
       <ul>
         <li><a href="index.html">Home</a></li>
-            <li><a href="Programs.html">Programs</a></li> 
+        <li><a href="Programs.html">Programs</a></li> 
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a href="Notice Board.html">Notice Board</a></li>
         <li><a href="Contact Us.html">Contact Us</a></li>
+        <li><a href="login-simple.php">Login</a></li>
+        <li><a href="signup.php">Sign Up</a></li>
       </ul>
     </nav>
 
   </div>
 </header>
 
-    <!-- Gallery Section -->
-  <section class="gallery">
-  <h2>Our Gallery</h2>
+<!-- ===== GALLERY SECTION ===== -->
+<section class="section">
+  <div class="container">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #004080;">
+      <i class="fa fa-images"></i> Photo Gallery
+    </h2>
 
-  <div class="gallery-grid">
-    <div class="gallery-item">
-      <img src="img 2.jpg" alt="Gallery Image">
-      <div class="overlay">Workshop</div>
+    <div class="gallery-grid">
+      
+      <div class="gallery-item">
+        <img src="img 2.jpg" alt="Workshop">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-tools"></i>
+            <h4>Workshop</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="img 3.jpg" alt="Lab Practice">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-flask"></i>
+            <h4>Lab Practice</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="img 4.jpg" alt="Graduation">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-graduation-cap"></i>
+            <h4>Graduation</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="img5.jpg" alt="Sports Week">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-trophy"></i>
+            <h4>Sports Week</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="work.jpg" alt="Project Exhibition">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-project-diagram"></i>
+            <h4>Project Exhibition</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="img1.jpg" alt="Campus Life">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-university"></i>
+            <h4>Campus Life</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="img 2.jpg" alt="Cultural Event">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-music"></i>
+            <h4>Cultural Event</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="img 3.jpg" alt="Field Visit">
+        <div class="gallery-overlay">
+          <div class="gallery-text">
+            <i class="fa fa-map-marked-alt"></i>
+            <h4>Field Visit</h4>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="gallery-item">
-      <img src="img 3.jpg" alt="Gallery Image">
-      <div class="overlay">Lab Practice</div>
-    </div>
-
-    <div class="gallery-item">
-      <img src="img 4.jpg" alt="Gallery Image">
-      <div class="overlay">Graduation</div>
-    </div>
-
-    <div class="gallery-item">
-      <img src="img5.jpg" alt="Gallery Image">
-      <div class="overlay">Sports Week</div>
-    </div>
-
-    <div class="gallery-item">
-      <img src="work.jpg" alt="Gallery Image">
-      <div class="overlay">Project Exhibition</div>
-    </div>
-
-    <div class="gallery-item">
-      <img src="img 2.jpg" alt="Gallery Image">
-      <div class="overlay">Campus Life</div>
-    </div>
   </div>
 </section>
 
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p>© 2025 Sindhuli Community Technical Institute (SCTI)</p>
+</footer>
 
-    <!-- ===== JavaScript for Hamburger Menu ===== -->
-    <script>
-        const menuToggle = document.querySelector('.menu-toggle');
-        const menu = document.querySelector('.head-menu ul');
-
-        menuToggle.addEventListener('click', () => {
-            menu.classList.toggle('active');
-        });
-    </script>
+<!-- ===== JS ===== -->
+<script>
+  document.getElementById("menu-toggle").onclick = function () {
+    document.getElementById("menu").classList.toggle("show");
+  };
+</script>
 
 </body>
 </html>

@@ -58,7 +58,7 @@ function handleLoginSubmit(e) {
       const userType = formData.get('userType');
       setTimeout(() => {
         if (userType === 'admin') {
-          window.location.href = 'admin/Admin-Notice-Board.html';
+          window.location.href = 'dashboards/admin-dashboard.php';
         } else if (userType === 'teacher') {
           window.location.href = 'dashboards/teacher-dashboard.php';
         } else if (userType === 'student') {
@@ -122,7 +122,7 @@ function handleSignupSubmit(e) {
       const userType = formData.get('userType');
       setTimeout(() => {
         if (userType === 'admin') {
-          window.location.href = 'admin/Admin-Notice-Board.html';
+          window.location.href = 'dashboards/admin-dashboard.php';
         } else if (userType === 'teacher') {
           window.location.href = 'dashboards/teacher-dashboard.php';
         } else if (userType === 'student') {

@@ -1473,3 +1473,26 @@ body {
     align-items: flex-start;
   }
 }
+
+
+/* ===== ACTIVE MENU ITEM ===== */
+.menu ul li a.active {
+  color: #ffd700;
+  border-bottom: 3px solid #ffd700;
+}
+
+/* ===== SMOOTH CONTENT TRANSITIONS ===== */
+#content-area {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

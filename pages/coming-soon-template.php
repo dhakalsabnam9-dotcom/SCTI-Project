@@ -10,6 +10,66 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'admin') {
 // Get page title from URL parameter
 $pageTitle = isset($_GET['page']) ? htmlspecialchars($_GET['page']) : 'Feature';
 $pageIcon = isset($_GET['icon']) ? htmlspecialchars($_GET['icon']) : 'fa-cog';
+
+// Define features for each page
+$features = [
+    'Manage Students' => [
+        'Add new student registrations',
+        'View and edit student profiles',
+        'Track student attendance',
+        'Manage student grades and results',
+        'Generate student ID cards',
+        'Export student data to Excel/PDF'
+    ],
+    'Manage Teachers' => [
+        'Add and manage teacher profiles',
+        'Assign subjects and classes',
+        'Track teacher attendance',
+        'Manage salary and payroll',
+        'View teacher performance reports',
+        'Schedule management'
+    ],
+    'Manage Programs' => [
+        'Add new courses and programs',
+        'Update course curriculum',
+        'Manage course fees and duration',
+        'Assign teachers to courses',
+        'Track program enrollment',
+        'Generate program reports'
+    ],
+    'Manage Notices' => [
+        'Create and publish notices',
+        'Schedule notice publication',
+        'Categorize notices (Urgent, Event, Exam)',
+        'Send email notifications',
+        'Archive old notices',
+        'View notice analytics'
+    ],
+    'View Reports' => [
+        'Student enrollment reports',
+        'Financial reports and analytics',
+        'Attendance reports',
+        'Performance analytics',
+        'Custom report builder',
+        'Export reports in multiple formats'
+    ],
+    'Settings' => [
+        'System configuration',
+        'User role management',
+        'Email and SMS settings',
+        'Backup and restore database',
+        'Theme customization',
+        'Security settings'
+    ]
+];
+
+$currentFeatures = isset($features[$pageTitle]) ? $features[$pageTitle] : [
+    'Full CRUD operations',
+    'Advanced search and filtering',
+    'Data export capabilities',
+    'Real-time updates',
+    'Detailed analytics'
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -204,12 +264,9 @@ $pageIcon = isset($_GET['icon']) ? htmlspecialchars($_GET['icon']) : 'fa-cog';
   <div class="feature-list">
     <h3>Planned Features:</h3>
     <ul>
-      <li>Full CRUD operations (Create, Read, Update, Delete)</li>
-      <li>Advanced search and filtering</li>
-      <li>Data export (Excel, PDF)</li>
-      <li>Bulk operations</li>
-      <li>Real-time updates</li>
-      <li>Detailed analytics and reports</li>
+      <?php foreach ($currentFeatures as $feature): ?>
+        <li><?php echo htmlspecialchars($feature); ?></li>
+      <?php endforeach; ?>
     </ul>
   </div>
   

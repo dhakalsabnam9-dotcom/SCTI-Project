@@ -237,7 +237,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 
   <!-- Statistics Cards -->
   <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-students.php'">
       <div class="stat-icon blue">
         <i class="fa fa-users"></i>
       </div>
@@ -247,7 +247,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-teachers.php'">
       <div class="stat-icon green">
         <i class="fa fa-chalkboard-teacher"></i>
       </div>
@@ -257,7 +257,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-programs.php'">
       <div class="stat-icon orange">
         <i class="fa fa-book"></i>
       </div>
@@ -267,7 +267,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-notices.php'">
       <div class="stat-icon purple">
         <i class="fa fa-bullhorn"></i>
       </div>
@@ -296,27 +296,27 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <i class="fa fa-envelope"></i>
         <span>View Contact Messages</span>
       </a>
-      <a href="../admin/Admin-Notice-Board.html" class="action-btn">
+      <a href="../pages/manage-notices.php" class="action-btn">
         <i class="fa fa-bullhorn"></i>
         <span>Manage Notices</span>
       </a>
-      <a href="#" class="action-btn" onclick="alert('Student management coming soon!'); return false;">
+      <a href="../pages/manage-students.php" class="action-btn">
         <i class="fa fa-user-graduate"></i>
         <span>Manage Students</span>
       </a>
-      <a href="#" class="action-btn" onclick="alert('Teacher management coming soon!'); return false;">
+      <a href="../pages/manage-teachers.php" class="action-btn">
         <i class="fa fa-chalkboard-teacher"></i>
         <span>Manage Teachers</span>
       </a>
-      <a href="#" class="action-btn" onclick="alert('Program management coming soon!'); return false;">
+      <a href="../pages/manage-programs.php" class="action-btn">
         <i class="fa fa-graduation-cap"></i>
         <span>Manage Programs</span>
       </a>
-      <a href="#" class="action-btn" onclick="alert('Reports coming soon!'); return false;">
+      <a href="../pages/view-reports.php" class="action-btn">
         <i class="fa fa-chart-bar"></i>
         <span>View Reports</span>
       </a>
-      <a href="#" class="action-btn" onclick="alert('Settings coming soon!'); return false;">
+      <a href="../pages/settings.php" class="action-btn">
         <i class="fa fa-cog"></i>
         <span>Settings</span>
       </a>

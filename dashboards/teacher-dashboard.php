@@ -49,9 +49,33 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       background: white; padding: 25px; border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       display: flex; align-items: center; gap: 20px;
-      transition: transform 0.3s;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(40,167,69,0.1), transparent);
+      transition: left 0.5s;
+    }
+    .stat-card:hover::before {
+      left: 100%;
+    }
+    .stat-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 8px 25px rgba(40,167,69,0.3);
+      border: 2px solid #28a745;
+    }
+    .stat-card:active {
+      transform: translateY(-2px) scale(0.98);
+      box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+    }
     
     .stat-icon {
       width: 60px; height: 60px; border-radius: 10px;
@@ -101,9 +125,47 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       text-decoration: none; text-align: center;
       transition: all 0.3s; display: flex;
       flex-direction: column; align-items: center; gap: 10px;
+      position: relative;
+      overflow: hidden;
     }
-    .quick-link:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(40,167,69,0.3); }
-    .quick-link i { font-size: 24px; }
+    .quick-link::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .quick-link:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    .quick-link:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 8px 20px rgba(40,167,69,0.4);
+      background: linear-gradient(135deg, #20c997, #28a745);
+    }
+    .quick-link:active {
+      transform: translateY(-2px) scale(0.95);
+      box-shadow: 0 4px 15px rgba(40,167,69,0.5);
+    }
+    .quick-link i { 
+      font-size: 24px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s;
+    }
+    .quick-link:hover i {
+      transform: scale(1.2) rotate(5deg);
+    }
+    .quick-link span {
+      position: relative;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
@@ -128,7 +190,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-students.php'">
       <div class="stat-icon green"><i class="fa fa-users"></i></div>
       <div class="stat-info">
         <h3>120</h3>
@@ -136,7 +198,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-classes.php'">
       <div class="stat-icon blue"><i class="fa fa-book"></i></div>
       <div class="stat-info">
         <h3>5</h3>
@@ -144,7 +206,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-assignments.php'">
       <div class="stat-icon orange"><i class="fa fa-file-alt"></i></div>
       <div class="stat-info">
         <h3>12</h3>
@@ -152,7 +214,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-schedule.php'">
       <div class="stat-icon purple"><i class="fa fa-calendar"></i></div>
       <div class="stat-info">
         <h3>4</h3>
@@ -222,27 +284,27 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
   <div class="card">
     <h2><i class="fa fa-bolt"></i> Quick Actions</h2>
     <div class="quick-links">
-      <a href="#" class="quick-link" onclick="alert('Attendance coming soon!'); return false;">
+      <a href="../pages/teacher-attendance.php" class="quick-link">
         <i class="fa fa-calendar-check"></i>
         <span>Mark Attendance</span>
       </a>
-      <a href="#" class="quick-link" onclick="alert('Grades coming soon!'); return false;">
+      <a href="../pages/teacher-grades.php" class="quick-link">
         <i class="fa fa-chart-line"></i>
         <span>Enter Grades</span>
       </a>
-      <a href="#" class="quick-link" onclick="alert('Assignments coming soon!'); return false;">
+      <a href="../pages/teacher-assignments.php" class="quick-link">
         <i class="fa fa-file-alt"></i>
         <span>Assignments</span>
       </a>
-      <a href="#" class="quick-link" onclick="alert('Students coming soon!'); return false;">
+      <a href="../pages/teacher-students.php" class="quick-link">
         <i class="fa fa-users"></i>
         <span>View Students</span>
       </a>
-      <a href="#" class="quick-link" onclick="alert('Materials coming soon!'); return false;">
+      <a href="../pages/teacher-materials.php" class="quick-link">
         <i class="fa fa-book"></i>
         <span>Course Materials</span>
       </a>
-      <a href="#" class="quick-link" onclick="alert('Profile coming soon!'); return false;">
+      <a href="../pages/teacher-profile.php" class="quick-link">
         <i class="fa fa-user"></i>
         <span>Profile</span>
       </a>

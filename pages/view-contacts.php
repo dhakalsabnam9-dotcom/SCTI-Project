@@ -246,7 +246,7 @@ $conn = null;
     <h1><i class="fa fa-envelope"></i> Contact Messages</h1>
     <div>
       <a href="../dashboards/admin-dashboard.php"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
-      <a href="logout.php" style="margin-left: 10px; background: #dc3545;"><i class="fa fa-sign-out"></i> Logout</a>
+      <a href="/scti-school/includes/logout.php" style="margin-left: 10px; background: #dc3545;"><i class="fa fa-sign-out"></i> Logout</a>
     </div>
   </div>
 </div>

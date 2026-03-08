@@ -1,15 +1,45 @@
 <?php
 session_start();
 
-// Check if user is logged in and is admin
-if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'admin') {
+// Check if user is logged in
+if (!isset($_SESSION['logged_in'])) {
     header("Location: login-simple.php");
     exit();
 }
 
+$userType = $_SESSION['user_type'];
+$dashboardUrl = ($userType === 'admin') ? '../dashboards/admin-dashboard.php' : 
+                (($userType === 'student') ? '../dashboards/student-dashboard.php' : '../dashboards/teacher-dashboard.php');
+
 // Get page title from URL parameter
-$pageTitle = isset($_GET['page']) ? htmlspecialchars($_GET['page']) : 'Feature';
+$page = isset($_GET['page']) ? strtolower($_GET['page']) : 'feature';
 $pageIcon = isset($_GET['icon']) ? htmlspecialchars($_GET['icon']) : 'fa-cog';
+
+// Map page codes to display titles
+$pageTitles = [
+    'students' => 'Manage Students',
+    'teachers' => 'Manage Teachers',
+    'programs' => 'Manage Programs',
+    'notices' => 'Manage Notices',
+    'reports' => 'View Reports',
+    'settings' => 'Settings',
+    'courses' => 'My Courses',
+    'attendance' => 'My Attendance',
+    'grades' => 'My Grades & GPA',
+    'assignments' => 'My Assignments',
+    'timetable' => 'My Timetable',
+    'library' => 'Library Portal',
+    'profile' => 'My Profile',
+    'classes' => 'My Classes',
+    'schedule' => 'My Schedule',
+    'attendance-teacher' => 'Mark Attendance',
+    'grades-teacher' => 'Enter Grades',
+    'assignments-teacher' => 'Manage Assignments',
+    'materials' => 'Course Materials',
+    'profile-teacher' => 'My Profile'
+];
+
+$pageTitle = isset($pageTitles[$page]) ? $pageTitles[$page] : ucfirst($page);
 
 // Define features for each page
 $features = [
@@ -60,6 +90,110 @@ $features = [
         'Backup and restore database',
         'Theme customization',
         'Security settings'
+    ],
+    'My Courses' => [
+        'View all enrolled courses',
+        'Access course materials and syllabus',
+        'View instructor information',
+        'Track course progress',
+        'Download course resources',
+        'View course announcements'
+    ],
+    'My Attendance' => [
+        'View attendance records by course',
+        'Monthly attendance reports',
+        'Submit leave requests',
+        'View attendance percentage',
+        'Download attendance certificates',
+        'Set attendance reminders'
+    ],
+    'My Grades & GPA' => [
+        'View grades by semester',
+        'GPA calculation and tracking',
+        'Grade reports and analytics',
+        'Download transcript',
+        'View grade distribution',
+        'Compare performance with class average'
+    ],
+    'My Assignments' => [
+        'View pending assignments',
+        'Submit assignments online',
+        'View assignment grades and feedback',
+        'Track submission deadlines',
+        'Download assignment materials',
+        'Receive deadline reminders'
+    ],
+    'My Timetable' => [
+        'View weekly class schedule',
+        'View exam timetable',
+        'Set class reminders',
+        'Download timetable as PDF',
+        'View room and instructor details',
+        'Sync with calendar apps'
+    ],
+    'Library Portal' => [
+        'Search library catalog',
+        'View borrowed books',
+        'Renew book loans',
+        'Reserve books online',
+        'View due dates and fines',
+        'Access digital resources'
+    ],
+    'My Profile' => [
+        'View and edit personal information',
+        'Update contact details',
+        'Change password',
+        'Upload profile picture',
+        'View enrollment details',
+        'Download student ID card'
+    ],
+    'My Classes' => [
+        'View all assigned classes',
+        'Access class rosters',
+        'View student performance',
+        'Manage class schedules',
+        'Post class announcements',
+        'Track class attendance'
+    ],
+    'My Schedule' => [
+        'View weekly teaching schedule',
+        'View exam schedule',
+        'Set class reminders',
+        'Download schedule as PDF',
+        'View room assignments',
+        'Sync with calendar apps'
+    ],
+    'Mark Attendance' => [
+        'Mark student attendance',
+        'View attendance history',
+        'Generate attendance reports',
+        'Track absent students',
+        'Send absence notifications',
+        'Export attendance data'
+    ],
+    'Enter Grades' => [
+        'Enter student grades',
+        'View grade history',
+        'Calculate GPA',
+        'Generate grade reports',
+        'Submit final grades',
+        'Export grade sheets'
+    ],
+    'Manage Assignments' => [
+        'Create new assignments',
+        'Review submitted assignments',
+        'Grade assignments',
+        'Provide feedback',
+        'Set deadlines',
+        'Track submission status'
+    ],
+    'Course Materials' => [
+        'Upload course materials',
+        'Organize resources by topic',
+        'Share lecture notes',
+        'Upload presentations',
+        'Manage reading materials',
+        'Track material downloads'
     ]
 ];
 
@@ -75,7 +209,7 @@ $currentFeatures = isset($features[$pageTitle]) ? $features[$pageTitle] : [
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><?php echo $pageTitle; ?> - SCTI Admin</title>
+  <title><?php echo $pageTitle; ?> - SCTI <?php echo ucfirst($userType); ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/style.css">
@@ -246,7 +380,7 @@ $currentFeatures = isset($features[$pageTitle]) ? $features[$pageTitle] : [
   <div class="container">
     <h1><i class="fa <?php echo $pageIcon; ?>"></i> <?php echo $pageTitle; ?></h1>
     <div>
-      <a href="../dashboards/admin-dashboard.php"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
+      <a href="<?php echo $dashboardUrl; ?>"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
       <a href="../includes/logout.php" style="background: #dc3545;"><i class="fa fa-sign-out"></i> Logout</a>
     </div>
   </div>
@@ -270,7 +404,7 @@ $currentFeatures = isset($features[$pageTitle]) ? $features[$pageTitle] : [
     </ul>
   </div>
   
-  <a href="../dashboards/admin-dashboard.php" class="back-btn">
+  <a href="<?php echo $dashboardUrl; ?>" class="back-btn">
     <i class="fa fa-arrow-left"></i> Back to Dashboard
   </a>
 </div>

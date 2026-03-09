@@ -18,6 +18,9 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/style.css">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+    
     .dashboard-container {
       max-width: 1400px;
       margin: 0 auto;
@@ -33,6 +36,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 4px 15px rgba(0,64,128,0.2);
     }
     
     .dashboard-header h1 {
@@ -74,12 +78,32 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       display: flex;
       align-items: center;
       gap: 20px;
-      transition: transform 0.3s;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
-    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,64,128,0.1), transparent);
+      transition: left 0.5s;
+    }
+    .stat-card:hover::before {
+      left: 100%;
+    }
     .stat-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 25px rgba(0,64,128,0.3);
+      border: 2px solid #004080;
+    }
+    .stat-card:active {
+      transform: translateY(-2px) scale(0.98);
+      box-shadow: 0 4px 15px rgba(0,64,128,0.4);
     }
     
     .stat-icon {
@@ -143,15 +167,46 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       border: none;
       cursor: pointer;
       font-size: 16px;
+      position: relative;
+      overflow: hidden;
     }
-    
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .action-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
     .action-btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 5px 15px rgba(0,64,128,0.3);
+      background: linear-gradient(135deg, #0059b3, #004080);
     }
-    
+    .action-btn:active {
+      transform: translateY(-1px) scale(0.95);
+      box-shadow: 0 3px 10px rgba(0,64,128,0.4);
+    }
     .action-btn i {
       font-size: 24px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s;
+    }
+    .action-btn:hover i {
+      transform: scale(1.2) rotate(5deg);
+    }
+    .action-btn span {
+      position: relative;
+      z-index: 1;
     }
     
     .recent-activity {
@@ -179,6 +234,14 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       display: flex;
       align-items: center;
       gap: 15px;
+      transition: all 0.3s;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+    .activity-item:hover {
+      background: #f8f9fa;
+      transform: translateX(5px);
+      border-bottom-color: #004080;
     }
     
     .activity-item:last-child {
@@ -194,6 +257,12 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       align-items: center;
       justify-content: center;
       color: #004080;
+      transition: all 0.3s;
+    }
+    .activity-item:hover .activity-icon {
+      background: linear-gradient(135deg, #004080, #0059b3);
+      color: white;
+      transform: scale(1.1);
     }
     
     .activity-content {

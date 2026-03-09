@@ -24,7 +24,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       box-shadow: 0 4px 15px rgba(40,167,69,0.2);
     }
     .page-header h1 { margin: 0 0 10px 0; font-size: 28px; }
-    .breadcrumb { opacity: 0.9; font-size: 14px; }
+    .breadcrumb { opacity: 1; font-size: 14px; background: transparent; padding: 0; }
     .breadcrumb a { color: white; text-decoration: none; }
     .profile-grid {
       display: grid; grid-template-columns: 300px 1fr; gap: 20px;

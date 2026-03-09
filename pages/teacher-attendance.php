@@ -25,30 +25,38 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       box-shadow: 0 4px 15px rgba(40,167,69,0.2);
     }
     .page-header h1 { margin: 0 0 10px 0; font-size: 28px; }
-    .breadcrumb { opacity: 0.9; font-size: 14px; }
+    .breadcrumb { opacity: 1; font-size: 14px; background: transparent; padding: 0; }
     .breadcrumb a { color: white; text-decoration: none; }
     
     .attendance-controls {
       background: white; padding: 25px; border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;
-      display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
     }
-    .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
-    .form-control {
+    .control-group label {
+      display: block; margin-bottom: 8px; color: #666;
+      font-weight: 600; font-size: 14px;
+    }
+    .control-select {
       width: 100%; padding: 12px; border: 2px solid #dee2e6;
       border-radius: 6px; font-size: 14px;
     }
-    .btn-submit {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white; padding: 12px 30px; border: none;
-      border-radius: 6px; cursor: pointer; font-size: 14px;
-      align-self: end; transition: all 0.3s;
+    .control-select:focus {
+      outline: none; border-color: #28a745;
     }
-    .btn-submit:hover {
-      background: linear-gradient(135deg, #20c997, #28a745);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+    
+    .attendance-summary {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px; margin-bottom: 30px;
     }
+    .summary-box {
+      background: white; padding: 20px; border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;
+    }
+    .summary-box h3 { font-size: 32px; margin: 10px 0; }
+    .summary-box.present h3 { color: #28a745; }
+    .summary-box.absent h3 { color: #dc3545; }
+    .summary-box.late h3 { color: #ffc107; }
     
     .attendance-table-container {
       background: white; border-radius: 10px; padding: 30px;
@@ -59,31 +67,67 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       width: 100%; border-collapse: collapse;
     }
     .attendance-table th {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white; padding: 15px; text-align: left;
-      font-weight: 600; border: 1px solid #20c997;
+      background: #f8f9fa; padding: 15px; text-align: left;
+      color: #333; font-weight: 600; border-bottom: 2px solid #dee2e6;
     }
     .attendance-table td {
       padding: 15px; border-bottom: 1px solid #dee2e6;
     }
     
-    .attendance-btn {
-      padding: 8px 16px; border: 2px solid; border-radius: 6px;
-      cursor: pointer; font-size: 13px; transition: all 0.3s;
-      margin-right: 8px; background: white;
+    .student-info {
+      display: flex; align-items: center; gap: 10px;
     }
-    .btn-present { border-color: #28a745; color: #28a745; }
-    .btn-present.active { background: #28a745; color: white; }
-    .btn-absent { border-color: #dc3545; color: #dc3545; }
-    .btn-absent.active { background: #dc3545; color: white; }
-    .btn-late { border-color: #ffc107; color: #856404; }
-    .btn-late.active { background: #ffc107; color: #856404; }
+    .student-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: bold;
+    }
+    
+    .attendance-buttons {
+      display: flex; gap: 8px;
+    }
+    .attendance-btn {
+      padding: 8px 16px; border: none; border-radius: 6px;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-present {
+      background: #d4edda; color: #155724;
+    }
+    .btn-present:hover, .btn-present.active {
+      background: #28a745; color: white;
+    }
+    .btn-absent {
+      background: #f8d7da; color: #721c24;
+    }
+    .btn-absent:hover, .btn-absent.active {
+      background: #dc3545; color: white;
+    }
+    .btn-late {
+      background: #fff3cd; color: #856404;
+    }
+    .btn-late:hover, .btn-late.active {
+      background: #ffc107; color: white;
+    }
+    
+    .save-btn {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white; padding: 15px 40px; border: none;
+      border-radius: 8px; cursor: pointer; font-size: 16px;
+      font-weight: 600; margin-top: 20px;
+      transition: all 0.3s;
+    }
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+    }
   </style>
 </head>
 <body>
 
 <div class="top-header">
-  <marquee>Mark Attendance - Track student presence efficiently</marquee>
+  <marquee>Attendance Management - Mark and track student attendance</marquee>
 </div>
 
 <div class="container">
@@ -91,34 +135,56 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
   <div class="page-header">
     <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
     <div class="breadcrumb">
-      <a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Mark Attendance
+      <a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Attendance
     </div>
   </div>
 
   <div class="attendance-controls">
-    <div class="form-group">
-      <label>Select Class</label>
-      <select class="form-control" id="classSelect">
+    <div class="control-group">
+      <label><i class="fa fa-book"></i> Select Class</label>
+      <select class="control-select">
         <option>Programming Fundamentals</option>
         <option>Database Management</option>
         <option>Web Development</option>
         <option>Data Structures</option>
       </select>
     </div>
-    <div class="form-group">
-      <label>Date</label>
-      <input type="date" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+    <div class="control-group">
+      <label><i class="fa fa-calendar"></i> Select Date</label>
+      <input type="date" class="control-select" value="2026-03-08">
     </div>
-    <div class="form-group">
-      <label>Session</label>
-      <select class="form-control">
-        <option>Morning (9:00 AM - 12:00 PM)</option>
-        <option>Afternoon (1:00 PM - 5:00 PM)</option>
+    <div class="control-group">
+      <label><i class="fa fa-clock"></i> Select Period</label>
+      <select class="control-select">
+        <option>9:00 AM - 10:30 AM</option>
+        <option>11:00 AM - 12:30 PM</option>
+        <option>1:30 PM - 3:00 PM</option>
+        <option>3:30 PM - 5:00 PM</option>
       </select>
     </div>
-    <button class="btn-submit" onclick="alert('Attendance saved successfully!');">
-      <i class="fa fa-save"></i> Save Attendance
-    </button>
+  </div>
+
+  <div class="attendance-summary">
+    <div class="summary-box present">
+      <i class="fa fa-check-circle" style="font-size: 24px; color: #28a745;"></i>
+      <h3>32</h3>
+      <p>Present</p>
+    </div>
+    <div class="summary-box absent">
+      <i class="fa fa-times-circle" style="font-size: 24px; color: #dc3545;"></i>
+      <h3>2</h3>
+      <p>Absent</p>
+    </div>
+    <div class="summary-box late">
+      <i class="fa fa-clock" style="font-size: 24px; color: #ffc107;"></i>
+      <h3>1</h3>
+      <p>Late</p>
+    </div>
+    <div class="summary-box">
+      <i class="fa fa-percentage" style="font-size: 24px; color: #004080;"></i>
+      <h3>91%</h3>
+      <p>Attendance Rate</p>
+    </div>
   </div>
 
   <div class="attendance-table-container">
@@ -129,91 +195,148 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
           <th>Student Name</th>
           <th>Student ID</th>
           <th>Mark Attendance</th>
+          <th>Remarks</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>1</td>
-          <td>Ram Sharma</td>
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">RS</div>
+              <span>Ram Sharma</span>
+            </div>
+          </td>
           <td>STU20251001</td>
           <td>
-            <button class="attendance-btn btn-present active" onclick="markAttendance(this, 'present')">
-              <i class="fa fa-check"></i> Present
-            </button>
-            <button class="attendance-btn btn-absent" onclick="markAttendance(this, 'absent')">
-              <i class="fa fa-times"></i> Absent
-            </button>
-            <button class="attendance-btn btn-late" onclick="markAttendance(this, 'late')">
-              <i class="fa fa-clock"></i> Late
-            </button>
+            <div class="attendance-buttons">
+              <button class="attendance-btn btn-present active">
+                <i class="fa fa-check"></i> Present
+              </button>
+              <button class="attendance-btn btn-absent">
+                <i class="fa fa-times"></i> Absent
+              </button>
+              <button class="attendance-btn btn-late">
+                <i class="fa fa-clock"></i> Late
+              </button>
+            </div>
+          </td>
+          <td>
+            <input type="text" placeholder="Add remarks..." style="padding: 8px; border: 1px solid #dee2e6; border-radius: 4px; width: 100%;">
           </td>
         </tr>
         <tr>
           <td>2</td>
-          <td>Sita Poudel</td>
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">SP</div>
+              <span>Sita Poudel</span>
+            </div>
+          </td>
           <td>STU20251002</td>
           <td>
-            <button class="attendance-btn btn-present active" onclick="markAttendance(this, 'present')">
-              <i class="fa fa-check"></i> Present
-            </button>
-            <button class="attendance-btn btn-absent" onclick="markAttendance(this, 'absent')">
-              <i class="fa fa-times"></i> Absent
-            </button>
-            <button class="attendance-btn btn-late" onclick="markAttendance(this, 'late')">
-              <i class="fa fa-clock"></i> Late
-            </button>
+            <div class="attendance-buttons">
+              <button class="attendance-btn btn-present active">
+                <i class="fa fa-check"></i> Present
+              </button>
+              <button class="attendance-btn btn-absent">
+                <i class="fa fa-times"></i> Absent
+              </button>
+              <button class="attendance-btn btn-late">
+                <i class="fa fa-clock"></i> Late
+              </button>
+            </div>
+          </td>
+          <td>
+            <input type="text" placeholder="Add remarks..." style="padding: 8px; border: 1px solid #dee2e6; border-radius: 4px; width: 100%;">
           </td>
         </tr>
         <tr>
           <td>3</td>
-          <td>Hari Thapa</td>
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">HT</div>
+              <span>Hari Thapa</span>
+            </div>
+          </td>
           <td>STU20251003</td>
           <td>
-            <button class="attendance-btn btn-present active" onclick="markAttendance(this, 'present')">
-              <i class="fa fa-check"></i> Present
-            </button>
-            <button class="attendance-btn btn-absent" onclick="markAttendance(this, 'absent')">
-              <i class="fa fa-times"></i> Absent
-            </button>
-            <button class="attendance-btn btn-late" onclick="markAttendance(this, 'late')">
-              <i class="fa fa-clock"></i> Late
-            </button>
+            <div class="attendance-buttons">
+              <button class="attendance-btn btn-present">
+                <i class="fa fa-check"></i> Present
+              </button>
+              <button class="attendance-btn btn-absent active">
+                <i class="fa fa-times"></i> Absent
+              </button>
+              <button class="attendance-btn btn-late">
+                <i class="fa fa-clock"></i> Late
+              </button>
+            </div>
+          </td>
+          <td>
+            <input type="text" placeholder="Add remarks..." value="Sick leave" style="padding: 8px; border: 1px solid #dee2e6; border-radius: 4px; width: 100%;">
           </td>
         </tr>
         <tr>
           <td>4</td>
-          <td>Gita KC</td>
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">GK</div>
+              <span>Gita KC</span>
+            </div>
+          </td>
           <td>STU20251004</td>
           <td>
-            <button class="attendance-btn btn-present active" onclick="markAttendance(this, 'present')">
-              <i class="fa fa-check"></i> Present
-            </button>
-            <button class="attendance-btn btn-absent" onclick="markAttendance(this, 'absent')">
-              <i class="fa fa-times"></i> Absent
-            </button>
-            <button class="attendance-btn btn-late" onclick="markAttendance(this, 'late')">
-              <i class="fa fa-clock"></i> Late
-            </button>
+            <div class="attendance-buttons">
+              <button class="attendance-btn btn-present active">
+                <i class="fa fa-check"></i> Present
+              </button>
+              <button class="attendance-btn btn-absent">
+                <i class="fa fa-times"></i> Absent
+              </button>
+              <button class="attendance-btn btn-late">
+                <i class="fa fa-clock"></i> Late
+              </button>
+            </div>
+          </td>
+          <td>
+            <input type="text" placeholder="Add remarks..." style="padding: 8px; border: 1px solid #dee2e6; border-radius: 4px; width: 100%;">
           </td>
         </tr>
         <tr>
           <td>5</td>
-          <td>Prakash Gurung</td>
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">PG</div>
+              <span>Prakash Gurung</span>
+            </div>
+          </td>
           <td>STU20251005</td>
           <td>
-            <button class="attendance-btn btn-present active" onclick="markAttendance(this, 'present')">
-              <i class="fa fa-check"></i> Present
-            </button>
-            <button class="attendance-btn btn-absent" onclick="markAttendance(this, 'absent')">
-              <i class="fa fa-times"></i> Absent
-            </button>
-            <button class="attendance-btn btn-late" onclick="markAttendance(this, 'late')">
-              <i class="fa fa-clock"></i> Late
-            </button>
+            <div class="attendance-buttons">
+              <button class="attendance-btn btn-present">
+                <i class="fa fa-check"></i> Present
+              </button>
+              <button class="attendance-btn btn-absent">
+                <i class="fa fa-times"></i> Absent
+              </button>
+              <button class="attendance-btn btn-late active">
+                <i class="fa fa-clock"></i> Late
+              </button>
+            </div>
+          </td>
+          <td>
+            <input type="text" placeholder="Add remarks..." value="10 mins late" style="padding: 8px; border: 1px solid #dee2e6; border-radius: 4px; width: 100%;">
           </td>
         </tr>
       </tbody>
     </table>
+    
+    <div style="text-align: center; margin-top: 30px;">
+      <button class="save-btn" onclick="alert('Save attendance coming soon!');">
+        <i class="fa fa-save"></i> Save Attendance
+      </button>
+    </div>
   </div>
 
 </div>
@@ -223,12 +346,31 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
 </footer>
 
 <script>
-function markAttendance(btn, status) {
-  const row = btn.closest('tr');
-  const buttons = row.querySelectorAll('.attendance-btn');
-  buttons.forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
+  // Toggle attendance buttons
+  document.querySelectorAll('.attendance-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active from siblings
+      this.parentElement.querySelectorAll('.attendance-btn').forEach(b => b.classList.remove('active'));
+      // Add active to clicked button
+      this.classList.add('active');
+      
+      // Update summary counts (demo)
+      updateSummary();
+    });
+  });
+  
+  function updateSummary() {
+    const presentCount = document.querySelectorAll('.btn-present.active').length;
+    const absentCount = document.querySelectorAll('.btn-absent.active').length;
+    const lateCount = document.querySelectorAll('.btn-late.active').length;
+    const total = presentCount + absentCount + lateCount;
+    const rate = total > 0 ? Math.round((presentCount / total) * 100) : 0;
+    
+    document.querySelector('.summary-box.present h3').textContent = presentCount;
+    document.querySelector('.summary-box.absent h3').textContent = absentCount;
+    document.querySelector('.summary-box.late h3').textContent = lateCount;
+    document.querySelector('.summary-box:last-child h3').textContent = rate + '%';
+  }
 </script>
 
 </body>

@@ -57,6 +57,27 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       background: white; padding: 20px; border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       display: flex; align-items: center; gap: 15px;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,64,128,0.1), transparent);
+      transition: left 0.5s;
+    }
+    .stat-card:hover::before {
+      left: 100%;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0,64,128,0.2);
     }
     .stat-icon {
       width: 50px; height: 50px; border-radius: 10px;
@@ -83,58 +104,150 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     }
     .search-box input {
       width: 100%; padding: 12px 40px 12px 15px;
-      border: 2px solid #e0e0e0; border-radius: 6px;
+      border: 2px solid #e0e0e0; border-radius: 8px;
       font-size: 14px; transition: all 0.3s;
+      background: white;
     }
     .search-box input:focus {
       outline: none; border-color: #004080;
+      box-shadow: 0 0 0 3px rgba(0,64,128,0.1);
+      transform: translateY(-2px);
     }
     .search-box i {
       position: absolute; right: 15px; top: 50%;
       transform: translateY(-50%); color: #999;
+      transition: all 0.3s;
+    }
+    .search-box input:focus + i {
+      color: #004080;
+      transform: translateY(-50%) scale(1.2);
     }
     
     .filter-select {
       padding: 12px 15px; border: 2px solid #e0e0e0;
-      border-radius: 6px; font-size: 14px; cursor: pointer;
+      border-radius: 8px; font-size: 14px; cursor: pointer;
+      transition: all 0.3s;
+      background: white;
+    }
+    .filter-select:hover {
+      border-color: #004080;
+      transform: translateY(-2px);
+    }
+    .filter-select:focus {
+      outline: none;
+      border-color: #004080;
+      box-shadow: 0 0 0 3px rgba(0,64,128,0.1);
+    }
+    
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border-radius: 50%;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(40,167,69,0.4);
+      transition: all 0.3s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 6px 30px rgba(40,167,69,0.6);
+    }
+    .fab:active {
+      transform: scale(0.95);
     }
     
     .notice-card {
-      background: white; border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: white; border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
       margin-bottom: 20px; overflow: hidden;
       border-left: 5px solid #004080;
-      transition: all 0.3s;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+    .notice-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #004080, #0059b3, #17a2b8);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s;
+    }
+    .notice-card:hover::before {
+      transform: scaleX(1);
     }
     .notice-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 12px 35px rgba(0,64,128,0.2);
     }
     
     .notice-card.urgent {
       border-left-color: #dc3545;
     }
+    .notice-card.urgent::before {
+      background: linear-gradient(90deg, #dc3545, #c82333, #bd2130);
+    }
     .notice-card.important {
       border-left-color: #ffc107;
+    }
+    .notice-card.important::before {
+      background: linear-gradient(90deg, #ffc107, #ff9800, #f57c00);
     }
     
     .notice-header {
       display: flex; justify-content: space-between;
-      align-items: start; padding: 20px 25px;
-      background: #f8f9fa;
+      align-items: start; padding: 25px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      position: relative;
+    }
+    .notice-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,64,128,0.2), transparent);
     }
     
     .notice-title h3 {
-      margin: 0 0 8px 0; color: #004080; font-size: 20px;
+      margin: 0 0 10px 0; color: #004080; font-size: 20px;
+      font-weight: 700;
+      transition: color 0.3s;
+    }
+    .notice-card:hover .notice-title h3 {
+      color: #0059b3;
     }
     .notice-meta {
       font-size: 13px; color: #666;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
     }
     .notice-meta i {
       margin-right: 5px; color: #004080;
+      transition: transform 0.3s;
+    }
+    .notice-card:hover .notice-meta i {
+      transform: scale(1.2);
     }
     .notice-meta span {
-      margin-right: 15px;
+      display: inline-flex;
+      align-items: center;
     }
     
     .notice-badges {
@@ -143,22 +256,48 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     }
     
     .status-badge {
-      padding: 5px 12px; border-radius: 20px;
-      font-size: 12px; font-weight: 600;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
       text-transform: uppercase; display: inline-block;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s;
     }
-    .status-badge.published { background: #d4edda; color: #155724; }
-    .status-badge.draft { background: #fff3cd; color: #856404; }
-    .status-badge.archived { background: #f8d7da; color: #721c24; }
+    .status-badge.published { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+    .status-badge.draft { background: linear-gradient(135deg, #fff3cd, #ffeaa7); color: #856404; }
+    .status-badge.archived { background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #721c24; }
     
     .priority-badge {
-      padding: 5px 12px; border-radius: 20px;
-      font-size: 11px; font-weight: 600;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      animation: fadeIn 0.5s 0.1s backwards;
     }
-    .priority-badge.urgent { background: #dc3545; color: white; }
-    .priority-badge.important { background: #ffc107; color: #333; }
-    .priority-badge.normal { background: #17a2b8; color: white; }
+    .priority-badge.urgent { 
+      background: linear-gradient(135deg, #dc3545, #c82333); 
+      color: white;
+      animation: pulse 2s infinite;
+    }
+    .priority-badge.important { 
+      background: linear-gradient(135deg, #ffc107, #ff9800); 
+      color: white; 
+    }
+    .priority-badge.normal { 
+      background: linear-gradient(135deg, #17a2b8, #138496); 
+      color: white; 
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
     
     .notice-body {
       padding: 20px 25px;
@@ -181,15 +320,39 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       display: flex; gap: 8px;
     }
     .btn-sm {
-      padding: 8px 15px; font-size: 13px; border-radius: 4px;
+      padding: 8px 15px; font-size: 13px; border-radius: 6px;
       border: none; cursor: pointer; transition: all 0.3s;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
     }
-    .btn-info { background: #17a2b8; color: white; }
-    .btn-info:hover { background: #138496; }
-    .btn-warning { background: #ffc107; color: #333; }
-    .btn-warning:hover { background: #e0a800; }
-    .btn-danger { background: #dc3545; color: white; }
-    .btn-danger:hover { background: #c82333; }
+    .btn-sm::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+    }
+    .btn-sm:hover::before {
+      width: 200px;
+      height: 200px;
+    }
+    .btn-sm i {
+      position: relative;
+      z-index: 1;
+    }
+    .btn-info { background: linear-gradient(135deg, #17a2b8, #138496); color: white; }
+    .btn-info:hover { background: linear-gradient(135deg, #138496, #117a8b); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(23,162,184,0.4); }
+    .btn-warning { background: linear-gradient(135deg, #ffc107, #ff9800); color: white; }
+    .btn-warning:hover { background: linear-gradient(135deg, #ff9800, #f57c00); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,193,7,0.4); }
+    .btn-danger { background: linear-gradient(135deg, #dc3545, #c82333); color: white; }
+    .btn-danger:hover { background: linear-gradient(135deg, #c82333, #bd2130); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220,53,69,0.4); }
   </style>
 </head>
 <body>
@@ -431,19 +594,72 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 
 </div>
 
+<!-- Floating Action Button -->
+<button class="fab" onclick="alert('Create Notice form coming soon!')" title="Create New Notice">
+  <i class="fa fa-plus"></i>
+</button>
+
 <footer class="footer" style="margin-top: 40px;">
   <p>© 2025 SCTI - Admin Panel</p>
 </footer>
 
 <script>
-// Simple search functionality
+// Simple search functionality with animation
 document.getElementById('searchInput').addEventListener('input', function(e) {
   const searchTerm = e.target.value.toLowerCase();
   const cards = document.querySelectorAll('.notice-card');
   
-  cards.forEach(card => {
+  cards.forEach((card, index) => {
     const text = card.textContent.toLowerCase();
-    card.style.display = text.includes(searchTerm) ? '' : 'none';
+    if (text.includes(searchTerm)) {
+      card.style.display = '';
+      card.style.animation = `fadeIn 0.5s ${index * 0.1}s backwards`;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+});
+
+// Filter by status
+document.getElementById('statusFilter').addEventListener('change', function(e) {
+  const status = e.target.value.toLowerCase();
+  const cards = document.querySelectorAll('.notice-card');
+  
+  cards.forEach(card => {
+    if (!status) {
+      card.style.display = '';
+    } else {
+      const badge = card.querySelector('.status-badge');
+      const hasStatus = badge && badge.textContent.toLowerCase().includes(status);
+      card.style.display = hasStatus ? '' : 'none';
+    }
+  });
+});
+
+// Filter by priority
+document.getElementById('priorityFilter').addEventListener('change', function(e) {
+  const priority = e.target.value.toLowerCase();
+  const cards = document.querySelectorAll('.notice-card');
+  
+  cards.forEach(card => {
+    if (!priority) {
+      card.style.display = '';
+    } else {
+      const badge = card.querySelector('.priority-badge');
+      const hasPriority = badge && badge.textContent.toLowerCase().includes(priority);
+      card.style.display = hasPriority ? '' : 'none';
+    }
+  });
+});
+
+// Add smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 });
 </script>

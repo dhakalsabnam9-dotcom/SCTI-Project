@@ -121,6 +121,66 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     .stat-icon.green { background: linear-gradient(135deg, #28a745, #20c997); }
     .stat-icon.orange { background: linear-gradient(135deg, #fd7e14, #ffc107); }
     .stat-icon.purple { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
+    .stat-icon.cyan { background: linear-gradient(135deg, #17a2b8, #138496); }
+    .stat-icon.red { background: linear-gradient(135deg, #dc3545, #c82333); }
+    
+    /* Special Gallery Card Styling */
+    .stat-card.gallery-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+    }
+    
+    .stat-card.gallery-card::before {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+    
+    .stat-card.gallery-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(102,126,234,0.4);
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    
+    .stat-card.gallery-card .stat-icon {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .stat-card.gallery-card .stat-icon i {
+      color: white;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    .stat-card.gallery-card .stat-info h3 {
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .stat-card.gallery-card .stat-info p {
+      color: rgba(255,255,255,0.9);
+    }
+    
+    .stat-card.gallery-card::after {
+      content: '📸';
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      font-size: 60px;
+      opacity: 0.1;
+      transform: rotate(-15deg);
+    }
     
     .stat-info h3 {
       margin: 0;
@@ -207,6 +267,52 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     .action-btn span {
       position: relative;
       z-index: 1;
+    }
+    
+    /* Special Gallery Action Button */
+    .action-btn.gallery-action-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-btn.gallery-action-btn::before {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .action-btn.gallery-action-btn::after {
+      content: '✨';
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    
+    .action-btn.gallery-action-btn:hover::after {
+      opacity: 1;
+      right: 10px;
+    }
+    
+    .action-btn.gallery-action-btn:hover {
+      background: linear-gradient(135deg, #764ba2, #667eea);
+      box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    }
+    
+    .action-btn.gallery-action-btn i {
+      animation: rotate 4s linear infinite;
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .action-btn.gallery-action-btn:hover i {
+      animation: none;
+      transform: scale(1.3) rotate(15deg);
     }
     
     .recent-activity {
@@ -347,7 +453,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     </div>
     
     <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/view-contacts.php'">
-      <div class="stat-icon" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+      <div class="stat-icon red">
         <i class="fa fa-envelope"></i>
       </div>
       <div class="stat-info">
@@ -356,8 +462,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       </div>
     </div>
 
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-gallery.php'">
-      <div class="stat-icon" style="background: linear-gradient(135deg, #17a2b8, #138496);">
+    <div class="stat-card gallery-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-gallery.php'">
+      <div class="stat-icon">
         <i class="fa fa-images"></i>
       </div>
       <div class="stat-info">
@@ -391,7 +497,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <i class="fa fa-graduation-cap"></i>
         <span>Manage Programs</span>
       </a>
-      <a href="../pages/manage-gallery.php" class="action-btn" style="background: linear-gradient(135deg, #17a2b8, #138496);">
+      <a href="../pages/manage-gallery.php" class="action-btn gallery-action-btn">
         <i class="fa fa-images"></i>
         <span>Manage Gallery</span>
       </a>

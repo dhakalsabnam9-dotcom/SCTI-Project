@@ -355,6 +355,16 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <p>Contact Messages</p>
       </div>
     </div>
+
+    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-gallery.php'">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #17a2b8, #138496);">
+        <i class="fa fa-images"></i>
+      </div>
+      <div class="stat-info">
+        <h3 id="galleryCount">0</h3>
+        <p>Gallery Images</p>
+      </div>
+    </div>
   </div>
 
   <!-- Quick Actions -->
@@ -380,6 +390,10 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       <a href="../pages/manage-programs.php" class="action-btn">
         <i class="fa fa-graduation-cap"></i>
         <span>Manage Programs</span>
+      </a>
+      <a href="../pages/manage-gallery.php" class="action-btn" style="background: linear-gradient(135deg, #17a2b8, #138496);">
+        <i class="fa fa-images"></i>
+        <span>Manage Gallery</span>
       </a>
       <a href="../pages/view-reports.php" class="action-btn">
         <i class="fa fa-chart-bar"></i>
@@ -462,6 +476,18 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     })
     .catch(error => {
       console.error('Error fetching contact count:', error);
+    });
+
+  // Fetch gallery images count
+  fetch('../pages/get-gallery-count.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('galleryCount').textContent = data.count;
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching gallery count:', error);
     });
 </script>
 

@@ -207,6 +207,24 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       cursor: pointer;
     }
     
+    .gallery-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #17a2b8, #138496, #0c5460);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s;
+      z-index: 10;
+    }
+    
+    .gallery-item:hover::before {
+      transform: scaleX(1);
+    }
+    
     .gallery-item:hover {
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 15px 40px rgba(23,162,184,0.3);
@@ -228,8 +246,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     }
     
     .gallery-item:hover img {
-      transform: scale(1.1);
-      filter: brightness(0.9);
+      transform: scale(1.15) rotate(2deg);
+      filter: brightness(0.85) contrast(1.1);
     }
     
     .image-overlay {
@@ -238,9 +256,9 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
+      background: linear-gradient(to bottom, rgba(23,162,184,0.2) 0%, rgba(0,0,0,0.8) 100%);
       opacity: 0;
-      transition: all 0.3s;
+      transition: all 0.4s;
       display: flex;
       align-items: flex-end;
       padding: 20px;
@@ -253,12 +271,19 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     .overlay-info {
       color: white;
       width: 100%;
+      transform: translateY(20px);
+      transition: transform 0.4s;
+    }
+    
+    .gallery-item:hover .overlay-info {
+      transform: translateY(0);
     }
     
     .overlay-info h4 {
       margin: 0 0 5px 0;
       font-size: 16px;
       font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
     .overlay-info p {
@@ -269,6 +294,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     
     .gallery-item-info {
       padding: 20px;
+      background: linear-gradient(to bottom, white 0%, #f8f9fa 100%);
     }
     
     .gallery-item-header {
@@ -285,6 +311,11 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       font-weight: 600;
       flex: 1;
       line-height: 1.4;
+      transition: color 0.3s;
+    }
+    
+    .gallery-item:hover .gallery-item-info h3 {
+      color: #17a2b8;
     }
     
     .gallery-item-info p {
@@ -309,6 +340,11 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     
     .gallery-item-meta i {
       color: #17a2b8;
+      transition: transform 0.3s;
+    }
+    
+    .gallery-item:hover .gallery-item-meta i {
+      transform: scale(1.2) rotate(360deg);
     }
     
     .gallery-item-actions {
@@ -329,6 +365,36 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       align-items: center;
       justify-content: center;
       gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .gallery-item-actions button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+    }
+    
+    .gallery-item-actions button:hover::before {
+      width: 200px;
+      height: 200px;
+    }
+    
+    .gallery-item-actions button i {
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s;
+    }
+    
+    .gallery-item-actions button:hover i {
+      transform: scale(1.2) rotate(15deg);
     }
     
     .btn-edit {

@@ -411,6 +411,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
   </div>
 
   <!-- Statistics Cards -->
+  <!-- Updated: Gallery card added -->
   <div class="stats-grid">
     <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-students.php'">
       <div class="stat-icon blue">

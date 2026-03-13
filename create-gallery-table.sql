@@ -1,4 +1,6 @@
--- Create gallery_images table for dynamic gallery management
+-- Gallery Images Table for SCTI School
+-- Run this SQL in phpMyAdmin on scti_school database
+
 CREATE TABLE IF NOT EXISTS gallery_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -14,8 +16,7 @@ CREATE TABLE IF NOT EXISTS gallery_images (
     INDEX idx_category (category),
     INDEX idx_active (is_active),
     INDEX idx_display_order (display_order)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create uploads directory structure (you'll need to create these folders manually)
--- uploads/gallery/
--- uploads/gallery/thumbnails/
+-- Verify table was created
+SELECT 'Gallery table created successfully!' AS Status;

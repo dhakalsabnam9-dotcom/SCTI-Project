@@ -1,4 +1,4 @@
-# Dynamic Gallery - Setup Complete! 🎨
+r# Dynamic Gallery - Setup Complete! 🎨
 
 ## What Was Created
 

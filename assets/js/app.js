@@ -14,6 +14,11 @@ function loadPage(pageName) {
   if (pageName === 'gallery') {
     initGallery();
   }
+
+  // Initialize notices after DOM is injected
+  if (pageName === 'notices') {
+    initNotices();
+  }
   
   // Scroll to top smoothly
   window.scrollTo({ top: 0, behavior: 'smooth' });

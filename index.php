@@ -30,7 +30,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="assets/css/style.css?v=26">
+  <link rel="stylesheet" href="assets/css/style.css?v=32">
 </head>
 
 <body>
@@ -84,12 +84,12 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/pages/home.js"></script>
 <script src="assets/js/pages/programs.js"></script>
 <script src="assets/js/pages/gallery.js?v=31"></script>
-<script src="assets/js/pages/notices.js"></script>
+<script src="assets/js/pages/notices.js?v=32"></script>
 <script src="assets/js/pages/contact.js"></script>
 <script src="assets/js/pages/login.js"></script>
 <script src="assets/js/pages/signup.js"></script>
 <script src="assets/js/pages.js"></script>
-<script src="assets/js/app.js?v=25"></script>
+<script src="assets/js/app.js?v=32"></script>
 
 </body>
 </html>

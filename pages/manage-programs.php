@@ -1,10 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    header('Location: ../index.php');
-    exit();
+    header('Location: ../index.php'); exit();
 }
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,358 +14,160 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
   <link rel="stylesheet" href="../assets/css/style.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-    
     .page-header {
       background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
       color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;
-      box-shadow: 0 4px 15px rgba(0,64,128,0.2);
       display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 15px rgba(0,64,128,0.2);
     }
-    .page-header h1 { margin: 0; font-size: 28px; }
-    .breadcrumb { opacity: 1; font-size: 14px; background: transparent; padding: 0; margin-top: 8px; }
-    .breadcrumb a { color: white; text-decoration: none; }
-    .breadcrumb a:hover { text-decoration: underline; }
-    
-    .header-actions { display: flex; gap: 10px; }
-    .btn {
-      padding: 12px 24px; border: none; border-radius: 6px;
+    .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
+    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .btn-add {
+      background: rgba(255,255,255,0.2); color: white;
+      padding: 12px 24px; border: 2px solid white; border-radius: 6px;
       cursor: pointer; font-size: 14px; transition: all 0.3s;
-      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+      display: inline-flex; align-items: center; gap: 8px;
     }
-    .btn-primary {
-      background: white; color: #004080; font-weight: 600;
-    }
-    .btn-primary:hover {
-      background: #f0f0f0; transform: translateY(-2px);
-    }
-    .btn-success {
-      background: #28a745; color: white;
-    }
-    .btn-success:hover {
-      background: #218838; transform: translateY(-2px);
-    }
-    
-    .programs-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 25px;
-    }
-    
+    .btn-add:hover { background: white; color: #004080; }
+    .programs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
     .program-card {
       background: white; border-radius: 12px; overflow: hidden;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-      transition: all 0.3s; border: 2px solid transparent;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.1); transition: all 0.3s;
     }
-    .program-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 8px 30px rgba(0,64,128,0.2);
-      border-color: #004080;
+    .program-card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px rgba(0,64,128,0.2); }
+    .program-banner {
+      height: 8px;
     }
-    
-    .program-header {
-      background: linear-gradient(135deg, #004080, #0059b3);
-      color: white; padding: 30px; position: relative;
-    }
-    .program-icon {
-      width: 70px; height: 70px; background: rgba(255,255,255,0.2);
-      border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-size: 32px; margin-bottom: 15px;
-    }
-    .program-header h3 { margin: 0 0 8px 0; font-size: 22px; }
-    .program-code { opacity: 0.9; font-size: 13px; }
-    
+    .banner-blue { background: linear-gradient(90deg, #004080, #0059b3); }
+    .banner-green { background: linear-gradient(90deg, #28a745, #20c997); }
+    .banner-orange { background: linear-gradient(90deg, #fd7e14, #ffc107); }
+    .banner-purple { background: linear-gradient(90deg, #6f42c1, #e83e8c); }
     .program-body { padding: 25px; }
-    
-    .program-info-item {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 15px; color: #666; font-size: 14px;
+    .program-icon {
+      width: 60px; height: 60px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: white; margin-bottom: 15px;
     }
-    .program-info-item i { color: #004080; width: 20px; font-size: 16px; }
-    
-    .program-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 15px; margin: 20px 0; padding: 15px;
-      background: #f8f9fa; border-radius: 8px;
-    }
-    .stat-item {
-      text-align: center;
-    }
-    .stat-item h4 {
-      margin: 0; font-size: 24px; color: #004080;
-    }
-    .stat-item p {
-      margin: 5px 0 0 0; font-size: 12px; color: #666;
-    }
-    
-    .program-actions {
-      display: flex; gap: 10px; margin-top: 20px;
-      padding-top: 20px; border-top: 1px solid #e0e0e0;
-    }
+    .icon-blue { background: linear-gradient(135deg, #004080, #0059b3); }
+    .icon-green { background: linear-gradient(135deg, #28a745, #20c997); }
+    .icon-orange { background: linear-gradient(135deg, #fd7e14, #ffc107); }
+    .icon-purple { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
+    .program-title { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 5px; }
+    .program-code { color: #666; font-size: 13px; margin-bottom: 15px; }
+    .program-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+    .pstat { background: #f8f9fa; border-radius: 8px; padding: 10px; text-align: center; }
+    .pstat .num { font-size: 20px; font-weight: 700; color: #004080; }
+    .pstat .lbl { font-size: 11px; color: #666; }
+    .program-desc { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px; }
+    .badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-active { background: #d4edda; color: #155724; }
+    .card-actions { display: flex; gap: 8px; margin-top: 15px; }
     .btn-sm {
-      flex: 1; padding: 10px 15px; font-size: 13px; border-radius: 6px;
-      border: none; cursor: pointer; transition: all 0.3s;
-      text-align: center; font-weight: 600;
+      flex: 1; padding: 10px; border: none; border-radius: 6px;
+      cursor: pointer; font-size: 13px; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
     }
-    .btn-info { background: #17a2b8; color: white; }
-    .btn-info:hover { background: #138496; transform: translateY(-2px); }
-    .btn-warning { background: #ffc107; color: #333; }
-    .btn-warning:hover { background: #e0a800; transform: translateY(-2px); }
-    .btn-danger { background: #dc3545; color: white; }
-    .btn-danger:hover { background: #c82333; transform: translateY(-2px); }
-    
-    .status-badge {
-      position: absolute; top: 20px; right: 20px;
-      padding: 6px 14px; border-radius: 20px;
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase;
-    }
-    .status-badge.active { background: #28a745; color: white; }
-    .status-badge.inactive { background: #dc3545; color: white; }
+    .btn-primary { background: linear-gradient(135deg, #004080, #0059b3); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .btn-outline { background: white; color: #004080; border: 2px solid #004080; }
+    .btn-outline:hover { background: #004080; color: white; }
   </style>
 </head>
 <body>
-
-<div class="top-header">
-  <marquee>Manage Programs - Add, edit, and monitor academic programs</marquee>
-</div>
-
+<div class="top-header"><marquee>Manage Programs - Oversee all academic programs offered at SCTI</marquee></div>
 <div class="container">
-  
   <div class="page-header">
     <div>
       <h1><i class="fa fa-graduation-cap"></i> Manage Programs</h1>
-      <div class="breadcrumb">
-        <a href="../dashboards/admin-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Manage Programs
-      </div>
+      <div class="breadcrumb"><a href="../dashboards/admin-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Manage Programs</div>
     </div>
-    <div class="header-actions">
-      <a href="../dashboards/admin-dashboard.php" class="btn btn-primary">
-        <i class="fa fa-arrow-left"></i> Back
-      </a>
-      <button class="btn btn-success" onclick="alert('Add Program form coming soon!')">
-        <i class="fa fa-plus"></i> Add Program
-      </button>
-    </div>
+    <button class="btn-add" onclick="alert('Add program feature coming soon!');"><i class="fa fa-plus"></i> Add Program</button>
   </div>
 
   <div class="programs-grid">
-    
     <div class="program-card">
-      <div class="program-header">
-        <span class="status-badge active">Active</span>
-        <div class="program-icon">
-          <i class="fa fa-laptop-code"></i>
-        </div>
-        <h3>B.Tech Ed in Information Technology</h3>
-        <div class="program-code">4 Years • Bachelor's Degree</div>
-      </div>
+      <div class="program-banner banner-blue"></div>
       <div class="program-body">
-        <div class="program-info-item">
-          <i class="fa fa-calendar-alt"></i>
-          <span>Duration: 4 Years (8 Semesters)</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-book"></i>
-          <span>Total Courses: 42</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-certificate"></i>
-          <span>Affiliation: Tribhuvan University</span>
-        </div>
-        
+        <div class="program-icon icon-blue"><i class="fa fa-laptop-code"></i></div>
+        <div class="program-title">B.Tech in IT</div>
+        <div class="program-code">BTIT | 4 Years | Affiliated: TU</div>
         <div class="program-stats">
-          <div class="stat-item">
-            <h4>120</h4>
-            <p>Students</p>
-          </div>
-          <div class="stat-item">
-            <h4>8</h4>
-            <p>Teachers</p>
-          </div>
-          <div class="stat-item">
-            <h4>42</h4>
-            <p>Courses</p>
-          </div>
+          <div class="pstat"><div class="num">120</div><div class="lbl">Students</div></div>
+          <div class="pstat"><div class="num">8</div><div class="lbl">Semesters</div></div>
+          <div class="pstat"><div class="num">6</div><div class="lbl">Teachers</div></div>
         </div>
-        
-        <div class="program-actions">
-          <button class="btn-sm btn-info" onclick="alert('View details coming soon!')">
-            <i class="fa fa-eye"></i> View
-          </button>
-          <button class="btn-sm btn-warning" onclick="alert('Edit coming soon!')">
-            <i class="fa fa-edit"></i> Edit
-          </button>
-          <button class="btn-sm btn-danger" onclick="if(confirm('Delete this program?')) alert('Delete coming soon!')">
-            <i class="fa fa-trash"></i>
-          </button>
+        <p class="program-desc">Bachelor of Technology in Information Technology covering programming, databases, networking and software engineering.</p>
+        <span class="badge badge-active">Active</span>
+        <div class="card-actions">
+          <button class="btn-sm btn-primary"><i class="fa fa-eye"></i> View</button>
+          <button class="btn-sm btn-outline"><i class="fa fa-edit"></i> Edit</button>
         </div>
       </div>
     </div>
 
     <div class="program-card">
-      <div class="program-header">
-        <span class="status-badge active">Active</span>
-        <div class="program-icon">
-          <i class="fa fa-desktop"></i>
-        </div>
-        <h3>Diploma in Information Technology</h3>
-        <div class="program-code">3 Years • Diploma</div>
-      </div>
+      <div class="program-banner banner-green"></div>
       <div class="program-body">
-        <div class="program-info-item">
-          <i class="fa fa-calendar-alt"></i>
-          <span>Duration: 3 Years (6 Semesters)</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-book"></i>
-          <span>Total Courses: 32</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-certificate"></i>
-          <span>Affiliation: CTEVT</span>
-        </div>
-        
+        <div class="program-icon icon-green"><i class="fa fa-hard-hat"></i></div>
+        <div class="program-title">Diploma in Civil Engineering</div>
+        <div class="program-code">DCE | 3 Years | Affiliated: CTEVT</div>
         <div class="program-stats">
-          <div class="stat-item">
-            <h4>85</h4>
-            <p>Students</p>
-          </div>
-          <div class="stat-item">
-            <h4>6</h4>
-            <p>Teachers</p>
-          </div>
-          <div class="stat-item">
-            <h4>32</h4>
-            <p>Courses</p>
-          </div>
+          <div class="pstat"><div class="num">75</div><div class="lbl">Students</div></div>
+          <div class="pstat"><div class="num">6</div><div class="lbl">Semesters</div></div>
+          <div class="pstat"><div class="num">5</div><div class="lbl">Teachers</div></div>
         </div>
-        
-        <div class="program-actions">
-          <button class="btn-sm btn-info" onclick="alert('View details coming soon!')">
-            <i class="fa fa-eye"></i> View
-          </button>
-          <button class="btn-sm btn-warning" onclick="alert('Edit coming soon!')">
-            <i class="fa fa-edit"></i> Edit
-          </button>
-          <button class="btn-sm btn-danger" onclick="if(confirm('Delete this program?')) alert('Delete coming soon!')">
-            <i class="fa fa-trash"></i>
-          </button>
+        <p class="program-desc">Diploma program in Civil Engineering covering construction, surveying, structural design and project management.</p>
+        <span class="badge badge-active">Active</span>
+        <div class="card-actions">
+          <button class="btn-sm btn-primary"><i class="fa fa-eye"></i> View</button>
+          <button class="btn-sm btn-outline"><i class="fa fa-edit"></i> Edit</button>
         </div>
       </div>
     </div>
 
     <div class="program-card">
-      <div class="program-header">
-        <span class="status-badge active">Active</span>
-        <div class="program-icon">
-          <i class="fa fa-hard-hat"></i>
-        </div>
-        <h3>Diploma in Civil Engineering</h3>
-        <div class="program-code">3 Years • Diploma</div>
-      </div>
+      <div class="program-banner banner-orange"></div>
       <div class="program-body">
-        <div class="program-info-item">
-          <i class="fa fa-calendar-alt"></i>
-          <span>Duration: 3 Years (6 Semesters)</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-book"></i>
-          <span>Total Courses: 30</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-certificate"></i>
-          <span>Affiliation: CTEVT</span>
-        </div>
-        
+        <div class="program-icon icon-orange"><i class="fa fa-bolt"></i></div>
+        <div class="program-title">Diploma in Electrical Engineering</div>
+        <div class="program-code">DEE | 3 Years | Affiliated: CTEVT</div>
         <div class="program-stats">
-          <div class="stat-item">
-            <h4>45</h4>
-            <p>Students</p>
-          </div>
-          <div class="stat-item">
-            <h4>5</h4>
-            <p>Teachers</p>
-          </div>
-          <div class="stat-item">
-            <h4>30</h4>
-            <p>Courses</p>
-          </div>
+          <div class="pstat"><div class="num">50</div><div class="lbl">Students</div></div>
+          <div class="pstat"><div class="num">6</div><div class="lbl">Semesters</div></div>
+          <div class="pstat"><div class="num">4</div><div class="lbl">Teachers</div></div>
         </div>
-        
-        <div class="program-actions">
-          <button class="btn-sm btn-info" onclick="alert('View details coming soon!')">
-            <i class="fa fa-eye"></i> View
-          </button>
-          <button class="btn-sm btn-warning" onclick="alert('Edit coming soon!')">
-            <i class="fa fa-edit"></i> Edit
-          </button>
-          <button class="btn-sm btn-danger" onclick="if(confirm('Delete this program?')) alert('Delete coming soon!')">
-            <i class="fa fa-trash"></i>
-          </button>
+        <p class="program-desc">Diploma program in Electrical Engineering covering circuit theory, power systems, electronics and industrial automation.</p>
+        <span class="badge badge-active">Active</span>
+        <div class="card-actions">
+          <button class="btn-sm btn-primary"><i class="fa fa-eye"></i> View</button>
+          <button class="btn-sm btn-outline"><i class="fa fa-edit"></i> Edit</button>
         </div>
       </div>
     </div>
 
     <div class="program-card">
-      <div class="program-header">
-        <span class="status-badge active">Active</span>
-        <div class="program-icon">
-          <i class="fa fa-bolt"></i>
-        </div>
-        <h3>Diploma in Electrical Engineering</h3>
-        <div class="program-code">3 Years • Diploma</div>
-      </div>
+      <div class="program-banner banner-purple"></div>
       <div class="program-body">
-        <div class="program-info-item">
-          <i class="fa fa-calendar-alt"></i>
-          <span>Duration: 3 Years (6 Semesters)</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-book"></i>
-          <span>Total Courses: 28</span>
-        </div>
-        <div class="program-info-item">
-          <i class="fa fa-certificate"></i>
-          <span>Affiliation: CTEVT</span>
-        </div>
-        
+        <div class="program-icon icon-purple"><i class="fa fa-tools"></i></div>
+        <div class="program-title">Diploma in Mechanical Engineering</div>
+        <div class="program-code">DME | 3 Years | Affiliated: CTEVT</div>
         <div class="program-stats">
-          <div class="stat-item">
-            <h4>38</h4>
-            <p>Students</p>
-          </div>
-          <div class="stat-item">
-            <h4>4</h4>
-            <p>Teachers</p>
-          </div>
-          <div class="stat-item">
-            <h4>28</h4>
-            <p>Courses</p>
-          </div>
+          <div class="pstat"><div class="num">0</div><div class="lbl">Students</div></div>
+          <div class="pstat"><div class="num">6</div><div class="lbl">Semesters</div></div>
+          <div class="pstat"><div class="num">0</div><div class="lbl">Teachers</div></div>
         </div>
-        
-        <div class="program-actions">
-          <button class="btn-sm btn-info" onclick="alert('View details coming soon!')">
-            <i class="fa fa-eye"></i> View
-          </button>
-          <button class="btn-sm btn-warning" onclick="alert('Edit coming soon!')">
-            <i class="fa fa-edit"></i> Edit
-          </button>
-          <button class="btn-sm btn-danger" onclick="if(confirm('Delete this program?')) alert('Delete coming soon!')">
-            <i class="fa fa-trash"></i>
-          </button>
+        <p class="program-desc">Diploma program in Mechanical Engineering. Admissions opening for 2026/27 academic year.</p>
+        <span class="badge" style="background:#fff3cd;color:#856404;">Upcoming</span>
+        <div class="card-actions">
+          <button class="btn-sm btn-primary"><i class="fa fa-eye"></i> View</button>
+          <button class="btn-sm btn-outline"><i class="fa fa-edit"></i> Edit</button>
         </div>
       </div>
     </div>
-
   </div>
-
 </div>
-
-<footer class="footer" style="margin-top: 40px;">
-  <p>© 2025 SCTI - Admin Panel</p>
-</footer>
-
+<footer class="footer" style="margin-top:30px;"><p>© 2025 SCTI - Admin Panel</p></footer>
 </body>
 </html>

@@ -1,337 +1,134 @@
 <?php
 session_start();
-
-// Check if user is logged in and is admin
-if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'admin') {
-    header("Location: login-simple.php");
-    exit();
+if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+    header('Location: ../index.php'); exit();
 }
+require_once '../includes/config.php';
 
-// Database configuration
-require_once('../includes/config.php');
-
-// Get database connection
-$conn = getDBConnection();
-
-// Fetch all contact messages
+$messages = [];
+$error = '';
 try {
-    $stmt = $conn->prepare("
-        SELECT * FROM contacts 
-        ORDER BY created_at DESC
-    ");
-    $stmt->execute();
-    $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    $error = "Error fetching contacts: " . $e->getMessage();
+    $db = getDBConnection();
+    $stmt = $db->query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 50");
+    $messages = $stmt->fetchAll();
+} catch (Exception $e) {
+    $error = 'Could not load messages.';
 }
-
-$conn = null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Contact Messages - SCTI Admin</title>
+  <title>Contact Messages | SCTI Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-
-  <!-- External CSS -->
   <link rel="stylesheet" href="../assets/css/style.css">
-  
   <style>
-    .admin-header {
-      background: linear-gradient(135deg, #004080, #0059b3);
-      color: white;
-      padding: 20px 0;
-      margin-bottom: 30px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .page-header {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(220,53,69,0.2);
     }
-    
-    .admin-header .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .admin-header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-    
-    .admin-header a {
-      color: white;
-      text-decoration: none;
-      padding: 8px 16px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 5px;
+    .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
+    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .stat-box { background: white; border-radius: 10px; padding: 18px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-top: 4px solid #dc3545; }
+    .stat-box .num { font-size: 28px; font-weight: 700; color: #dc3545; }
+    .stat-box .lbl { color: #666; font-size: 13px; margin-top: 4px; }
+    .messages-list { display: flex; flex-direction: column; gap: 15px; }
+    .message-card {
+      background: white; border-radius: 10px; padding: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 5px solid #dc3545;
       transition: all 0.3s;
     }
-    
-    .admin-header a:hover {
-      background: rgba(255,255,255,0.3);
+    .message-card:hover { transform: translateX(5px); box-shadow: 0 5px 20px rgba(220,53,69,0.2); }
+    .message-card.read { border-left-color: #adb5bd; opacity: 0.85; }
+    .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .sender-info { display: flex; align-items: center; gap: 12px; }
+    .sender-avatar {
+      width: 45px; height: 45px; border-radius: 50%;
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px; font-weight: 700;
     }
-    
-    .stats-card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-      display: flex;
-      gap: 30px;
+    .sender-name { font-weight: 700; color: #333; font-size: 16px; }
+    .sender-email { color: #666; font-size: 13px; }
+    .msg-time { color: #999; font-size: 12px; }
+    .msg-subject { font-weight: 600; color: #333; margin-bottom: 8px; font-size: 15px; }
+    .msg-body { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 15px; }
+    .msg-actions { display: flex; gap: 8px; }
+    .btn-sm {
+      padding: 8px 16px; border: none; border-radius: 5px;
+      cursor: pointer; font-size: 13px; transition: all 0.3s;
+      display: inline-flex; align-items: center; gap: 5px;
     }
-    
-    .stat-item {
-      flex: 1;
-      text-align: center;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    
-    .stat-item.new {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white;
-    }
-    
-    .stat-item.read {
-      background: linear-gradient(135deg, #17a2b8, #138496);
-      color: white;
-    }
-    
-    .stat-item.total {
-      background: linear-gradient(135deg, #004080, #0059b3);
-      color: white;
-    }
-    
-    .stat-item h3 {
-      font-size: 36px;
-      margin: 0 0 10px 0;
-    }
-    
-    .stat-item p {
-      margin: 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    
-    .contact-card {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      border-left: 5px solid #004080;
-      transition: all 0.3s;
-    }
-    
-    .contact-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    }
-    
-    .contact-card.new {
-      border-left-color: #28a745;
-      background: linear-gradient(to right, #f0fff4, white);
-    }
-    
-    .contact-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 15px;
-    }
-    
-    .contact-info h3 {
-      margin: 0 0 5px 0;
-      color: #004080;
-      font-size: 20px;
-    }
-    
-    .contact-meta {
-      font-size: 13px;
-      color: #666;
-    }
-    
-    .contact-meta i {
-      margin-right: 5px;
-      color: #004080;
-    }
-    
-    .contact-meta span {
-      margin-right: 15px;
-    }
-    
-    .status-badge {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    
-    .status-badge.new {
-      background: #28a745;
-      color: white;
-    }
-    
-    .status-badge.read {
-      background: #17a2b8;
-      color: white;
-    }
-    
-    .status-badge.replied {
-      background: #ffc107;
-      color: #333;
-    }
-    
-    .contact-subject {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    
-    .contact-message {
-      color: #555;
-      line-height: 1.6;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-    
-    .contact-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 15px;
-      border-top: 1px solid #e0e0e0;
-      font-size: 13px;
-      color: #666;
-    }
-    
-    .contact-date {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .no-contacts {
-      text-align: center;
-      padding: 60px 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .no-contacts i {
-      font-size: 60px;
-      color: #ccc;
-      margin-bottom: 20px;
-    }
-    
-    .no-contacts h3 {
-      color: #666;
-      margin: 0;
-    }
+    .btn-reply { background: #cce5ff; color: #004085; }
+    .btn-reply:hover { background: #004080; color: white; }
+    .btn-mark { background: #d4edda; color: #155724; }
+    .btn-mark:hover { background: #28a745; color: white; }
+    .btn-delete { background: #f8d7da; color: #dc3545; }
+    .btn-delete:hover { background: #dc3545; color: white; }
+    .badge-new { background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; background: #f8d7da; color: #721c24; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .empty-state i { font-size: 60px; color: #dee2e6; margin-bottom: 15px; }
   </style>
 </head>
-
 <body>
-
-<!-- Admin Header -->
-<div class="admin-header">
-  <div class="container">
-    <h1><i class="fa fa-envelope"></i> Contact Messages</h1>
-    <div>
-      <a href="../dashboards/admin-dashboard.php"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
-      <a href="/scti-school/includes/logout.php" style="margin-left: 10px; background: #dc3545;"><i class="fa fa-sign-out"></i> Logout</a>
-    </div>
+<div class="top-header"><marquee>Contact Messages - View and respond to messages from visitors and students</marquee></div>
+<div class="container">
+  <div class="page-header">
+    <h1><i class="fa fa-envelope-open-text"></i> Contact Messages</h1>
+    <div class="breadcrumb"><a href="../dashboards/admin-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Contact Messages</div>
   </div>
-</div>
 
-<!-- Main Content -->
-<section class="section">
-  <div class="container">
-    
-    <?php if (isset($error)): ?>
-      <div class="alert alert-danger">
-        <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
-      </div>
-    <?php endif; ?>
-    
-    <?php
-    // Calculate statistics
-    $totalContacts = count($contacts);
-    $newContacts = count(array_filter($contacts, function($c) { return $c['status'] === 'new'; }));
-    $readContacts = count(array_filter($contacts, function($c) { return $c['status'] === 'read'; }));
-    ?>
-    
-    <!-- Statistics -->
-    <div class="stats-card">
-      <div class="stat-item new">
-        <h3><?php echo $newContacts; ?></h3>
-        <p><i class="fa fa-envelope"></i> New Messages</p>
-      </div>
-      <div class="stat-item read">
-        <h3><?php echo $readContacts; ?></h3>
-        <p><i class="fa fa-envelope-open"></i> Read Messages</p>
-      </div>
-      <div class="stat-item total">
-        <h3><?php echo $totalContacts; ?></h3>
-        <p><i class="fa fa-inbox"></i> Total Messages</p>
-      </div>
-    </div>
-    
-    <!-- Contact Messages -->
-    <?php if (empty($contacts)): ?>
-      <div class="no-contacts">
+  <div class="stats-row">
+    <div class="stat-box"><div class="num"><?php echo count($messages); ?></div><div class="lbl">Total Messages</div></div>
+    <div class="stat-box"><div class="num"><?php echo count($messages); ?></div><div class="lbl">Unread</div></div>
+    <div class="stat-box"><div class="num">0</div><div class="lbl">Replied</div></div>
+  </div>
+
+  <?php if ($error): ?>
+    <div class="alert"><i class="fa fa-exclamation-circle"></i> <?php echo $error; ?></div>
+  <?php endif; ?>
+
+  <div class="messages-list">
+    <?php if (empty($messages)): ?>
+      <div class="empty-state">
         <i class="fa fa-inbox"></i>
-        <h3>No contact messages yet</h3>
-        <p>Contact messages will appear here when users submit the contact form.</p>
+        <p style="font-size:18px;margin-bottom:8px;">No messages yet</p>
+        <p>Contact form submissions will appear here.</p>
       </div>
     <?php else: ?>
-      <?php foreach ($contacts as $contact): ?>
-        <div class="contact-card <?php echo $contact['status']; ?>">
-          <div class="contact-header">
-            <div class="contact-info">
-              <h3><?php echo htmlspecialchars($contact['name']); ?></h3>
-              <div class="contact-meta">
-                <span><i class="fa fa-envelope"></i><?php echo htmlspecialchars($contact['email']); ?></span>
-                <span><i class="fa fa-phone"></i><?php echo htmlspecialchars($contact['phone']); ?></span>
-              </div>
-            </div>
-            <span class="status-badge <?php echo $contact['status']; ?>">
-              <?php echo $contact['status']; ?>
-            </span>
-          </div>
-          
-          <div class="contact-subject">
-            <i class="fa fa-tag"></i> <?php echo htmlspecialchars($contact['subject']); ?>
-          </div>
-          
-          <div class="contact-message">
-            <?php echo nl2br(htmlspecialchars($contact['message'])); ?>
-          </div>
-          
-          <div class="contact-footer">
-            <div class="contact-date">
-              <i class="fa fa-clock"></i>
-              <?php echo date('F j, Y - g:i A', strtotime($contact['created_at'])); ?>
+      <?php foreach ($messages as $msg): ?>
+      <div class="message-card">
+        <div class="msg-header">
+          <div class="sender-info">
+            <div class="sender-avatar"><?php echo strtoupper(substr($msg['name'] ?? 'U', 0, 1)); ?></div>
+            <div>
+              <div class="sender-name"><?php echo htmlspecialchars($msg['name'] ?? 'Unknown'); ?> <span class="badge-new">New</span></div>
+              <div class="sender-email"><?php echo htmlspecialchars($msg['email'] ?? ''); ?></div>
             </div>
           </div>
+          <div class="msg-time"><?php echo isset($msg['created_at']) ? date('M d, Y H:i', strtotime($msg['created_at'])) : ''; ?></div>
         </div>
+        <?php if (!empty($msg['subject'])): ?>
+          <div class="msg-subject"><?php echo htmlspecialchars($msg['subject']); ?></div>
+        <?php endif; ?>
+        <div class="msg-body"><?php echo nl2br(htmlspecialchars($msg['message'] ?? '')); ?></div>
+        <div class="msg-actions">
+          <button class="btn-sm btn-reply"><i class="fa fa-reply"></i> Reply</button>
+          <button class="btn-sm btn-mark"><i class="fa fa-check"></i> Mark Read</button>
+          <button class="btn-sm btn-delete"><i class="fa fa-trash"></i> Delete</button>
+        </div>
+      </div>
       <?php endforeach; ?>
     <?php endif; ?>
-    
   </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer">
-  <p>© 2025 Sindhuli Community Technical Institute (SCTI) - Admin Panel</p>
-</footer>
-
+</div>
+<footer class="footer" style="margin-top:30px;"><p>© 2025 SCTI - Admin Panel</p></footer>
 </body>
 </html>

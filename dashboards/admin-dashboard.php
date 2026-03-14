@@ -412,7 +412,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <i class="fa fa-bullhorn"></i>
       </div>
       <div class="stat-info">
-        <h3>12</h3>
+        <h3 id="noticeCount">0</h3>
         <p>Active Notices</p>
       </div>
     </div>
@@ -537,6 +537,12 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 </footer>
 
 <script>
+  // Fetch notice count
+  fetch('../pages/get-notice-count.php')
+    .then(r => r.json())
+    .then(d => { if (d.success) document.getElementById('noticeCount').textContent = d.count; })
+    .catch(() => {});
+
   // Fetch contact messages count
   fetch('../pages/get-contact-count.php')
     .then(response => response.json())

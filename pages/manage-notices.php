@@ -313,24 +313,32 @@ async function toggleNotice(id, currentStatus) {
   const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
   const n = allNotices.find(x => x.id == id);
   if (!n) return;
-  const payload = { ...n, id, status: newStatus };
+  const payload = {
+    id:          parseInt(n.id),
+    title:       n.title,
+    description: n.description,
+    category:    n.category,
+    priority:    n.priority,
+    notice_date: n.notice_date,
+    status:      newStatus
+  };
   try {
     const res  = await fetch('notice-save.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
     const data = await res.json();
-    if (data.success) { showToast('Status updated','success'); loadNotices(); }
-    else showToast(data.message,'error');
-  } catch(e) { showToast('Update failed','error'); }
+    if (data.success) { showToast('Status updated to ' + newStatus,'success'); loadNotices(); }
+    else showToast(data.message || 'Update failed','error');
+  } catch(e) { showToast('Update failed: ' + e.message,'error'); }
 }
 
 // ── DELETE ────────────────────────────────────
 async function deleteNotice(id) {
-  if (!confirm('Delete this notice?')) return;
+  if (!confirm('Delete this notice? This cannot be undone.')) return;
   try {
-    const res  = await fetch('notice-delete.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id}) });
+    const res  = await fetch('notice-delete.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: parseInt(id)}) });
     const data = await res.json();
     if (data.success) { showToast('Notice deleted','success'); loadNotices(); }
-    else showToast(data.message,'error');
-  } catch(e) { showToast('Delete failed','error'); }
+    else showToast(data.message || 'Delete failed','error');
+  } catch(e) { showToast('Delete failed: ' + e.message,'error'); }
 }
 
 // ── HELPERS ───────────────────────────────────

@@ -1,69 +1,79 @@
 ﻿// =============================================
-//  GALLERY PAGE — Beautiful Category Group UI
+//  GALLERY PAGE
 // =============================================
 const galleryPage = `
-  <div class="gh-hero">
-    <div class="gh-hero-shapes">
-      <div class="gh-shape gh-s1"></div>
-      <div class="gh-shape gh-s2"></div>
-      <div class="gh-shape gh-s3"></div>
-    </div>
-    <div class="gh-hero-body">
-      <div class="gh-hero-badge"><i class="fa fa-camera"></i> SCTI Gallery</div>
-      <h1>Our Photo Gallery</h1>
-      <p>Explore moments of learning, achievement, and campus life at SCTI</p>
-      <div class="gh-hero-stats" id="ghHeroStats" style="display:none;">
-        <div class="gh-hs-item"><span id="ghHsPhotos">0</span><small>Photos</small></div>
-        <div class="gh-hs-div"></div>
-        <div class="gh-hs-item"><span id="ghHsCats">0</span><small>Categories</small></div>
+  <div class="glp-wrap">
+
+    <!-- HERO -->
+    <div class="glp-hero">
+      <div class="glp-hero-inner">
+        <div class="glp-hero-icon"><i class="fa fa-images"></i></div>
+        <h1>Photo Gallery</h1>
+        <p>Explore moments of learning, achievement &amp; campus life at SCTI</p>
+        <div class="glp-hero-counters" id="glpCounters" style="display:none">
+          <div class="glp-counter-pill">
+            <i class="fa fa-image"></i>
+            <span id="glpTotalPhotos">0</span> Photos
+          </div>
+          <div class="glp-counter-pill">
+            <i class="fa fa-layer-group"></i>
+            <span id="glpTotalCats">0</span> Categories
+          </div>
+        </div>
+      </div>
+      <div class="glp-hero-wave">
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f4f6fb"/>
+        </svg>
       </div>
     </div>
-    <div class="gh-wave">
-      <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
-        <path d="M0,35 C480,70 960,0 1440,35 L1440,70 L0,70 Z" fill="#f0f4f8"/>
-      </svg>
+
+    <!-- FILTER BAR -->
+    <div class="glp-filter-bar">
+      <div class="glp-filters" id="galleryFilters">
+        <button class="glp-filter active" data-category="">
+          <i class="fa fa-border-all"></i> All
+        </button>
+      </div>
     </div>
+
+    <!-- CONTENT -->
+    <div class="glp-content">
+      <div class="container">
+
+        <div id="galleryLoading" class="glp-loading">
+          <div class="glp-dots"><span></span><span></span><span></span></div>
+          <p>Loading gallery...</p>
+        </div>
+
+        <div id="galleryContent"></div>
+
+        <div id="galleryEmpty" class="glp-empty" style="display:none">
+          <i class="fa fa-images"></i>
+          <h3>No Photos Yet</h3>
+          <p>No images found in this category.</p>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
-  <div class="gh-tabs-wrap">
-    <div class="gh-tabs" id="galleryFilters">
-      <button class="gh-tab active" data-category="">
-        <i class="fa fa-border-all"></i> All Categories
-      </button>
-    </div>
-  </div>
-
-  <div class="gh-main">
-    <div class="container">
-      <div id="galleryLoading" class="gh-loading">
-        <div class="gh-pulse"><div></div><div></div><div></div></div>
-        <p>Loading gallery...</p>
-      </div>
-      <div id="galleryContent"></div>
-      <div id="galleryEmpty" class="gh-empty" style="display:none;">
-        <i class="fa fa-images"></i>
-        <h3>No Photos Yet</h3>
-        <p>No images found in this category.</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="glLightbox" class="ghl" onclick="glbBgClick(event)">
-    <button class="ghl-close" onclick="closeLightbox()"><i class="fa fa-xmark"></i></button>
-    <button class="ghl-nav ghl-prev" onclick="navigateLightbox(-1)"><i class="fa fa-chevron-left"></i></button>
-    <button class="ghl-nav ghl-next" onclick="navigateLightbox(1)"><i class="fa fa-chevron-right"></i></button>
-    <div class="ghl-stage">
-      <div class="ghl-img-box">
-        <img id="lightboxImage" src="" alt="">
-      </div>
-      <div class="ghl-caption">
-        <div class="ghl-caption-left">
+  <!-- LIGHTBOX -->
+  <div id="glLightbox" class="glp-lb" onclick="glbBgClick(event)">
+    <button class="glp-lb-close" onclick="closeLightbox()"><i class="fa fa-xmark"></i></button>
+    <button class="glp-lb-nav glp-lb-prev" onclick="navigateLightbox(-1)"><i class="fa fa-chevron-left"></i></button>
+    <button class="glp-lb-nav glp-lb-next" onclick="navigateLightbox(1)"><i class="fa fa-chevron-right"></i></button>
+    <div class="glp-lb-stage">
+      <div class="glp-lb-img"><img id="lightboxImage" src="" alt=""></div>
+      <div class="glp-lb-info">
+        <div>
           <h3 id="lightboxTitle"></h3>
           <p id="lightboxDescription"></p>
         </div>
-        <div class="ghl-caption-right">
-          <span id="lightboxCategory" class="ghl-cat-badge"></span>
-          <span id="glbCounter" class="ghl-counter"></span>
+        <div class="glp-lb-meta">
+          <span id="lightboxCategory" class="glp-lb-cat"></span>
+          <span id="glbCounter" class="glp-lb-num"></span>
         </div>
       </div>
     </div>
@@ -71,45 +81,34 @@ const galleryPage = `
 `;
 
 // =============================================
-//  CONFIG
+//  STATE & CONFIG
 // =============================================
-let galleryImages = [];
+let galleryImages   = [];
 let currentImageIndex = 0;
 
-const catIcons = {
-  campus:       'fa-university',
-  events:       'fa-calendar-star',
-  students:     'fa-user-graduate',
-  facilities:   'fa-building',
-  activities:   'fa-person-running',
-  achievements: 'fa-trophy',
-  sports:       'fa-futbol',
-  labs:         'fa-flask',
-  library:      'fa-book-open',
-  classroom:    'fa-chalkboard-teacher',
-  ceremony:     'fa-award',
-  default:      'fa-folder-open'
+const CAT_ICONS = {
+  campus:'fa-university', events:'fa-calendar-star', students:'fa-user-graduate',
+  facilities:'fa-building', activities:'fa-person-running', achievements:'fa-trophy',
+  sports:'fa-futbol', labs:'fa-flask', library:'fa-book-open',
+  classroom:'fa-chalkboard', ceremony:'fa-award', default:'fa-folder-open'
 };
 
-const palettes = [
-  { c1: '#004080', c2: '#0d6efd', light: '#e8f0fe', text: '#004080' },
-  { c1: '#0d6efd', c2: '#17a2b8', light: '#e0f7fa', text: '#0d6efd' },
-  { c1: '#198754', c2: '#20c997', light: '#e6f9f0', text: '#198754' },
-  { c1: '#fd7e14', c2: '#ffc107', light: '#fff3cd', text: '#b45309' },
-  { c1: '#6f42c1', c2: '#d63384', light: '#f3e8ff', text: '#6f42c1' },
-  { c1: '#dc3545', c2: '#fd7e14', light: '#fde8e8', text: '#dc3545' },
-  { c1: '#0dcaf0', c2: '#0d6efd', light: '#e0f4ff', text: '#0369a1' },
-  { c1: '#20c997', c2: '#198754', light: '#d1fae5', text: '#065f46' },
+// Distinct, vivid gradients per category
+const PALETTES = [
+  { from:'#1e3a8a', to:'#3b82f6', accent:'#60a5fa' },
+  { from:'#065f46', to:'#10b981', accent:'#34d399' },
+  { from:'#7c2d12', to:'#f97316', accent:'#fb923c' },
+  { from:'#4c1d95', to:'#8b5cf6', accent:'#a78bfa' },
+  { from:'#881337', to:'#f43f5e', accent:'#fb7185' },
+  { from:'#164e63', to:'#06b6d4', accent:'#22d3ee' },
+  { from:'#713f12', to:'#eab308', accent:'#fde047' },
+  { from:'#134e4a', to:'#14b8a6', accent:'#2dd4bf' },
 ];
-let paletteIdx = 0;
-const catPaletteMap = {};
-
+let _pi = 0;
+const _pm = {};
 function getPalette(cat) {
-  if (!catPaletteMap[cat]) {
-    catPaletteMap[cat] = palettes[paletteIdx % palettes.length];
-    paletteIdx++;
-  }
-  return catPaletteMap[cat];
+  if (!_pm[cat]) { _pm[cat] = PALETTES[_pi % PALETTES.length]; _pi++; }
+  return _pm[cat];
 }
 
 // =============================================
@@ -121,24 +120,21 @@ async function loadGalleryCategories() {
     const data = await res.json();
     if (!data.success) { setupGalleryFilters(); return; }
 
-    const container = document.getElementById('galleryFilters');
-    if (!container) return;
+    const bar = document.getElementById('galleryFilters');
+    if (!bar) return;
 
     data.categories.forEach(cat => {
-      const icon = catIcons[cat.name.toLowerCase()] || catIcons.default;
+      const icon = CAT_ICONS[cat.name.toLowerCase()] || CAT_ICONS.default;
       const p    = getPalette(cat.name);
       const btn  = document.createElement('button');
-      btn.className = 'gh-tab';
-      btn.setAttribute('data-category', cat.name);
-      btn.style.setProperty('--tc1', p.c1);
+      btn.className = 'glp-filter';
+      btn.dataset.category = cat.name;
+      btn.style.cssText = `--fa:${p.from};--fb:${p.to}`;
       btn.innerHTML = `<i class="fa ${icon}"></i> ${cat.name}`;
-      container.appendChild(btn);
+      bar.appendChild(btn);
     });
-
     setupGalleryFilters();
-  } catch (e) {
-    setupGalleryFilters();
-  }
+  } catch(e) { setupGalleryFilters(); }
 }
 
 // =============================================
@@ -161,19 +157,20 @@ async function loadGalleryImages(category = '') {
       galleryImages = result.images;
       renderGallery(result.images, category);
 
+      // Update hero counters
       const cats = new Set(result.images.map(i => i.category).filter(Boolean));
-      const photoEl = document.getElementById('ghHsPhotos');
-      const catEl   = document.getElementById('ghHsCats');
-      const statsEl = document.getElementById('ghHeroStats');
-      if (photoEl) photoEl.textContent = result.images.length;
-      if (catEl)   catEl.textContent   = cats.size;
-      if (statsEl) statsEl.style.display = 'flex';
+      const pc = document.getElementById('glpTotalPhotos');
+      const cc = document.getElementById('glpTotalCats');
+      const cw = document.getElementById('glpCounters');
+      if (pc) pc.textContent = result.images.length;
+      if (cc) cc.textContent = cats.size;
+      if (cw) cw.style.display = 'flex';
     } else {
       empty.style.display = 'flex';
     }
-  } catch (err) {
-    console.error('Gallery load error:', err);
-    empty.style.display = 'flex';
+  } catch(err) {
+    console.error('Gallery error:', err);
+    document.getElementById('galleryEmpty').style.display = 'flex';
   } finally {
     loading.style.display = 'none';
   }
@@ -187,117 +184,81 @@ function renderGallery(images, activeCategory) {
 
   if (activeCategory !== '') {
     const p    = getPalette(activeCategory);
-    const icon = catIcons[activeCategory.toLowerCase()] || catIcons.default;
-    content.innerHTML = categoryCardHTML(activeCategory, icon, p, images, 0);
-    animateCards();
+    const icon = CAT_ICONS[activeCategory.toLowerCase()] || CAT_ICONS.default;
+    content.innerHTML = buildCategorySection(activeCategory, icon, p, images);
+    fadeInCards();
     return;
   }
 
-  const groups = {};
-  const nocat  = [];
+  // Group by category
+  const groups = {}, nocat = [];
   images.forEach((img, i) => {
     img._idx = i;
     if (img.category) {
-      if (!groups[img.category]) groups[img.category] = [];
-      groups[img.category].push(img);
+      (groups[img.category] = groups[img.category] || []).push(img);
     } else {
       nocat.push(img);
     }
   });
 
   let html = '';
-  let cardIdx = 0;
+  let ci   = 0;
   Object.keys(groups).forEach(cat => {
-    const icon = catIcons[cat.toLowerCase()] || catIcons.default;
+    const icon = CAT_ICONS[cat.toLowerCase()] || CAT_ICONS.default;
     const p    = getPalette(cat);
-    html += categoryCardHTML(cat, icon, p, groups[cat], cardIdx);
-    cardIdx++;
+    html += buildCategorySection(cat, icon, p, groups[cat]);
+    ci++;
   });
-
   if (nocat.length) {
-    const p = getPalette('__general__');
-    html += categoryCardHTML('General', 'fa-images', p, nocat, cardIdx);
+    html += buildCategorySection('General', 'fa-images', getPalette('__gen__'), nocat);
   }
 
   content.innerHTML = html;
-  animateCards();
+  fadeInCards();
 }
 
-// =============================================
-//  CATEGORY CARD HTML
-// =============================================
-function categoryCardHTML(cat, icon, p, images, cardIdx) {
+function buildCategorySection(cat, icon, p, images) {
   const count = images.length;
-
-  // Up to 3 blurred preview thumbs for header background
-  const previews = images.slice(0, 3).map(img => {
-    const src = img.thumbnail_path || img.file_path;
-    return `<div class="gc-preview-thumb" style="background-image:url('${src}')"></div>`;
-  }).join('');
-
-  const items = images.map(img => itemHTML(img, img._idx !== undefined ? img._idx : 0, p)).join('');
+  const tiles  = images.map(img => buildTile(img, img._idx ?? 0, p)).join('');
 
   return `
-    <div class="gc-card" style="--c1:${p.c1};--c2:${p.c2};--cl:${p.light};--ct:${p.text};animation-delay:${cardIdx * 0.1}s">
-      <div class="gc-header">
-        <div class="gc-header-bg"></div>
-        <div class="gc-preview-strip">${previews}</div>
-        <div class="gc-preview-overlay"></div>
-        <div class="gc-header-content">
-          <div class="gc-icon-wrap"><i class="fa ${icon}"></i></div>
-          <div class="gc-header-text">
+    <div class="glp-section">
+      <div class="glp-section-head" style="--fa:${p.from};--fb:${p.to}">
+        <div class="glp-sh-left">
+          <div class="glp-sh-icon"><i class="fa ${icon}"></i></div>
+          <div class="glp-sh-text">
             <h2>${cat}</h2>
-            <p>${count} photo${count !== 1 ? 's' : ''} in this collection</p>
+            <span>${count} photo${count !== 1 ? 's' : ''} in this collection</span>
           </div>
-          <div class="gc-count-badge"><span>${count}</span><small>photos</small></div>
         </div>
-        <div class="gc-header-wave">
-          <svg viewBox="0 0 400 30" preserveAspectRatio="none">
-            <path d="M0,15 C100,30 300,0 400,15 L400,30 L0,30 Z" fill="white"/>
-          </svg>
-        </div>
+        <div class="glp-sh-badge">${count}<small>PHOTOS</small></div>
       </div>
-      <div class="gc-body">
-        <div class="gc-grid">${items}</div>
-        ${count > 8 ? `<div class="gc-show-more" onclick="toggleShowMore(this)">
-          <i class="fa fa-chevron-down"></i> Show all ${count} photos
-        </div>` : ''}
-      </div>
+      <div class="glp-grid">${tiles}</div>
     </div>`;
 }
 
-function itemHTML(img, index, p) {
-  const thumb = img.thumbnail_path || img.file_path;
+function buildTile(img, index, p) {
+  const src = img.thumbnail_path || img.file_path;
   return `
-    <div class="gc-item" onclick="openLightbox(${index})">
-      <div class="gc-img-wrap">
-        <img src="${thumb}" alt="${img.title}" loading="lazy"
-             onerror="this.src='assets/images/img1.jpg'">
-      </div>
-      <div class="gc-overlay">
-        <div class="gc-overlay-icon"><i class="fa fa-magnifying-glass-plus"></i></div>
-        <div class="gc-overlay-title">${img.title}</div>
+    <div class="glp-tile" onclick="openLightbox(${index})" style="--fa:${p.from};--fb:${p.to}">
+      <img src="${src}" alt="${img.title}" loading="lazy"
+           onerror="this.src='assets/images/img1.jpg'">
+      <div class="glp-tile-over">
+        <div class="glp-tile-zoom"><i class="fa fa-magnifying-glass-plus"></i></div>
+        <p class="glp-tile-title">${img.title}</p>
       </div>
     </div>`;
 }
 
-function toggleShowMore(btn) {
-  const grid = btn.previousElementSibling;
-  const isExpanded = grid.classList.toggle('gc-grid-expanded');
-  btn.innerHTML = isExpanded
-    ? '<i class="fa fa-chevron-up"></i> Show less'
-    : `<i class="fa fa-chevron-down"></i> Show all photos`;
-}
-
-function animateCards() {
-  document.querySelectorAll('.gc-card').forEach((card, i) => {
-    card.style.opacity   = '0';
-    card.style.transform = 'translateY(40px)';
+function fadeInCards() {
+  document.querySelectorAll('.glp-section').forEach((el, i) => {
+    el.style.opacity   = '0';
+    el.style.transform = 'translateY(28px)';
     setTimeout(() => {
-      card.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
-      card.style.opacity    = '1';
-      card.style.transform  = 'translateY(0)';
-    }, i * 120);
+      el.style.transition = 'opacity .5s ease, transform .5s ease';
+      el.style.opacity    = '1';
+      el.style.transform  = 'translateY(0)';
+    }, i * 90);
   });
 }
 
@@ -328,10 +289,10 @@ function navigateLightbox(dir) {
   imgEl.style.transform = dir > 0 ? 'translateX(40px)' : 'translateX(-40px)';
   setTimeout(() => {
     openLightbox(currentImageIndex);
-    imgEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    imgEl.style.transition = 'opacity .3s, transform .3s';
     imgEl.style.opacity    = '1';
     imgEl.style.transform  = 'translateX(0)';
-  }, 160);
+  }, 150);
 }
 
 function glbBgClick(e) {
@@ -342,15 +303,18 @@ function glbBgClick(e) {
 //  FILTERS
 // =============================================
 function setupGalleryFilters() {
-  document.querySelectorAll('.gh-tab').forEach(btn => {
+  document.querySelectorAll('.glp-filter').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.gh-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.glp-filter').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      loadGalleryImages(btn.getAttribute('data-category'));
+      loadGalleryImages(btn.dataset.category);
     });
   });
 }
 
+// =============================================
+//  KEYBOARD
+// =============================================
 document.addEventListener('keydown', e => {
   const lb = document.getElementById('glLightbox');
   if (lb && lb.classList.contains('active')) {

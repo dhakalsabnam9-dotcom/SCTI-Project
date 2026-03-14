@@ -1940,8 +1940,19 @@ body {
 
 /* Breadcrumb */
 .breadcrumb {
-  padding: 20px 0;
-  background: #f8f9fa;
+  padding: 0;
+  background: transparent;
+  font-size: 14px;
+  opacity: 1;
+}
+
+.breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
 }
 
 .breadcrumb-list {

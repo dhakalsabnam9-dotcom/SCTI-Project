@@ -83,7 +83,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/menu.js"></script>
 <script src="assets/js/pages/home.js"></script>
 <script src="assets/js/pages/programs.js"></script>
-<script src="assets/js/pages/gallery.js?v=29"></script>
+<script src="assets/js/pages/gallery.js?v=30"></script>
 <script src="assets/js/pages/notices.js"></script>
 <script src="assets/js/pages/contact.js"></script>
 <script src="assets/js/pages/login.js"></script>

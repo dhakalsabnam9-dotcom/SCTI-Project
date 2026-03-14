@@ -192,14 +192,19 @@ let currentFilter = 'all';
 async function loadNotices() {
   try {
     const res  = await fetch('notice-list.php?status=all');
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) {
+      document.getElementById('noticeList').innerHTML = '<div class="empty-state"><i class="fa fa-exclamation-triangle"></i><p>Parse error: ' + text.substring(0,120) + '</p></div>';
+      return;
+    }
     if (data.success) {
       allNotices = data.notices;
       updateStats();
       renderNotices();
     }
   } catch(e) {
-    document.getElementById('noticeList').innerHTML = '<div class="empty-state"><i class="fa fa-exclamation-triangle"></i><p>Failed to load notices</p></div>';
+    document.getElementById('noticeList').innerHTML = '<div class="empty-state"><i class="fa fa-exclamation-triangle"></i><p>Failed: ' + e.message + '</p></div>';
   }
 }
 
@@ -302,43 +307,59 @@ async function saveNotice() {
 
   try {
     const res  = await fetch('notice-save.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { showToast('Server error: ' + text.substring(0,80), 'error'); return; }
     if (data.success) { showToast(data.message,'success'); closeModal(); loadNotices(); }
     else showToast(data.message,'error');
-  } catch(e) { showToast('Save failed','error'); }
+  } catch(e) { showToast('Save failed: ' + e.message,'error'); }
 }
 
 // ── TOGGLE ────────────────────────────────────
 async function toggleNotice(id, currentStatus) {
   const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-  const n = allNotices.find(x => x.id == id);
-  if (!n) return;
+  const n = allNotices.find(x => String(x.id) === String(id));
+  if (!n) { showToast('Notice not found','error'); return; }
+  // Extract just the date part (YYYY-MM-DD)
+  const dateOnly = (n.notice_date || '').split(' ')[0].split('T')[0] || new Date().toISOString().split('T')[0];
   const payload = {
     id:          parseInt(n.id),
     title:       n.title,
     description: n.description,
     category:    n.category,
     priority:    n.priority,
-    notice_date: n.notice_date,
+    notice_date: dateOnly,
     status:      newStatus
   };
   try {
-    const res  = await fetch('notice-save.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const data = await res.json();
-    if (data.success) { showToast('Status updated to ' + newStatus,'success'); loadNotices(); }
-    else showToast(data.message || 'Update failed','error');
-  } catch(e) { showToast('Update failed: ' + e.message,'error'); }
+    const res  = await fetch('notice-save.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { showToast('Server error: ' + text.substring(0,80), 'error'); return; }
+    if (data.success) { showToast('Status → ' + newStatus, 'success'); loadNotices(); }
+    else showToast(data.message || 'Update failed', 'error');
+  } catch(e) { showToast('Network error: ' + e.message, 'error'); }
 }
 
 // ── DELETE ────────────────────────────────────
 async function deleteNotice(id) {
   if (!confirm('Delete this notice? This cannot be undone.')) return;
   try {
-    const res  = await fetch('notice-delete.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: parseInt(id)}) });
-    const data = await res.json();
-    if (data.success) { showToast('Notice deleted','success'); loadNotices(); }
-    else showToast(data.message || 'Delete failed','error');
-  } catch(e) { showToast('Delete failed: ' + e.message,'error'); }
+    const res  = await fetch('notice-delete.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id: parseInt(id)})
+    });
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { showToast('Server error: ' + text.substring(0,80), 'error'); return; }
+    if (data.success) { showToast('Notice deleted', 'success'); loadNotices(); }
+    else showToast(data.message || 'Delete failed', 'error');
+  } catch(e) { showToast('Network error: ' + e.message, 'error'); }
 }
 
 // ── HELPERS ───────────────────────────────────

@@ -2,6 +2,84 @@
 //  GALLERY PAGE
 // =============================================
 const galleryPage = `
+  <style>
+    .glp-wrap{background:#f4f6fb;min-height:60vh}
+    .glp-hero{position:relative;background:linear-gradient(135deg,#004080 0%,#0059b3 60%,#17a2b8 100%);padding:52px 20px 0;text-align:center;overflow:hidden}
+    .glp-hero-inner{position:relative;z-index:2;color:white;padding-bottom:28px}
+    .glp-hero-icon{font-size:48px;margin-bottom:12px;opacity:.9}
+    .glp-hero-inner h1{font-size:38px;font-weight:900;margin:0 0 10px;letter-spacing:-1px}
+    .glp-hero-inner p{font-size:15px;opacity:.82;max-width:480px;margin:0 auto 22px;line-height:1.6}
+    .glp-hero-counters{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+    .glp-counter-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:30px;padding:8px 20px;font-size:14px;font-weight:700;color:white}
+    .glp-hero-wave{position:relative;z-index:2;line-height:0}
+    .glp-hero-wave svg{width:100%;height:50px;display:block}
+    .glp-filter-bar{background:white;border-bottom:2px solid #e8ecf2;position:sticky;top:100px;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.07)}
+    .glp-filters{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;scrollbar-width:none}
+    .glp-filters::-webkit-scrollbar{display:none}
+    .glp-filter{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:2px solid #dde3ed;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:all .2s ease}
+    .glp-filter:hover{border-color:#004080;color:#004080;background:white;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,64,128,.12)}
+    .glp-filter.active{background:linear-gradient(135deg,var(--fa,#004080),var(--fb,#0059b3));border-color:transparent;color:white;box-shadow:0 4px 14px rgba(0,64,128,.3)}
+    .glp-content{background:#f4f6fb;padding:36px 0 60px;min-height:400px}
+    .glp-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px}
+    .glp-dots{display:flex;gap:10px}
+    .glp-dots span{width:14px;height:14px;border-radius:50%;background:#004080;animation:glpBounce 1.3s ease-in-out infinite}
+    .glp-dots span:nth-child(2){animation-delay:.18s;background:#0059b3}
+    .glp-dots span:nth-child(3){animation-delay:.36s;background:#17a2b8}
+    @keyframes glpBounce{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1.2);opacity:1}}
+    .glp-loading p{color:#8a9ab5;font-size:14px;font-weight:500}
+    .glp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center}
+    .glp-empty i{font-size:64px;color:#c5cfe0;margin-bottom:18px}
+    .glp-empty h3{margin:0 0 8px;color:#4a5568;font-size:20px;font-weight:700}
+    .glp-empty p{margin:0;color:#8a9ab5;font-size:14px}
+    .glp-section{background:white;border-radius:20px;overflow:hidden;margin-bottom:32px;box-shadow:0 3px 18px rgba(0,0,0,.07)}
+    .glp-section-head{background:linear-gradient(135deg,var(--fa,#004080) 0%,var(--fb,#0059b3) 100%);padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .glp-sh-left{display:flex;align-items:center;gap:16px;min-width:0}
+    .glp-sh-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:22px;color:white;flex-shrink:0}
+    .glp-sh-text h2{margin:0 0 3px;font-size:20px;font-weight:800;color:white;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .glp-sh-text span{font-size:12px;color:rgba(255,255,255,.7);font-weight:500}
+    .glp-sh-badge{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.3);border-radius:14px;padding:10px 16px;color:white;flex-shrink:0;min-width:60px;text-align:center;font-size:26px;font-weight:900;line-height:1}
+    .glp-sh-badge small{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-top:3px;font-weight:700}
+    .glp-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:20px;padding:24px 26px 30px}
+    .glp-tile{border-radius:16px;overflow:hidden;cursor:pointer;background:white;box-shadow:0 4px 16px rgba(0,0,0,.10);transition:transform .3s ease,box-shadow .3s ease;display:flex !important;flex-direction:column !important}
+    .glp-tile:hover{transform:translateY(-7px);box-shadow:0 20px 44px rgba(0,0,0,.17)}
+    .glp-tile-img-wrap{position:relative;width:100%;padding-top:75%;overflow:hidden;background:#dde3ed;flex-shrink:0}
+    .glp-tile-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease}
+    .glp-tile:hover .glp-tile-img-wrap img{transform:scale(1.08)}
+    .glp-tile-over{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s ease}
+    .glp-tile:hover .glp-tile-over{opacity:1}
+    .glp-tile-zoom{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;transform:scale(.5);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+    .glp-tile:hover .glp-tile-zoom{transform:scale(1)}
+    .glp-tile-title{padding:11px 14px 13px;font-size:13px;font-weight:600;color:#2d3748;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:white;border-top:1px solid #eef1f6;margin:0}
+    .glp-lb{position:fixed;inset:0;background:rgba(4,8,18,.96);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+    .glp-lb.active{display:flex;animation:glpLbIn .28s ease}
+    @keyframes glpLbIn{from{opacity:0}to{opacity:1}}
+    .glp-lb-close{position:fixed;top:20px;right:20px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .22s;z-index:10001}
+    .glp-lb-close:hover{background:#dc3545;border-color:transparent;transform:rotate(90deg) scale(1.1)}
+    .glp-lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .22s;z-index:10001}
+    .glp-lb-prev{left:16px}.glp-lb-next{right:16px}
+    .glp-lb-nav:hover{background:rgba(0,64,128,.8);border-color:transparent;transform:translateY(-50%) scale(1.1)}
+    .glp-lb-stage{width:92%;max-width:900px;display:flex;flex-direction:column;align-items:center;animation:glpLbZoom .35s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes glpLbZoom{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+    .glp-lb-img{width:100%;border-radius:12px;overflow:hidden;background:#0d0d0d;max-height:65vh;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+    .glp-lb-img img{max-width:100%;max-height:65vh;object-fit:contain;display:block;transition:opacity .25s ease}
+    .glp-lb-info{width:100%;margin-top:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .glp-lb-info h3{margin:0 0 3px;color:white;font-size:16px;font-weight:700}
+    .glp-lb-info p{margin:0;color:rgba(255,255,255,.5);font-size:13px}
+    .glp-lb-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+    .glp-lb-cat{display:inline-block;padding:4px 12px;background:linear-gradient(135deg,#004080,#0059b3);color:white;border-radius:16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .glp-lb-num{color:rgba(255,255,255,.4);font-size:12px;font-weight:600}
+    @media(max-width:768px){
+      .glp-hero{padding:40px 16px 0}
+      .glp-hero-inner h1{font-size:26px}
+      .glp-grid{grid-template-columns:repeat(2,1fr) !important;gap:12px;padding:16px}
+      .glp-section-head{padding:16px 18px}
+      .glp-sh-text h2{font-size:16px}
+    }
+    @media(max-width:480px){
+      .glp-grid{grid-template-columns:repeat(1,1fr) !important;gap:10px;padding:12px}
+      .glp-sh-badge{display:none}
+    }
+  </style>
   <div class="glp-wrap">
 
     <!-- HERO -->
@@ -220,15 +298,17 @@ function renderGallery(images, activeCategory) {
 function buildCategorySection(cat, icon, p, images) {
   const count = images.length;
   const tiles  = images.map(img => buildTile(img, img._idx ?? 0, p)).join('');
+  const isAll  = (document.querySelector('.glp-filter.active')?.dataset.category === '');
 
   return `
     <div class="glp-section">
-      <div class="glp-section-head" style="--fa:${p.from};--fb:${p.to}">
+      <div class="glp-section-head" style="--fa:${p.from};--fb:${p.to};cursor:${isAll ? 'pointer' : 'default'}"
+           ${isAll ? `onclick="filterToCategory('${cat.replace(/'/g,"\\'")}','${p.from}','${p.to}')" title="Click to filter by ${cat}"` : ''}>
         <div class="glp-sh-left">
           <div class="glp-sh-icon"><i class="fa ${icon}"></i></div>
           <div class="glp-sh-text">
             <h2>${cat}</h2>
-            <span>${count} photo${count !== 1 ? 's' : ''} in this collection</span>
+            <span>${count} photo${count !== 1 ? 's' : ''} in this collection${isAll ? ' — click to filter' : ''}</span>
           </div>
         </div>
         <div class="glp-sh-badge">${count}<small>PHOTOS</small></div>
@@ -250,6 +330,19 @@ function buildTile(img, index, p) {
       </div>
       <p class="glp-tile-title">${img.title}</p>
     </div>`;
+}
+
+function filterToCategory(cat, colorFrom, colorTo) {
+  // Activate the matching filter pill
+  document.querySelectorAll('.glp-filter').forEach(b => {
+    b.classList.remove('active');
+    if (b.dataset.category === cat) {
+      b.classList.add('active');
+      b.style.setProperty('--fa', colorFrom);
+      b.style.setProperty('--fb', colorTo);
+    }
+  });
+  loadGalleryImages(cat);
 }
 
 function fadeInCards() {

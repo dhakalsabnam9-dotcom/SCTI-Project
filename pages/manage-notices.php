@@ -50,8 +50,13 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .meta-item{display:flex;align-items:center;gap:5px;color:#666;font-size:12px}
     .meta-item i{color:#004080}
     .notice-body{color:#555;font-size:14px;line-height:1.6;margin-bottom:14px}
-    .notice-actions{display:flex;gap:8px;position:relative;z-index:10}
-    .btn-sm{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s,color .2s;display:inline-flex;align-items:center;gap:5px;position:relative;z-index:10;pointer-events:all}
+    /* ── Override global style.css notice-card rules that break buttons ── */
+    .notice-card{overflow:visible!important;transform:none}
+    .notice-card:hover{transform:none!important}
+    .notice-card::before{display:none!important}
+    /* ── Actions & buttons ── */
+    .notice-actions{display:flex;gap:8px;position:relative;z-index:20}
+    .btn-sm{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s,color .2s;display:inline-flex;align-items:center;gap:5px;position:relative;z-index:20;pointer-events:all!important}
     .btn-edit{background:#cce5ff;color:#004085}
     .btn-edit:hover{background:#004080;color:white}
     .btn-delete{background:#f8d7da;color:#dc3545}

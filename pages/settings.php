@@ -23,7 +23,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'admin';
       box-shadow: 0 4px 15px rgba(0,64,128,0.2);
     }
     .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
-    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .breadcrumb { background: transparent !important; padding: 0; font-size: 14px; }
+    .breadcrumb a { color: white; text-decoration: none; }
     .settings-layout { display: grid; grid-template-columns: 220px 1fr; gap: 25px; }
     .settings-nav { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: fit-content; }
     .nav-item {

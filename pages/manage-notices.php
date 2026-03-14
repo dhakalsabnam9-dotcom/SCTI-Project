@@ -23,7 +23,8 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
       box-shadow: 0 4px 15px rgba(0,64,128,0.2);
     }
     .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
-    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .breadcrumb { background: transparent !important; padding: 0; font-size: 14px; }
+    .breadcrumb a { color: white; text-decoration: none; }
     .btn-add {
       background: rgba(255,255,255,0.2); color: white;
       padding: 12px 24px; border: 2px solid white; border-radius: 6px;

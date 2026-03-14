@@ -33,7 +33,8 @@ try {
       box-shadow: 0 4px 15px rgba(220,53,69,0.2);
     }
     .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
-    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .breadcrumb { background: transparent !important; padding: 0; font-size: 14px; }
+    .breadcrumb a { color: white; text-decoration: none; }
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
     .stat-box { background: white; border-radius: 10px; padding: 18px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-top: 4px solid #dc3545; }
     .stat-box .num { font-size: 28px; font-weight: 700; color: #dc3545; }

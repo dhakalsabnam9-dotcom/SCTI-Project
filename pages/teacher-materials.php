@@ -24,7 +24,8 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       box-shadow: 0 4px 15px rgba(40,167,69,0.2);
     }
     .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
-    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .breadcrumb { background: transparent !important; padding: 0; font-size: 14px; }
+    .breadcrumb a { color: white; text-decoration: none; }
     .btn-upload {
       background: rgba(255,255,255,0.2); color: white;
       padding: 12px 24px; border: 2px solid white; border-radius: 6px;

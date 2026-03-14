@@ -23,7 +23,8 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       box-shadow: 0 4px 15px rgba(40,167,69,0.2);
     }
     .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
-    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .breadcrumb { background: transparent !important; padding: 0; font-size: 14px; }
+    .breadcrumb a { color: white; text-decoration: none; }
     .card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
     .card h2 { color: #28a745; margin-bottom: 20px; font-size: 20px; }
     .timetable { width: 100%; border-collapse: collapse; }

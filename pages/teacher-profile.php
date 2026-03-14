@@ -24,7 +24,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'teacher';
       box-shadow: 0 4px 15px rgba(40,167,69,0.2);
     }
     .page-header h1 { margin: 0 0 8px 0; font-size: 28px; }
-    .breadcrumb a { color: white; text-decoration: none; font-size: 14px; }
+    .breadcrumb { background: transparent !important; padding: 0; font-size: 14px; }
+    .breadcrumb a { color: white; text-decoration: none; }
     .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 25px; }
     .profile-card {
       background: white; border-radius: 10px; padding: 30px;

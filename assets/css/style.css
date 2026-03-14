@@ -1955,6 +1955,24 @@ body {
   text-decoration: underline;
 }
 
+/* Breadcrumb inside colored page headers — force white text */
+.page-header .breadcrumb,
+.dashboard-header .breadcrumb {
+  color: rgba(255,255,255,0.85) !important;
+  background: transparent !important;
+}
+
+.page-header .breadcrumb a,
+.dashboard-header .breadcrumb a {
+  color: white !important;
+  text-decoration: none;
+}
+
+.page-header .breadcrumb a:hover,
+.dashboard-header .breadcrumb a:hover {
+  text-decoration: underline;
+}
+
 .breadcrumb-list {
   list-style: none;
   display: flex;

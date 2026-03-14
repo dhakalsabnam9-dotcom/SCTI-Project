@@ -18,9 +18,10 @@ ini_set('session.cookie_secure', 0); // Set to 1 if using HTTPS
 // Timezone
 date_default_timezone_set('Asia/Kathmandu');
 
-// Error Reporting (disable in production)
+// Error Reporting - OFF so PHP errors don't corrupt JSON responses
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 // Database Connection Singleton
 class Database {
@@ -38,7 +39,7 @@ class Database {
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch(PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+            throw new Exception("DB connection failed: " . $e->getMessage());
         }
     }
     

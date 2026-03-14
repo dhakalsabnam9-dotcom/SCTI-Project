@@ -1,175 +1,145 @@
 <?php
+ob_start();
 session_start();
-header('Content-Type: application/json');
 
-// Check if user is logged in and is admin
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+// Always return JSON, no matter what
+function sendJSON($data) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    echo json_encode($data);
     exit();
+}
+
+if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+    sendJSON(['success' => false, 'message' => 'Unauthorized']);
 }
 
 require_once '../includes/config.php';
 
-try {
-    // Validate file upload
-    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-        throw new Exception('No file uploaded or upload error occurred');
-    }
-    
-    $file = $_FILES['image'];
-    $title = trim($_POST['title'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $category = trim($_POST['category'] ?? '');
-    
-    // Validate title
-    if (empty($title)) {
-        throw new Exception('Title is required');
-    }
-    
-    // Validate file type
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    $fileType = mime_content_type($file['tmp_name']);
-    
-    if (!in_array($fileType, $allowedTypes)) {
-        throw new Exception('Invalid file type. Only JPG, PNG, GIF, and WEBP are allowed');
-    }
-    
-    // Validate file size (10MB max)
-    $maxSize = 10 * 1024 * 1024; // 10MB in bytes
-    if ($file['size'] > $maxSize) {
-        throw new Exception('File size exceeds 10MB limit');
-    }
-    
-    // Create upload directory if it doesn't exist
-    $uploadDir = '../uploads/gallery/';
-    $thumbnailDir = '../uploads/gallery/thumbnails/';
-    
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-    
-    if (!file_exists($thumbnailDir)) {
-        mkdir($thumbnailDir, 0755, true);
-    }
-    
-    // Generate unique filename
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = uniqid('gallery_') . '_' . time() . '.' . $extension;
-    $filepath = $uploadDir . $filename;
-    $thumbnailPath = $thumbnailDir . $filename;
-    
-    // Move uploaded file
-    if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-        throw new Exception('Failed to move uploaded file');
-    }
-    
-    // Create thumbnail
-    createThumbnail($filepath, $thumbnailPath, 300, 300);
-    
-    // Store relative paths for database
-    $dbFilePath = 'uploads/gallery/' . $filename;
-    $dbThumbnailPath = 'uploads/gallery/thumbnails/' . $filename;
-    
-    // Insert into database
-    $stmt = $conn->prepare("INSERT INTO gallery_images (title, description, file_path, thumbnail_path, category, created_by) VALUES (?, ?, ?, ?, ?, ?)");
-    $userId = $_SESSION['user_id'] ?? null;
-    $stmt->bind_param("sssssi", $title, $description, $dbFilePath, $dbThumbnailPath, $category, $userId);
-    
-    if (!$stmt->execute()) {
-        // Delete uploaded files if database insert fails
-        unlink($filepath);
-        if (file_exists($thumbnailPath)) {
-            unlink($thumbnailPath);
-        }
-        throw new Exception('Failed to save image information to database');
-    }
-    
-    $imageId = $stmt->insert_id;
-    $stmt->close();
-    
-    echo json_encode([
-        'success' => true,
-        'message' => 'Image uploaded successfully',
-        'image_id' => $imageId
-    ]);
-    
-} catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ]);
+// Check file was sent
+if (!isset($_FILES['image'])) {
+    sendJSON(['success' => false, 'message' => 'No file field received']);
 }
 
-// Function to create thumbnail
-function createThumbnail($source, $destination, $maxWidth, $maxHeight) {
-    $imageInfo = getimagesize($source);
-    $mime = $imageInfo['mime'];
-    
-    // Create image resource based on type
-    switch ($mime) {
-        case 'image/jpeg':
-            $sourceImage = imagecreatefromjpeg($source);
-            break;
-        case 'image/png':
-            $sourceImage = imagecreatefrompng($source);
-            break;
-        case 'image/gif':
-            $sourceImage = imagecreatefromgif($source);
-            break;
-        case 'image/webp':
-            $sourceImage = imagecreatefromwebp($source);
-            break;
-        default:
-            return false;
+$errCode = $_FILES['image']['error'];
+if ($errCode !== UPLOAD_ERR_OK) {
+    $errMessages = [
+        UPLOAD_ERR_INI_SIZE   => 'File too large (php.ini limit)',
+        UPLOAD_ERR_FORM_SIZE  => 'File too large (form limit)',
+        UPLOAD_ERR_PARTIAL    => 'File only partially uploaded',
+        UPLOAD_ERR_NO_FILE    => 'No file selected',
+        UPLOAD_ERR_NO_TMP_DIR => 'Missing temp folder',
+        UPLOAD_ERR_CANT_WRITE => 'Failed to write to disk',
+        UPLOAD_ERR_EXTENSION  => 'Upload blocked by PHP extension',
+    ];
+    sendJSON(['success' => false, 'message' => $errMessages[$errCode] ?? "Upload error code: $errCode"]);
+}
+
+$file     = $_FILES['image'];
+$title    = trim($_POST['title'] ?? '');
+$desc     = trim($_POST['description'] ?? '');
+$category = trim($_POST['category'] ?? '');
+
+if (empty($title)) {
+    sendJSON(['success' => false, 'message' => 'Title is required']);
+}
+
+if ($file['size'] > 10 * 1024 * 1024) {
+    sendJSON(['success' => false, 'message' => 'File exceeds 10MB limit']);
+}
+
+// Detect MIME type
+$finfo = new finfo(FILEINFO_MIME_TYPE);
+$mime  = $finfo->file($file['tmp_name']);
+$allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+if (!array_key_exists($mime, $allowed)) {
+    sendJSON(['success' => false, 'message' => "Invalid file type: $mime. Only JPG, PNG, GIF, WEBP allowed"]);
+}
+
+$ext      = $allowed[$mime];
+$filename = 'gallery_' . uniqid() . '_' . time() . '.' . $ext;
+
+$uploadDir = '../uploads/gallery/';
+$thumbDir  = '../uploads/gallery/thumbnails/';
+
+// Create dirs if missing
+if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+    sendJSON(['success' => false, 'message' => 'Cannot create upload directory']);
+}
+if (!is_dir($thumbDir) && !mkdir($thumbDir, 0755, true)) {
+    sendJSON(['success' => false, 'message' => 'Cannot create thumbnails directory']);
+}
+
+// Check writable
+if (!is_writable($uploadDir)) {
+    sendJSON(['success' => false, 'message' => 'Upload directory is not writable']);
+}
+
+$filepath  = $uploadDir . $filename;
+$thumbPath = $thumbDir  . $filename;
+
+if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+    sendJSON(['success' => false, 'message' => 'move_uploaded_file() failed — check folder permissions']);
+}
+
+// Create thumbnail (non-fatal if GD missing)
+if (extension_loaded('gd')) {
+    createThumb($filepath, $thumbPath, 400, 300, $mime);
+} else {
+    copy($filepath, $thumbPath);
+}
+
+$dbFile  = 'uploads/gallery/' . $filename;
+$dbThumb = 'uploads/gallery/thumbnails/' . $filename;
+
+try {
+    $db = getDBConnection();
+
+    $db->exec("CREATE TABLE IF NOT EXISTS gallery_images (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        file_path VARCHAR(500) NOT NULL,
+        thumbnail_path VARCHAR(500),
+        category VARCHAR(100),
+        is_active TINYINT(1) DEFAULT 1,
+        created_by INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    $stmt = $db->prepare("INSERT INTO gallery_images
+        (title, description, file_path, thumbnail_path, category, created_by)
+        VALUES (?,?,?,?,?,?)");
+    $stmt->execute([$title, $desc, $dbFile, $dbThumb, $category ?: null, $_SESSION['user_id'] ?? null]);
+
+    sendJSON(['success' => true, 'message' => 'Image uploaded successfully', 'image_id' => $db->lastInsertId()]);
+
+} catch (Exception $e) {
+    sendJSON(['success' => false, 'message' => 'DB error: ' . $e->getMessage()]);
+}
+
+function createThumb($src, $dst, $maxW, $maxH, $mime) {
+    $info = @getimagesize($src);
+    if (!$info) return;
+    if ($mime === 'image/jpeg')      $img = @imagecreatefromjpeg($src);
+    elseif ($mime === 'image/png')   $img = @imagecreatefrompng($src);
+    elseif ($mime === 'image/gif')   $img = @imagecreatefromgif($src);
+    elseif ($mime === 'image/webp')  $img = @imagecreatefromwebp($src);
+    else return;
+    if (!$img) return;
+    $ow = imagesx($img); $oh = imagesy($img);
+    $r  = min($maxW / $ow, $maxH / $oh);
+    $tw = (int)round($ow * $r); $th = (int)round($oh * $r);
+    $thumb = imagecreatetruecolor($tw, $th);
+    if ($mime === 'image/png' || $mime === 'image/gif') {
+        imagealphablending($thumb, false); imagesavealpha($thumb, true);
+        imagefilledrectangle($thumb, 0, 0, $tw, $th, imagecolorallocatealpha($thumb, 255, 255, 255, 127));
     }
-    
-    if (!$sourceImage) {
-        return false;
-    }
-    
-    // Get original dimensions
-    $origWidth = imagesx($sourceImage);
-    $origHeight = imagesy($sourceImage);
-    
-    // Calculate thumbnail dimensions
-    $ratio = min($maxWidth / $origWidth, $maxHeight / $origHeight);
-    $thumbWidth = round($origWidth * $ratio);
-    $thumbHeight = round($origHeight * $ratio);
-    
-    // Create thumbnail
-    $thumbnail = imagecreatetruecolor($thumbWidth, $thumbHeight);
-    
-    // Preserve transparency for PNG and GIF
-    if ($mime == 'image/png' || $mime == 'image/gif') {
-        imagealphablending($thumbnail, false);
-        imagesavealpha($thumbnail, true);
-        $transparent = imagecolorallocatealpha($thumbnail, 255, 255, 255, 127);
-        imagefilledrectangle($thumbnail, 0, 0, $thumbWidth, $thumbHeight, $transparent);
-    }
-    
-    // Resize image
-    imagecopyresampled($thumbnail, $sourceImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $origWidth, $origHeight);
-    
-    // Save thumbnail
-    switch ($mime) {
-        case 'image/jpeg':
-            imagejpeg($thumbnail, $destination, 85);
-            break;
-        case 'image/png':
-            imagepng($thumbnail, $destination, 8);
-            break;
-        case 'image/gif':
-            imagegif($thumbnail, $destination);
-            break;
-        case 'image/webp':
-            imagewebp($thumbnail, $destination, 85);
-            break;
-    }
-    
-    // Free memory
-    imagedestroy($sourceImage);
-    imagedestroy($thumbnail);
-    
-    return true;
+    imagecopyresampled($thumb, $img, 0, 0, 0, 0, $tw, $th, $ow, $oh);
+    if ($mime === 'image/jpeg')     imagejpeg($thumb, $dst, 85);
+    elseif ($mime === 'image/png')  imagepng($thumb, $dst, 8);
+    elseif ($mime === 'image/gif')  imagegif($thumb, $dst);
+    elseif ($mime === 'image/webp') imagewebp($thumb, $dst, 85);
+    imagedestroy($img); imagedestroy($thumb);
 }
 ?>

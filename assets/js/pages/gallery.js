@@ -240,13 +240,15 @@ function buildCategorySection(cat, icon, p, images) {
 function buildTile(img, index, p) {
   const src = img.thumbnail_path || img.file_path;
   return `
-    <div class="glp-tile" onclick="openLightbox(${index})" style="--fa:${p.from};--fb:${p.to}">
-      <img src="${src}" alt="${img.title}" loading="lazy"
-           onerror="this.src='assets/images/img1.jpg'">
-      <div class="glp-tile-over">
-        <div class="glp-tile-zoom"><i class="fa fa-magnifying-glass-plus"></i></div>
-        <p class="glp-tile-title">${img.title}</p>
+    <div class="glp-tile" onclick="openLightbox(${index})">
+      <div class="glp-tile-img-wrap">
+        <img src="${src}" alt="${img.title}" loading="lazy"
+             onerror="this.src='assets/images/img1.jpg'">
+        <div class="glp-tile-over">
+          <div class="glp-tile-zoom"><i class="fa fa-magnifying-glass-plus"></i></div>
+        </div>
       </div>
+      <p class="glp-tile-title">${img.title}</p>
     </div>`;
 }
 

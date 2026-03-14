@@ -13,12 +13,12 @@ const noticesPage = `
     .nbp-counter-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:30px;padding:8px 20px;font-size:14px;font-weight:700;color:white}
     .nbp-hero-wave{position:relative;z-index:2;line-height:0}
     .nbp-hero-wave svg{width:100%;height:50px;display:block}
-    .nbp-filter-bar{background:white;border-bottom:2px solid #e8ecf2;position:sticky;top:100px;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.07)}
-    .nbp-filters{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;scrollbar-width:none}
+    .nbp-filter-bar{background:white;border-bottom:2px solid #e8ecf2;box-shadow:0 3px 12px rgba(0,0,0,.07);margin-bottom:0}
+    .nbp-filters{display:flex;gap:8px;padding:14px 20px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
     .nbp-filters::-webkit-scrollbar{display:none}
-    .nbp-filter{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:2px solid #dde3ed;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:all .2s ease}
-    .nbp-filter:hover{border-color:#7c3aed;color:#7c3aed;background:white;transform:translateY(-1px);box-shadow:0 4px 12px rgba(124,58,237,.12)}
-    .nbp-filter.active{background:linear-gradient(135deg,var(--fa,#4c1d95),var(--fb,#7c3aed));border-color:transparent;color:white;box-shadow:0 4px 14px rgba(124,58,237,.3)}
+    .nbp-filter{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:2px solid #dde3ed;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:all .2s ease;outline:none}
+    .nbp-filter:hover{border-color:#7c3aed;color:#7c3aed;background:white}
+    .nbp-filter.nbp-active{background:linear-gradient(135deg,#4c1d95,#7c3aed);border-color:transparent;color:white;box-shadow:0 4px 14px rgba(124,58,237,.3)}
     .nbp-content{background:#f4f6fb;padding:36px 0 60px;min-height:400px}
     .nbp-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px}
     .nbp-dots{display:flex;gap:10px}
@@ -32,7 +32,7 @@ const noticesPage = `
     .nbp-empty h3{margin:0 0 8px;color:#4a5568;font-size:20px;font-weight:700}
     .nbp-empty p{margin:0;color:#8a9ab5;font-size:14px}
     .nbp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-    .nbp-card{border-radius:16px;overflow:hidden;background:white;box-shadow:0 4px 16px rgba(0,0,0,.09);transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column;cursor:default}
+    .nbp-card{border-radius:16px;overflow:hidden;background:white;box-shadow:0 4px 16px rgba(0,0,0,.09);transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column}
     .nbp-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,.15)}
     .nbp-card-top{padding:20px 20px 14px;flex:1}
     .nbp-card-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
@@ -46,10 +46,7 @@ const noticesPage = `
     .nbp-card-foot{padding:12px 20px 16px;border-top:1px solid #eef1f6;display:flex;align-items:center;justify-content:space-between;gap:8px}
     .nbp-card-date{display:flex;align-items:center;gap:6px;font-size:12px;color:#8a9ab5;font-weight:500}
     .nbp-card-date i{color:#7c3aed}
-    .nbp-read-more{font-size:12px;font-weight:700;color:#7c3aed;text-decoration:none;display:flex;align-items:center;gap:4px;transition:gap .2s}
-    .nbp-read-more:hover{gap:8px}
     @media(max-width:768px){
-      .nbp-hero{padding:40px 16px 0}
       .nbp-hero-inner h1{font-size:26px}
       .nbp-grid{grid-template-columns:repeat(2,1fr);gap:14px}
     }
@@ -78,25 +75,25 @@ const noticesPage = `
 
     <div class="nbp-filter-bar">
       <div class="nbp-filters" id="nbpFilters">
-        <button class="nbp-filter active" data-cat="" style="--fa:#4c1d95;--fb:#7c3aed">
+        <button class="nbp-filter nbp-active" onclick="nbpFilter(this,'')" type="button">
           <i class="fa fa-border-all"></i> All
         </button>
-        <button class="nbp-filter" data-cat="urgent" style="--fa:#991b1b;--fb:#dc2626">
+        <button class="nbp-filter" onclick="nbpFilter(this,'urgent')" type="button">
           <i class="fa fa-exclamation-circle"></i> Urgent
         </button>
-        <button class="nbp-filter" data-cat="admission" style="--fa:#065f46;--fb:#10b981">
+        <button class="nbp-filter" onclick="nbpFilter(this,'admission')" type="button">
           <i class="fa fa-door-open"></i> Admission
         </button>
-        <button class="nbp-filter" data-cat="exam" style="--fa:#1e3a8a;--fb:#3b82f6">
+        <button class="nbp-filter" onclick="nbpFilter(this,'exam')" type="button">
           <i class="fa fa-pen-to-square"></i> Exam
         </button>
-        <button class="nbp-filter" data-cat="event" style="--fa:#7c2d12;--fb:#f97316">
-          <i class="fa fa-calendar-star"></i> Events
+        <button class="nbp-filter" onclick="nbpFilter(this,'event')" type="button">
+          <i class="fa fa-calendar-days"></i> Events
         </button>
-        <button class="nbp-filter" data-cat="holiday" style="--fa:#713f12;--fb:#eab308">
+        <button class="nbp-filter" onclick="nbpFilter(this,'holiday')" type="button">
           <i class="fa fa-umbrella-beach"></i> Holiday
         </button>
-        <button class="nbp-filter" data-cat="general" style="--fa:#164e63;--fb:#06b6d4">
+        <button class="nbp-filter" onclick="nbpFilter(this,'general')" type="button">
           <i class="fa fa-info-circle"></i> General
         </button>
       </div>
@@ -122,66 +119,85 @@ const noticesPage = `
 // =============================================
 //  STATE
 // =============================================
-let nbpAllNotices = [];
+var nbpAllNotices = [];
 
-const NBP_CAT_COLORS = {
+var NBP_CAT_COLORS = {
   urgent:    { from:'#991b1b', to:'#dc2626' },
   admission: { from:'#065f46', to:'#10b981' },
   exam:      { from:'#1e3a8a', to:'#3b82f6' },
   event:     { from:'#7c2d12', to:'#f97316' },
   holiday:   { from:'#713f12', to:'#eab308' },
   general:   { from:'#164e63', to:'#06b6d4' },
-  default:   { from:'#4c1d95', to:'#7c3aed' },
+  def:       { from:'#4c1d95', to:'#7c3aed' }
 };
+
+// =============================================
+//  FILTER CLICK — global so onclick works
+// =============================================
+function nbpFilter(btn, cat) {
+  document.querySelectorAll('.nbp-filter').forEach(function(b) {
+    b.classList.remove('nbp-active');
+  });
+  btn.classList.add('nbp-active');
+  nbpRender(cat);
+}
 
 // =============================================
 //  LOAD
 // =============================================
-async function loadNotices(category = '') {
-  const grid    = document.getElementById('nbpGrid');
-  const loading = document.getElementById('nbpLoading');
-  const empty   = document.getElementById('nbpEmpty');
-  if (!grid) return;
+function initNotices() {
+  if (!document.getElementById('nbpGrid')) return;
+  nbpAllNotices = [];
+
+  var grid    = document.getElementById('nbpGrid');
+  var loading = document.getElementById('nbpLoading');
+  var empty   = document.getElementById('nbpEmpty');
 
   loading.style.display = 'flex';
   grid.style.display    = 'none';
   empty.style.display   = 'none';
 
-  try {
-    const res    = await fetch('pages/notice-list.php?status=active');
-    const result = await res.json();
+  fetch('pages/notice-list.php?status=active')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      loading.style.display = 'none';
+      if (result.success && result.notices && result.notices.length > 0) {
+        nbpAllNotices = result.notices;
 
-    if (result.success && result.notices.length > 0) {
-      nbpAllNotices = result.notices;
+        var tc = document.getElementById('nbpTotal');
+        var uc = document.getElementById('nbpUrgent');
+        var cw = document.getElementById('nbpCounters');
+        if (tc) tc.textContent = result.notices.length;
+        if (uc) uc.textContent = result.notices.filter(function(n){ return n.priority==='urgent'; }).length;
+        if (cw) cw.style.display = 'flex';
 
-      // Update counters
-      const urgent = result.notices.filter(n => n.priority === 'urgent').length;
-      const tc = document.getElementById('nbpTotal');
-      const uc = document.getElementById('nbpUrgent');
-      const cw = document.getElementById('nbpCounters');
-      if (tc) tc.textContent = result.notices.length;
-      if (uc) uc.textContent = urgent;
-      if (cw) cw.style.display = 'flex';
-
-      renderNotices(category);
-    } else {
-      empty.style.display = 'flex';
-    }
-  } catch(err) {
-    console.error('Notices error:', err);
-    if (empty) empty.style.display = 'flex';
-  } finally {
-    loading.style.display = 'none';
-  }
+        nbpRender('');
+      } else {
+        empty.style.display = 'flex';
+      }
+    })
+    .catch(function(err) {
+      console.error('Notices error:', err);
+      loading.style.display = 'none';
+      var empty2 = document.getElementById('nbpEmpty');
+      if (empty2) empty2.style.display = 'flex';
+    });
 }
 
-function renderNotices(category) {
-  const grid  = document.getElementById('nbpGrid');
-  const empty = document.getElementById('nbpEmpty');
+// =============================================
+//  RENDER
+// =============================================
+function nbpRender(category) {
+  var grid  = document.getElementById('nbpGrid');
+  var empty = document.getElementById('nbpEmpty');
   if (!grid) return;
 
-  let list = nbpAllNotices;
-  if (category) list = list.filter(n => n.category === category || (category === 'urgent' && n.priority === 'urgent'));
+  var list = nbpAllNotices.slice();
+  if (category === 'urgent') {
+    list = list.filter(function(n){ return n.priority === 'urgent'; });
+  } else if (category) {
+    list = list.filter(function(n){ return n.category === category; });
+  }
 
   if (!list.length) {
     grid.style.display  = 'none';
@@ -189,67 +205,34 @@ function renderNotices(category) {
     return;
   }
 
-  grid.innerHTML    = list.map(n => buildNoticeCard(n)).join('');
+  grid.innerHTML     = list.map(nbpBuildCard).join('');
   grid.style.display = 'grid';
   empty.style.display = 'none';
-
-  // Fade in
-  grid.style.opacity   = '0';
-  grid.style.transform = 'translateY(18px)';
-  setTimeout(() => {
-    grid.style.transition = 'opacity .4s ease, transform .4s ease';
-    grid.style.opacity    = '1';
-    grid.style.transform  = 'translateY(0)';
-  }, 30);
 }
 
-function buildNoticeCard(n) {
-  const c    = NBP_CAT_COLORS[n.category] || NBP_CAT_COLORS.default;
-  const date = new Date(n.notice_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
-  const priLabel = n.priority.charAt(0).toUpperCase() + n.priority.slice(1);
-  const catLabel = n.category.charAt(0).toUpperCase() + n.category.slice(1);
-  const priClass = n.priority === 'urgent' ? 'nbp-badge-urgent' : n.priority === 'high' ? 'nbp-badge-high' : 'nbp-badge-normal';
+function nbpBuildCard(n) {
+  var c   = NBP_CAT_COLORS[n.category] || NBP_CAT_COLORS.def;
+  var dt  = '';
+  try { dt = new Date(n.notice_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); } catch(e){ dt = n.notice_date; }
+  var pl  = n.priority.charAt(0).toUpperCase() + n.priority.slice(1);
+  var cl  = n.category.charAt(0).toUpperCase() + n.category.slice(1);
+  var pc  = n.priority==='urgent' ? 'nbp-badge-urgent' : n.priority==='high' ? 'nbp-badge-high' : 'nbp-badge-normal';
 
-  return `
-    <div class="nbp-card">
-      <div class="nbp-card-top">
-        <div class="nbp-card-badges">
-          <span class="nbp-badge ${priClass}">${priLabel}</span>
-          <span class="nbp-badge nbp-badge-cat" style="background:linear-gradient(135deg,${c.from},${c.to})">${catLabel}</span>
-        </div>
-        <h3 class="nbp-card-title">${escNbp(n.title)}</h3>
-        <p class="nbp-card-body">${escNbp(n.description)}</p>
-      </div>
-      <div class="nbp-card-foot">
-        <div class="nbp-card-date"><i class="fa fa-calendar"></i> ${date}</div>
-        <a href="#" class="nbp-read-more" onclick="return false">Read More <i class="fa fa-arrow-right"></i></a>
-      </div>
-    </div>`;
+  return '<div class="nbp-card">'
+    + '<div class="nbp-card-top">'
+    +   '<div class="nbp-card-badges">'
+    +     '<span class="nbp-badge ' + pc + '">' + pl + '</span>'
+    +     '<span class="nbp-badge nbp-badge-cat" style="background:linear-gradient(135deg,' + c.from + ',' + c.to + ')">' + cl + '</span>'
+    +   '</div>'
+    +   '<h3 class="nbp-card-title">' + nbpEsc(n.title) + '</h3>'
+    +   '<p class="nbp-card-body">' + nbpEsc(n.description) + '</p>'
+    + '</div>'
+    + '<div class="nbp-card-foot">'
+    +   '<div class="nbp-card-date"><i class="fa fa-calendar"></i> ' + dt + '</div>'
+    + '</div>'
+    + '</div>';
 }
 
-function escNbp(s) {
+function nbpEsc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// =============================================
-//  FILTERS
-// =============================================
-function setupNoticeFilters() {
-  document.querySelectorAll('.nbp-filter').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nbp-filter').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderNotices(btn.dataset.cat);
-    });
-  });
-}
-
-// =============================================
-//  INIT
-// =============================================
-function initNotices() {
-  if (document.getElementById('nbpGrid')) {
-    loadNotices();
-    setupNoticeFilters();
-  }
 }

@@ -320,12 +320,14 @@ function openLightbox(index) {
   document.getElementById('lightboxCategory').textContent    = img.category || '';
   document.getElementById('glbCounter').textContent          = `${index + 1} / ${galleryImages.length}`;
   document.getElementById('glLightbox').classList.add('active');
+  const lb = document.getElementById('glLightbox'); if (lb.requestFullscreen) lb.requestFullscreen().catch(()=>{});
   document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox() {
   document.getElementById('glLightbox').classList.remove('active');
   document.body.style.overflow = '';
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
 }
 
 function navigateLightbox(dir) {

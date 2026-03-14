@@ -30,8 +30,8 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .filter-btn{padding:7px 16px;border:2px solid #dde3ed;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
     .filter-btn.active,.filter-btn:hover{background:#004080;border-color:#004080;color:white}
     .notice-list{display:flex;flex-direction:column;gap:14px}
-    .notice-card{background:white;border-radius:12px;padding:22px 24px;box-shadow:0 2px 10px rgba(0,0,0,.08);border-left:5px solid #004080;transition:all .25s}
-    .notice-card:hover{transform:translateX(4px);box-shadow:0 5px 20px rgba(0,64,128,.15)}
+    .notice-card{background:white;border-radius:12px;padding:22px 24px;box-shadow:0 2px 10px rgba(0,0,0,.08);border-left:5px solid #004080;transition:box-shadow .25s}
+    .notice-card:hover{box-shadow:0 5px 20px rgba(0,64,128,.15)}
     .notice-card.urgent{border-left-color:#dc3545}
     .notice-card.high{border-left-color:#fd7e14}
     .notice-card.info{border-left-color:#17a2b8}
@@ -50,8 +50,8 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .meta-item{display:flex;align-items:center;gap:5px;color:#666;font-size:12px}
     .meta-item i{color:#004080}
     .notice-body{color:#555;font-size:14px;line-height:1.6;margin-bottom:14px}
-    .notice-actions{display:flex;gap:8px}
-    .btn-sm{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+    .notice-actions{display:flex;gap:8px;position:relative;z-index:10}
+    .btn-sm{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s,color .2s;display:inline-flex;align-items:center;gap:5px;position:relative;z-index:10;pointer-events:all}
     .btn-edit{background:#cce5ff;color:#004085}
     .btn-edit:hover{background:#004080;color:white}
     .btn-delete{background:#f8d7da;color:#dc3545}
@@ -237,17 +237,17 @@ function renderNotices() {
 }
 
 function buildCard(n) {
-  const priClass = n.priority === 'urgent' ? 'urgent' : n.priority === 'high' ? 'high' : '';
-  const stClass  = n.status === 'inactive' ? 'inactive' : '';
-  const priLabel = n.priority.charAt(0).toUpperCase() + n.priority.slice(1);
-  const stLabel  = n.status.charAt(0).toUpperCase() + n.status.slice(1);
-  const catLabel = n.category.charAt(0).toUpperCase() + n.category.slice(1);
-  const date     = new Date(n.notice_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+  const priClass  = n.priority === 'urgent' ? 'urgent' : n.priority === 'high' ? 'high' : '';
+  const stClass   = n.status === 'inactive' ? 'inactive' : '';
+  const priLabel  = n.priority.charAt(0).toUpperCase() + n.priority.slice(1);
+  const stLabel   = n.status.charAt(0).toUpperCase() + n.status.slice(1);
+  const catLabel  = n.category.charAt(0).toUpperCase() + n.category.slice(1);
+  const date      = new Date(n.notice_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
   const toggleLbl = n.status === 'active' ? 'Deactivate' : 'Activate';
   const toggleIcon= n.status === 'active' ? 'fa-eye-slash' : 'fa-eye';
 
   return `
-    <div class="notice-card ${priClass} ${stClass}" id="nc-${n.id}">
+    <div class="notice-card ${priClass} ${stClass}" data-id="${n.id}">
       <div class="notice-header">
         <div class="notice-title">${escHtml(n.title)}</div>
         <div class="notice-badges">
@@ -262,9 +262,9 @@ function buildCard(n) {
       </div>
       <div class="notice-body">${escHtml(n.description)}</div>
       <div class="notice-actions">
-        <button class="btn-sm btn-edit" onclick="editNotice(${n.id})"><i class="fa fa-edit"></i> Edit</button>
-        <button class="btn-sm btn-toggle" onclick="toggleNotice(${n.id},'${n.status}')"><i class="fa ${toggleIcon}"></i> ${toggleLbl}</button>
-        <button class="btn-sm btn-delete" onclick="deleteNotice(${n.id})"><i class="fa fa-trash"></i> Delete</button>
+        <button class="btn-sm btn-edit"   data-action="edit"   data-id="${n.id}"><i class="fa fa-edit"></i> Edit</button>
+        <button class="btn-sm btn-toggle" data-action="toggle" data-id="${n.id}" data-status="${n.status}"><i class="fa ${toggleIcon}"></i> ${toggleLbl}</button>
+        <button class="btn-sm btn-delete" data-action="delete" data-id="${n.id}"><i class="fa fa-trash"></i> Delete</button>
       </div>
     </div>`;
 }
@@ -376,6 +376,19 @@ function escHtml(s) {
 }
 
 loadNotices();
+
+// ── EVENT DELEGATION ──────────────────────────
+document.getElementById('noticeList').addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  e.stopPropagation();
+  const action = btn.dataset.action;
+  const id     = btn.dataset.id;
+  const status = btn.dataset.status;
+  if (action === 'edit')   editNotice(id);
+  if (action === 'toggle') toggleNotice(id, status);
+  if (action === 'delete') deleteNotice(id);
+});
 </script>
 </body>
 </html>

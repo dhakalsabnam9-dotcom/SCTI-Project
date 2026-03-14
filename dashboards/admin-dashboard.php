@@ -272,47 +272,10 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     /* Special Gallery Action Button */
     .action-btn.gallery-action-btn {
       background: linear-gradient(135deg, #667eea, #764ba2);
-      position: relative;
-      overflow: hidden;
     }
-    
-    .action-btn.gallery-action-btn::before {
-      background: rgba(255,255,255,0.3);
-    }
-    
-    .action-btn.gallery-action-btn::after {
-      content: '✨';
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 24px;
-      opacity: 0;
-      transition: all 0.3s;
-    }
-    
-    .action-btn.gallery-action-btn:hover::after {
-      opacity: 1;
-      right: 10px;
-    }
-    
     .action-btn.gallery-action-btn:hover {
       background: linear-gradient(135deg, #764ba2, #667eea);
       box-shadow: 0 8px 25px rgba(102,126,234,0.4);
-    }
-    
-    .action-btn.gallery-action-btn i {
-      animation: rotate 4s linear infinite;
-    }
-    
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .action-btn.gallery-action-btn:hover i {
-      animation: none;
-      transform: scale(1.3) rotate(15deg);
     }
     
     .recent-activity {

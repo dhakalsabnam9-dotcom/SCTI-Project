@@ -559,13 +559,19 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 </head>
 <body>
 
+<div class="top-header">
+  <marquee>Manage Gallery - Upload and manage images for the school website</marquee>
+</div>
+
 <div class="container">
   
   <!-- Page Header -->
   <div class="page-header">
     <div>
       <h1><i class="fa fa-images"></i> Manage Gallery</h1>
-      <p style="margin: 5px 0 0 0; opacity: 0.9;">Upload and manage gallery images</p>
+      <div style="background: transparent; padding: 0; font-size: 14px; margin-top: 6px;">
+        <a href="../dashboards/admin-dashboard.php" style="color: white; text-decoration: none;"><i class="fa fa-home"></i> Dashboard</a> / Manage Gallery
+      </div>
     </div>
     <a href="../dashboards/admin-dashboard.php" class="back-btn">
       <i class="fa fa-arrow-left"></i> Back to Dashboard

@@ -39,8 +39,8 @@ const galleryPage = `
     .glp-sh-text span{font-size:12px;color:rgba(255,255,255,.7);font-weight:500}
     .glp-sh-badge{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.3);border-radius:14px;padding:10px 16px;color:white;flex-shrink:0;min-width:60px;text-align:center;font-size:26px;font-weight:900;line-height:1}
     .glp-sh-badge small{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-top:3px;font-weight:700}
-    .glp-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:20px;padding:24px 26px 30px}
-    .glp-tile{border-radius:16px;overflow:hidden;cursor:pointer;background:white;box-shadow:0 4px 16px rgba(0,0,0,.10);transition:transform .3s ease,box-shadow .3s ease;display:flex !important;flex-direction:column !important}
+    .glp-flat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:32px 0 60px}
+    .glp-tile{border-radius:16px;overflow:hidden;cursor:pointer;background:white;box-shadow:0 4px 16px rgba(0,0,0,.10);transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column}
     .glp-tile:hover{transform:translateY(-7px);box-shadow:0 20px 44px rgba(0,0,0,.17)}
     .glp-tile-img-wrap{position:relative;width:100%;padding-top:75%;overflow:hidden;background:#dde3ed;flex-shrink:0}
     .glp-tile-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease}
@@ -49,6 +49,7 @@ const galleryPage = `
     .glp-tile:hover .glp-tile-over{opacity:1}
     .glp-tile-zoom{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;transform:scale(.5);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
     .glp-tile:hover .glp-tile-zoom{transform:scale(1)}
+    .glp-tile-cat{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:white;text-transform:capitalize;letter-spacing:.3px}
     .glp-tile-title{padding:11px 14px 13px;font-size:13px;font-weight:600;color:#2d3748;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:white;border-top:1px solid #eef1f6;margin:0}
     .glp-lb{position:fixed;inset:0;background:rgba(4,8,18,.96);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
     .glp-lb.active{display:flex;animation:glpLbIn .28s ease}
@@ -71,13 +72,10 @@ const galleryPage = `
     @media(max-width:768px){
       .glp-hero{padding:40px 16px 0}
       .glp-hero-inner h1{font-size:26px}
-      .glp-grid{grid-template-columns:repeat(2,1fr) !important;gap:12px;padding:16px}
-      .glp-section-head{padding:16px 18px}
-      .glp-sh-text h2{font-size:16px}
+      .glp-flat-grid{grid-template-columns:repeat(2,1fr);gap:14px;padding:20px 0 40px}
     }
     @media(max-width:480px){
-      .glp-grid{grid-template-columns:repeat(1,1fr) !important;gap:10px;padding:12px}
-      .glp-sh-badge{display:none}
+      .glp-flat-grid{grid-template-columns:repeat(1,1fr);gap:12px;padding:16px 0 32px}
     }
   </style>
   <div class="glp-wrap">
@@ -260,65 +258,18 @@ async function loadGalleryImages(category = '') {
 function renderGallery(images, activeCategory) {
   const content = document.getElementById('galleryContent');
 
-  if (activeCategory !== '') {
-    const p    = getPalette(activeCategory);
-    const icon = CAT_ICONS[activeCategory.toLowerCase()] || CAT_ICONS.default;
-    content.innerHTML = buildCategorySection(activeCategory, icon, p, images);
-    fadeInCards();
-    return;
-  }
+  // Assign global index to every image for lightbox
+  images.forEach((img, i) => { img._idx = i; });
 
-  // Group by category
-  const groups = {}, nocat = [];
-  images.forEach((img, i) => {
-    img._idx = i;
-    if (img.category) {
-      (groups[img.category] = groups[img.category] || []).push(img);
-    } else {
-      nocat.push(img);
-    }
-  });
-
-  let html = '';
-  let ci   = 0;
-  Object.keys(groups).forEach(cat => {
-    const icon = CAT_ICONS[cat.toLowerCase()] || CAT_ICONS.default;
-    const p    = getPalette(cat);
-    html += buildCategorySection(cat, icon, p, groups[cat]);
-    ci++;
-  });
-  if (nocat.length) {
-    html += buildCategorySection('General', 'fa-images', getPalette('__gen__'), nocat);
-  }
-
-  content.innerHTML = html;
+  const tiles = images.map(img => buildTile(img, img._idx)).join('');
+  content.innerHTML = `<div class="glp-flat-grid">${tiles}</div>`;
   fadeInCards();
 }
 
-function buildCategorySection(cat, icon, p, images) {
-  const count = images.length;
-  const tiles  = images.map(img => buildTile(img, img._idx ?? 0, p)).join('');
-  const isAll  = (document.querySelector('.glp-filter.active')?.dataset.category === '');
-
-  return `
-    <div class="glp-section">
-      <div class="glp-section-head" style="--fa:${p.from};--fb:${p.to};cursor:${isAll ? 'pointer' : 'default'}"
-           ${isAll ? `onclick="filterToCategory('${cat.replace(/'/g,"\\'")}','${p.from}','${p.to}')" title="Click to filter by ${cat}"` : ''}>
-        <div class="glp-sh-left">
-          <div class="glp-sh-icon"><i class="fa ${icon}"></i></div>
-          <div class="glp-sh-text">
-            <h2>${cat}</h2>
-            <span>${count} photo${count !== 1 ? 's' : ''} in this collection${isAll ? ' — click to filter' : ''}</span>
-          </div>
-        </div>
-        <div class="glp-sh-badge">${count}<small>PHOTOS</small></div>
-      </div>
-      <div class="glp-grid">${tiles}</div>
-    </div>`;
-}
-
-function buildTile(img, index, p) {
+function buildTile(img, index) {
   const src = img.thumbnail_path || img.file_path;
+  const p   = getPalette(img.category || '__gen__');
+  const cat = img.category || '';
   return `
     <div class="glp-tile" onclick="openLightbox(${index})">
       <div class="glp-tile-img-wrap">
@@ -327,13 +278,13 @@ function buildTile(img, index, p) {
         <div class="glp-tile-over">
           <div class="glp-tile-zoom"><i class="fa fa-magnifying-glass-plus"></i></div>
         </div>
+        ${cat ? `<span class="glp-tile-cat" style="background:linear-gradient(135deg,${p.from},${p.to})">${cat}</span>` : ''}
       </div>
       <p class="glp-tile-title">${img.title}</p>
     </div>`;
 }
 
 function filterToCategory(cat, colorFrom, colorTo) {
-  // Activate the matching filter pill
   document.querySelectorAll('.glp-filter').forEach(b => {
     b.classList.remove('active');
     if (b.dataset.category === cat) {
@@ -346,15 +297,15 @@ function filterToCategory(cat, colorFrom, colorTo) {
 }
 
 function fadeInCards() {
-  document.querySelectorAll('.glp-section').forEach((el, i) => {
-    el.style.opacity   = '0';
-    el.style.transform = 'translateY(28px)';
-    setTimeout(() => {
-      el.style.transition = 'opacity .5s ease, transform .5s ease';
-      el.style.opacity    = '1';
-      el.style.transform  = 'translateY(0)';
-    }, i * 90);
-  });
+  const grid = document.querySelector('.glp-flat-grid');
+  if (!grid) return;
+  grid.style.opacity   = '0';
+  grid.style.transform = 'translateY(20px)';
+  setTimeout(() => {
+    grid.style.transition = 'opacity .4s ease, transform .4s ease';
+    grid.style.opacity    = '1';
+    grid.style.transform  = 'translateY(0)';
+  }, 30);
 }
 
 // =============================================

@@ -9,6 +9,11 @@ function loadPage(pageName) {
       initSignupValidation();
     }, 100);
   }
+
+  // Initialize gallery after DOM is injected
+  if (pageName === 'gallery') {
+    initGallery();
+  }
   
   // Scroll to top smoothly
   window.scrollTo({ top: 0, behavior: 'smooth' });

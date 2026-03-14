@@ -1,11 +1,16 @@
 <?php
 ob_start();
 session_start();
-header('Content-Type: application/json');
+
+function sendJSON($data) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
+}
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']); exit();
+    sendJSON(['success' => false, 'message' => 'Unauthorized']);
 }
 
 require_once '../includes/config.php';
@@ -16,7 +21,6 @@ try {
 
     $db = getDBConnection();
 
-    // Auto-create table if it doesn't exist yet
     $db->exec("CREATE TABLE IF NOT EXISTS gallery_images (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
@@ -48,11 +52,9 @@ try {
     $stmt->execute($params);
     $images = $stmt->fetchAll();
 
-    ob_end_clean();
-    echo json_encode(['success' => true, 'images' => $images, 'count' => count($images)]);
+    sendJSON(['success' => true, 'images' => $images, 'count' => count($images)]);
 
 } catch (Exception $e) {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    sendJSON(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

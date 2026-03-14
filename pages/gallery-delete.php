@@ -1,12 +1,16 @@
 <?php
 ob_start();
 session_start();
-header('Content-Type: application/json');
+
+function sendJSON($data) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
+}
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-    exit();
+    sendJSON(['success' => false, 'message' => 'Unauthorized access']);
 }
 
 require_once '../includes/config.php';
@@ -19,20 +23,16 @@ try {
 
     $db = getDBConnection();
 
-    $stmt = $db->prepare("SELECT file_path, thumbnail_path FROM gallery_images WHERE id = ? AND is_active = 1");
+    $stmt = $db->prepare("SELECT id FROM gallery_images WHERE id = ? AND is_active = 1");
     $stmt->execute([$id]);
-    $image = $stmt->fetch();
-
-    if (!$image) throw new Exception('Image not found');
+    if (!$stmt->fetch()) throw new Exception('Image not found');
 
     $del = $db->prepare("UPDATE gallery_images SET is_active = 0 WHERE id = ?");
     $del->execute([$id]);
 
-    ob_end_clean();
-    echo json_encode(['success' => true, 'message' => 'Image deleted successfully']);
+    sendJSON(['success' => true, 'message' => 'Image deleted successfully']);
 
 } catch (Exception $e) {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    sendJSON(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

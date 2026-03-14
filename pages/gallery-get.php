@@ -1,19 +1,22 @@
 <?php
 ob_start();
 session_start();
-header('Content-Type: application/json');
+
+function sendJSON($data) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
+}
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-    exit();
+    sendJSON(['success' => false, 'message' => 'Unauthorized access']);
 }
 
 require_once '../includes/config.php';
 
 try {
     $id = intval($_GET['id'] ?? 0);
-
     if (!$id) throw new Exception('Image ID is required');
 
     $db = getDBConnection();
@@ -24,11 +27,9 @@ try {
 
     if (!$image) throw new Exception('Image not found');
 
-    ob_end_clean();
-    echo json_encode(['success' => true, 'image' => $image]);
+    sendJSON(['success' => true, 'image' => $image]);
 
 } catch (Exception $e) {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    sendJSON(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

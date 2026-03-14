@@ -1,17 +1,22 @@
 <?php
 ob_start();
 session_start();
-header('Content-Type: application/json');
+
+function sendJSON($data) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
+}
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']); exit();
+    sendJSON(['success' => false, 'message' => 'Unauthorized']);
 }
 
 require_once '../includes/config.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? $_POST['action'] ?? '';
+$action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 try {
     $db = getDBConnection();
@@ -24,34 +29,27 @@ try {
 
     if ($method === 'GET') {
         $stmt = $db->query("SELECT * FROM gallery_categories ORDER BY name ASC");
-        $cats = $stmt->fetchAll();
-        ob_end_clean();
-        echo json_encode(['success' => true, 'categories' => $cats]);
+        sendJSON(['success' => true, 'categories' => $stmt->fetchAll()]);
 
     } elseif ($method === 'POST' && $action === 'add') {
         $name = trim($_POST['name'] ?? '');
         if (empty($name)) throw new Exception('Category name is required');
         $stmt = $db->prepare("INSERT INTO gallery_categories (name) VALUES (?)");
         $stmt->execute([$name]);
-        $id = $db->lastInsertId();
-        ob_end_clean();
-        echo json_encode(['success' => true, 'id' => $id, 'name' => $name]);
+        sendJSON(['success' => true, 'id' => $db->lastInsertId(), 'name' => $name]);
 
     } elseif ($method === 'POST' && $action === 'delete') {
         $id = intval($_POST['id'] ?? 0);
         if (!$id) throw new Exception('Invalid category ID');
         $stmt = $db->prepare("DELETE FROM gallery_categories WHERE id = ?");
         $stmt->execute([$id]);
-        ob_end_clean();
-        echo json_encode(['success' => true]);
+        sendJSON(['success' => true]);
 
     } else {
-        ob_end_clean();
-        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+        sendJSON(['success' => false, 'message' => 'Invalid request']);
     }
 
 } catch (Exception $e) {
-    ob_end_clean();
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    sendJSON(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

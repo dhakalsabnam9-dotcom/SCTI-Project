@@ -1,58 +1,50 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+ob_start();
+
+function sendJSON($data) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+    echo json_encode($data);
+    exit();
+}
 
 require_once '../includes/config.php';
 
 try {
-    $category = $_GET['category'] ?? '';
-    
-    // Build query - only show active images
-    $sql = "SELECT id, title, description, file_path, thumbnail_path, category, created_at 
-            FROM gallery_images 
-            WHERE is_active = 1";
-    
+    $category = trim($_GET['category'] ?? '');
+    $db = getDBConnection();
+
+    $db->exec("CREATE TABLE IF NOT EXISTS gallery_images (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        file_path VARCHAR(500) NOT NULL,
+        thumbnail_path VARCHAR(500),
+        category VARCHAR(100),
+        is_active TINYINT(1) DEFAULT 1,
+        created_by INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    $sql    = "SELECT id, title, description, file_path, thumbnail_path, category, created_at
+               FROM gallery_images WHERE is_active = 1";
     $params = [];
-    $types = '';
-    
-    // Add category filter
-    if (!empty($category)) {
+
+    if ($category !== '') {
         $sql .= " AND category = ?";
         $params[] = $category;
-        $types .= 's';
     }
-    
-    $sql .= " ORDER BY display_order ASC, created_at DESC";
-    
-    // Prepare and execute query
-    $stmt = $conn->prepare($sql);
-    
-    if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
-    }
-    
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    $images = [];
-    while ($row = $result->fetch_assoc()) {
-        $images[] = $row;
-    }
-    
-    $stmt->close();
-    
-    echo json_encode([
-        'success' => true,
-        'images' => $images,
-        'count' => count($images)
-    ]);
-    
+
+    $sql .= " ORDER BY category ASC, created_at DESC";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $images = $stmt->fetchAll();
+
+    sendJSON(['success' => true, 'images' => $images, 'count' => count($images)]);
+
 } catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage(),
-        'images' => [],
-        'count' => 0
-    ]);
+    sendJSON(['success' => false, 'message' => $e->getMessage(), 'images' => [], 'count' => 0]);
 }
 ?>

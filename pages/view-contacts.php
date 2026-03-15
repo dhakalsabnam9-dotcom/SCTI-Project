@@ -236,8 +236,9 @@ function viewMsg(i) {
 /* ── DELETE ── */
 function delMsg(id, idx) {
   if (!confirm('Delete this message? This cannot be undone.')) return;
-  fetch('get-contact-count.php?delete=1&id=' + id)
-    .then(function(){ return null; })
+  fetch('contact-delete.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:id})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (!d.success) { toast(d.message||'Delete failed','err'); return; } })
     .catch(function(){});
 
   // Remove from DOM and array

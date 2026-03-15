@@ -8,264 +8,242 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Manage Notices | SCTI Admin</title>
+  <title>Notice Manager | SCTI Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- NO style.css — admin page uses only its own styles below -->
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f2f5;min-height:100vh}
-    a{text-decoration:none;color:inherit}
-
-    /* TOP BAR */
-    .top-bar{background:#00264d;color:white;padding:7px 20px;font-size:13px}
-
-    /* CONTAINER */
-    .wrap{max-width:1100px;margin:0 auto;padding:24px 16px}
-
-    /* PAGE HEADER */
-    .ph{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:24px 28px;border-radius:12px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 16px rgba(0,64,128,.25)}
-    .ph h1{font-size:24px;margin:0 0 4px}
-    .ph-bc{font-size:12px;opacity:.85}
-    .ph-bc a{color:white}
-    .btn-add{background:rgba(255,255,255,.2);color:white;padding:10px 20px;border:2px solid white;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:7px}
-    .btn-add:hover{background:white;color:#004080}
-
-    /* STATS */
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-    .sbox{background:white;border-radius:10px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.07);border-top:4px solid #004080}
-    .sbox .n{font-size:28px;font-weight:800;color:#004080}
-    .sbox .l{color:#777;font-size:11px;margin-top:3px}
-
-    /* FILTER BAR */
-    .fbar{background:white;border-radius:10px;padding:12px 18px;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;gap:8px;flex-wrap:wrap}
-    .fbtn{padding:6px 15px;border:2px solid #dde3ed;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700}
-    .fbtn.on,.fbtn:hover{background:#004080;border-color:#004080;color:white}
-
-    /* NOTICE LIST */
-    .nlist{display:flex;flex-direction:column;gap:12px}
-
-    /* NOTICE CARD — no overflow, no transform, no ::before tricks */
-    .nc{background:white;border-radius:10px;padding:20px 22px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:5px solid #004080}
-    .nc.urgent{border-left-color:#dc3545}
-    .nc.high{border-left-color:#fd7e14}
-    .nc.dim{opacity:.55}
-
-    .nc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
-    .nc-title{font-size:16px;font-weight:700;color:#1a1a2e}
-    .nc-badges{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
-    .bdg{padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700}
-    .bdg-active{background:#d4edda;color:#155724}
-    .bdg-inactive{background:#e2e3e5;color:#383d41}
-    .bdg-urgent{background:#f8d7da;color:#721c24}
-    .bdg-high{background:#fff3cd;color:#856404}
-    .bdg-normal{background:#cce5ff;color:#004085}
-    .bdg-cat{background:#e8ecf2;color:#4a5568}
-
-    .nc-meta{display:flex;gap:14px;margin-bottom:8px;flex-wrap:wrap}
-    .nc-meta span{color:#888;font-size:11px;display:flex;align-items:center;gap:4px}
-    .nc-meta i{color:#004080}
-    .nc-body{color:#555;font-size:13px;line-height:1.6;margin-bottom:14px}
-
-    /* ACTION BUTTONS — plain, no z-index games needed */
-    .nc-actions{display:flex;gap:8px}
-    .abtn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
-    .abtn-edit{background:#cce5ff;color:#004085}
-    .abtn-edit:hover{background:#004080;color:white}
-    .abtn-tog{background:#d4edda;color:#155724}
-    .abtn-tog:hover{background:#28a745;color:white}
-    .abtn-del{background:#f8d7da;color:#dc3545}
-    .abtn-del:hover{background:#dc3545;color:white}
-
-    /* EMPTY */
-    .empty{text-align:center;padding:50px 20px;color:#aaa}
-    .empty i{font-size:48px;display:block;margin-bottom:12px}
-
-    /* MODAL */
-    .mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center}
-    .mo.open{display:flex}
-    .md{background:white;border-radius:14px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .md-head{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:18px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center}
-    .md-head h3{margin:0;font-size:17px}
-    .md-x{background:rgba(255,255,255,.2);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
-    .md-x:hover{background:#dc3545}
-    .md-body{padding:22px}
-    .fg{margin-bottom:16px}
-    .fg label{display:block;font-size:12px;font-weight:700;color:#444;margin-bottom:5px}
-    .fg input,.fg textarea,.fg select{width:100%;padding:9px 12px;border:2px solid #dde3ed;border-radius:7px;font-size:13px;font-family:inherit;outline:none}
-    .fg input:focus,.fg textarea:focus,.fg select:focus{border-color:#004080}
-    .fg textarea{resize:vertical;min-height:90px}
-    .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .md-foot{padding:14px 22px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px}
-    .btn-cancel{padding:9px 18px;border:2px solid #dde3ed;background:white;color:#666;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700}
-    .btn-cancel:hover{border-color:#999}
-    .btn-save{padding:9px 22px;background:linear-gradient(135deg,#004080,#0059b3);color:white;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700}
-    .btn-save:hover{opacity:.88}
-
-    /* TOAST */
-    .toast{position:fixed;bottom:22px;right:22px;color:white;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:99999;display:none}
-    .toast.ok{background:#28a745}
-    .toast.err{background:#dc3545}
-
-    /* FOOTER */
-    footer{background:#00264d;color:white;text-align:center;padding:12px;margin-top:30px;font-size:13px}
-
-    @media(max-width:600px){
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .frow{grid-template-columns:1fr}
-    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;}
+    .top-bar{background:#00264d;color:white;padding:7px 20px;font-size:13px;}
+    /* ── HEADER ── */
+    .pg-header{background:linear-gradient(135deg,#004080,#0059b3);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 18px rgba(0,64,128,.25);}
+    .pg-header h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 3px;}
+    .pg-header .bc{font-size:12px;color:rgba(255,255,255,.75);}
+    .pg-header .bc a{color:#fff;text-decoration:none;}
+    .hdr-btns{display:flex;gap:8px;}
+    .btn-hdr{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;transition:.2s;text-decoration:none;}
+    .btn-hdr.ghost{background:rgba(255,255,255,.18);color:#fff;}
+    .btn-hdr.ghost:hover{background:rgba(255,255,255,.32);}
+    /* ── STATS ── */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 28px;background:#fff;border-bottom:1px solid #e9ecef;}
+    .stat{display:flex;align-items:center;gap:12px;background:#f8f9fa;border-radius:10px;padding:12px 16px;}
+    .stat-ico{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;}
+    .ico-blue{background:linear-gradient(135deg,#004080,#0059b3);}
+    .ico-green{background:linear-gradient(135deg,#28a745,#20c997);}
+    .ico-red{background:linear-gradient(135deg,#dc3545,#c82333);}
+    .ico-grey{background:linear-gradient(135deg,#6c757d,#495057);}
+    .stat-val{font-size:24px;font-weight:700;color:#222;line-height:1;}
+    .stat-lbl{font-size:11px;color:#999;margin-top:2px;}
+    /* ── LAYOUT ── */
+    .layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 170px);}
+    .panel{background:#fff;border-right:1px solid #e9ecef;padding:22px;overflow-y:auto;}
+    .panel h3{font-size:15px;color:#004080;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #e8f0fe;display:flex;align-items:center;gap:8px;}
+    .content{padding:22px;overflow-y:auto;}
+    /* ── FORM ── */
+    .fg{margin-bottom:13px;}
+    .fg label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;}
+    .fc{width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;transition:.2s;}
+    .fc:focus{outline:none;border-color:#004080;box-shadow:0 0 0 3px rgba(0,64,128,.1);}
+    textarea.fc{resize:vertical;min-height:80px;}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s;margin-top:4px;}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,64,128,.35);}
+    .btn-reset{width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
+    .btn-reset:hover{background:#e0e0e0;}
+    .alert{padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;}
+    .alert-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+    .alert-err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+    /* ── TOOLBAR ── */
+    .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+    .toolbar select,.toolbar input{padding:9px 13px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;}
+    .toolbar input{flex:1;min-width:160px;}
+    .toolbar select:focus,.toolbar input:focus{outline:none;border-color:#004080;}
+    .btn-refresh{padding:9px 16px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.2s;}
+    .btn-refresh:hover{transform:translateY(-1px);}
+    /* ── NOTICE GRID ── */
+    .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+    .ncard{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:.25s;border-top:4px solid #004080;}
+    .ncard:hover{transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,64,128,.18);}
+    .ncard.urgent{border-top-color:#dc3545;}
+    .ncard.high{border-top-color:#fd7e14;}
+    .ncard.dim{opacity:.55;}
+    .ncard-body{padding:14px;}
+    .ncard-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+    .nbdg{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+    .nbdg-urgent{background:#f8d7da;color:#721c24;}
+    .nbdg-high{background:#fff3cd;color:#856404;}
+    .nbdg-normal{background:#cce5ff;color:#004085;}
+    .nbdg-active{background:#d4edda;color:#155724;}
+    .nbdg-inactive{background:#e2e3e5;color:#383d41;}
+    .nbdg-cat{background:#e8ecf2;color:#4a5568;}
+    .ncard-title{font-weight:700;color:#222;font-size:13px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .ncard-desc{color:#aaa;font-size:11px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:8px;}
+    .ncard-meta{font-size:10px;color:#ccc;margin-bottom:9px;display:flex;align-items:center;gap:4px;}
+    .ncard-meta i{color:#004080;}
+    .ncard-actions{display:flex;gap:7px;}
+    .nbtn{flex:1;padding:6px;border:none;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;transition:.2s;display:flex;align-items:center;justify-content:center;gap:4px;}
+    .nbtn-edit{background:#fff3cd;color:#856404;}
+    .nbtn-edit:hover{background:#ffc107;color:#fff;}
+    .nbtn-tog{background:#d4edda;color:#155724;}
+    .nbtn-tog:hover{background:#28a745;color:#fff;}
+    .nbtn-del{background:#f8d7da;color:#721c24;}
+    .nbtn-del:hover{background:#dc3545;color:#fff;}
+    .empty{text-align:center;padding:60px 20px;color:#ccc;grid-column:1/-1;}
+    .empty i{font-size:56px;display:block;margin-bottom:12px;}
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:22px;right:22px;color:white;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:99999;display:none;}
+    .toast.ok{background:#28a745;}
+    .toast.err{background:#dc3545;}
+    footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:13px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.stats{grid-template-columns:repeat(2,1fr);}}
   </style>
 </head>
 <body>
+<div class="top-bar"><marquee>Notice Manager — Create and manage notices for the SCTI website</marquee></div>
 
-<div class="top-bar"><marquee>Manage Notices — SCTI Admin Panel</marquee></div>
-
-<div class="wrap">
-
-  <!-- PAGE HEADER -->
-  <div class="ph">
-    <div>
-      <h1><i class="fa fa-bullhorn"></i> Manage Notices</h1>
-      <div class="ph-bc"><a href="../dashboards/admin-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Manage Notices</div>
-    </div>
-    <button class="btn-add" onclick="openModal()"><i class="fa fa-plus"></i> Create Notice</button>
+<!-- HEADER -->
+<div class="pg-header">
+  <div>
+    <h1><i class="fa fa-bullhorn"></i> Notice Manager</h1>
+    <div class="bc"><a href="../dashboards/admin-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Notices</div>
   </div>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="sbox"><div class="n" id="sTotal">0</div><div class="l">Total</div></div>
-    <div class="sbox" style="border-top-color:#28a745"><div class="n" id="sActive" style="color:#28a745">0</div><div class="l">Active</div></div>
-    <div class="sbox" style="border-top-color:#dc3545"><div class="n" id="sUrgent" style="color:#dc3545">0</div><div class="l">Urgent</div></div>
-    <div class="sbox" style="border-top-color:#6c757d"><div class="n" id="sInactive" style="color:#6c757d">0</div><div class="l">Inactive</div></div>
-  </div>
-
-  <!-- FILTER BAR -->
-  <div class="fbar">
-    <button class="fbtn on" onclick="setFilter('all',this)">All</button>
-    <button class="fbtn" onclick="setFilter('active',this)">Active</button>
-    <button class="fbtn" onclick="setFilter('inactive',this)">Inactive</button>
-    <button class="fbtn" onclick="setFilter('urgent',this)">Urgent</button>
-  </div>
-
-  <!-- NOTICE LIST -->
-  <div class="nlist" id="nlist">
-    <div class="empty"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div>
-  </div>
-
-</div><!-- /wrap -->
-
-<!-- MODAL -->
-<div class="mo" id="mo" onclick="bgClose(event)">
-  <div class="md">
-    <div class="md-head">
-      <h3 id="mdTitle"><i class="fa fa-plus"></i> Create Notice</h3>
-      <button class="md-x" onclick="closeModal()"><i class="fa fa-xmark"></i></button>
-    </div>
-    <div class="md-body">
-      <input type="hidden" id="fId" value="0">
-      <div class="fg"><label>Title *</label><input type="text" id="fTitle" placeholder="Notice title..."></div>
-      <div class="fg"><label>Description *</label><textarea id="fDesc" placeholder="Notice content..."></textarea></div>
-      <div class="frow">
-        <div class="fg">
-          <label>Category</label>
-          <select id="fCat">
-            <option value="general">General</option>
-            <option value="admission">Admission</option>
-            <option value="exam">Exam</option>
-            <option value="event">Event</option>
-            <option value="holiday">Holiday</option>
-            <option value="urgent">Urgent</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Priority</label>
-          <select id="fPri">
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-        </div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Notice Date</label><input type="date" id="fDate"></div>
-        <div class="fg">
-          <label>Status</label>
-          <select id="fStat">
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="md-foot">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveNotice()"><i class="fa fa-save"></i> Save</button>
-    </div>
+  <div class="hdr-btns">
+    <a href="../dashboards/admin-dashboard.php" class="btn-hdr ghost"><i class="fa fa-arrow-left"></i> Back</a>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-bullhorn"></i></div><div><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Total Notices</div></div></div>
+  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">—</div><div class="stat-lbl">Active</div></div></div>
+  <div class="stat"><div class="stat-ico ico-red"><i class="fa fa-exclamation-circle"></i></div><div><div class="stat-val" id="sUrgent">—</div><div class="stat-lbl">Urgent</div></div></div>
+  <div class="stat"><div class="stat-ico ico-grey"><i class="fa fa-archive"></i></div><div><div class="stat-val" id="sInactive">—</div><div class="stat-lbl">Inactive</div></div></div>
+</div>
 
-<footer>© 2025 SCTI - Admin Panel</footer>
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- LEFT PANEL: CREATE / EDIT FORM -->
+  <div class="panel">
+    <h3 id="formTitle"><i class="fa fa-plus-circle"></i> Create Notice</h3>
+    <div id="formAlert" class="alert"></div>
+    <input type="hidden" id="fId" value="0">
+    <div class="fg"><label>Title *</label><input type="text" id="fTitle" class="fc" placeholder="Notice title..."></div>
+    <div class="fg"><label>Description *</label><textarea id="fDesc" class="fc" placeholder="Notice content..."></textarea></div>
+    <div class="frow">
+      <div class="fg">
+        <label>Category</label>
+        <select id="fCat" class="fc">
+          <option value="general">General</option>
+          <option value="admission">Admission</option>
+          <option value="exam">Exam</option>
+          <option value="event">Event</option>
+          <option value="holiday">Holiday</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Priority</label>
+        <select id="fPri" class="fc">
+          <option value="normal">Normal</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Date</label><input type="date" id="fDate" class="fc"></div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="fStat" class="fc">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="saveNotice()"><i class="fa fa-save"></i> <span id="btnTxt">Save Notice</span></button>
+    <button class="btn-reset" onclick="resetForm()"><i class="fa fa-times"></i> Cancel / Reset</button>
+  </div>
+
+  <!-- RIGHT CONTENT: NOTICE GRID -->
+  <div class="content">
+    <div class="toolbar">
+      <select id="filterStatus" onchange="loadNotices()">
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <select id="filterPri" onchange="loadNotices()">
+        <option value="">All Priority</option>
+        <option value="urgent">Urgent</option>
+        <option value="high">High</option>
+        <option value="normal">Normal</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Search by title..." oninput="filterLocal()">
+      <button class="btn-refresh" onclick="loadNotices()"><i class="fa fa-sync"></i> Refresh</button>
+    </div>
+    <div class="ngrid" id="ngrid">
+      <div class="empty"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<div class="toast" id="toast"></div>
+<footer>© 2025 SCTI — Admin Panel</footer>
 
 <script>
-var notices = [];
-var curFilter = 'all';
+var allNotices = [];
 
 /* ── LOAD ── */
 function loadNotices() {
-  fetch('notice-list.php?status=all')
+  var status = document.getElementById('filterStatus').value;
+  var grid = document.getElementById('ngrid');
+  grid.innerHTML = '<div class="empty"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div>';
+
+  fetch('notice-list.php?status=' + encodeURIComponent(status))
     .then(function(r){ return r.text(); })
     .then(function(txt){
       var d;
       try { d = JSON.parse(txt); } catch(e) {
-        document.getElementById('nlist').innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>Parse error: ' + txt.substring(0,100) + '</p></div>';
+        grid.innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>Parse error: ' + txt.substring(0,80) + '</p></div>';
         return;
       }
-      if (d.success) {
-        notices = d.notices;
-        updateStats();
-        renderList();
-      } else {
-        document.getElementById('nlist').innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>' + (d.message||'Error') + '</p></div>';
-      }
+      if (!d.success) { grid.innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>' + (d.message||'Error') + '</p></div>'; return; }
+      allNotices = d.notices || [];
+      updateStats();
+      renderGrid(allNotices);
     })
-    .catch(function(e){
-      document.getElementById('nlist').innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>Network error: ' + e.message + '</p></div>';
-    });
+    .catch(function(e){ grid.innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>Network error: ' + e.message + '</p></div>'; });
 }
 
 function updateStats() {
-  document.getElementById('sTotal').textContent    = notices.length;
-  document.getElementById('sActive').textContent   = notices.filter(function(n){return n.status==='active';}).length;
-  document.getElementById('sUrgent').textContent   = notices.filter(function(n){return n.priority==='urgent';}).length;
-  document.getElementById('sInactive').textContent = notices.filter(function(n){return n.status==='inactive';}).length;
+  document.getElementById('sTotal').textContent    = allNotices.length;
+  document.getElementById('sActive').textContent   = allNotices.filter(function(n){return n.status==='active';}).length;
+  document.getElementById('sUrgent').textContent   = allNotices.filter(function(n){return n.priority==='urgent';}).length;
+  document.getElementById('sInactive').textContent = allNotices.filter(function(n){return n.status==='inactive';}).length;
 }
 
-function setFilter(f, btn) {
-  curFilter = f;
-  document.querySelectorAll('.fbtn').forEach(function(b){ b.classList.remove('on'); });
-  btn.classList.add('on');
-  renderList();
+function filterLocal() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var pri = document.getElementById('filterPri').value;
+  var list = allNotices.filter(function(n){
+    var matchQ = !q || n.title.toLowerCase().indexOf(q) > -1;
+    var matchP = !pri || n.priority === pri;
+    return matchQ && matchP;
+  });
+  renderGrid(list);
 }
 
-function renderList() {
-  var list = notices.slice();
-  if (curFilter === 'active')   list = list.filter(function(n){return n.status==='active';});
-  if (curFilter === 'inactive') list = list.filter(function(n){return n.status==='inactive';});
-  if (curFilter === 'urgent')   list = list.filter(function(n){return n.priority==='urgent';});
-
-  var el = document.getElementById('nlist');
-  if (!list.length) {
-    el.innerHTML = '<div class="empty"><i class="fa fa-bullhorn"></i><p>No notices found</p></div>';
-    return;
-  }
-  el.innerHTML = list.map(buildCard).join('');
+function renderGrid(list) {
+  var grid = document.getElementById('ngrid');
+  if (!list.length) { grid.innerHTML = '<div class="empty"><i class="fa fa-bullhorn"></i><p>No notices found</p></div>'; return; }
+  grid.innerHTML = list.map(buildCard).join('');
 }
 
 function buildCard(n) {
   var pc  = n.priority==='urgent' ? 'urgent' : n.priority==='high' ? 'high' : '';
-  var sc  = n.status==='inactive' ? 'dim' : '';
+  var dim = n.status==='inactive' ? 'dim' : '';
   var pl  = cap(n.priority);
   var sl  = cap(n.status);
   var cl  = cap(n.category);
@@ -275,52 +253,54 @@ function buildCard(n) {
   var id  = n.id;
   var st  = n.status;
 
-  return '<div class="nc ' + pc + ' ' + sc + '">'
-    + '<div class="nc-head">'
-    +   '<div class="nc-title">' + esc(n.title) + '</div>'
-    +   '<div class="nc-badges">'
-    +     '<span class="bdg bdg-' + n.priority + '">' + pl + '</span>'
-    +     '<span class="bdg bdg-' + n.status + '">' + sl + '</span>'
-    +     '<span class="bdg bdg-cat">' + cl + '</span>'
+  return '<div class="ncard ' + pc + ' ' + dim + '">'
+    + '<div class="ncard-body">'
+    +   '<div class="ncard-badges">'
+    +     '<span class="nbdg nbdg-' + n.priority + '">' + pl + '</span>'
+    +     '<span class="nbdg nbdg-' + n.status + '">' + sl + '</span>'
+    +     '<span class="nbdg nbdg-cat">' + cl + '</span>'
     +   '</div>'
-    + '</div>'
-    + '<div class="nc-meta">'
-    +   '<span><i class="fa fa-calendar"></i> ' + dt + '</span>'
-    +   '<span><i class="fa fa-tag"></i> ' + cl + '</span>'
-    + '</div>'
-    + '<div class="nc-body">' + esc(n.description) + '</div>'
-    + '<div class="nc-actions">'
-    +   '<button class="abtn abtn-edit" onclick="editNotice(' + id + ')"><i class="fa fa-edit"></i> Edit</button>'
-    +   '<button class="abtn abtn-tog"  onclick="toggleNotice(' + id + ',\'' + st + '\')"><i class="fa ' + ti + '"></i> ' + tl + '</button>'
-    +   '<button class="abtn abtn-del"  onclick="deleteNotice(' + id + ')"><i class="fa fa-trash"></i> Delete</button>'
+    +   '<div class="ncard-title">' + esc(n.title) + '</div>'
+    +   '<div class="ncard-desc">' + esc(n.description) + '</div>'
+    +   '<div class="ncard-meta"><i class="fa fa-calendar"></i> ' + dt + '</div>'
+    +   '<div class="ncard-actions">'
+    +     '<button class="nbtn nbtn-edit" onclick="editNotice(' + id + ')"><i class="fa fa-edit"></i> Edit</button>'
+    +     '<button class="nbtn nbtn-tog"  onclick="toggleNotice(' + id + ',\'' + st + '\')"><i class="fa ' + ti + '"></i> ' + tl + '</button>'
+    +     '<button class="nbtn nbtn-del"  onclick="deleteNotice(' + id + ')"><i class="fa fa-trash"></i> Del</button>'
+    +   '</div>'
     + '</div>'
     + '</div>';
 }
 
-/* ── MODAL ── */
-function openModal(n) {
-  document.getElementById('fId').value    = n ? n.id : 0;
-  document.getElementById('fTitle').value = n ? n.title : '';
-  document.getElementById('fDesc').value  = n ? n.description : '';
-  document.getElementById('fCat').value   = n ? n.category : 'general';
-  document.getElementById('fPri').value   = n ? n.priority : 'normal';
-  document.getElementById('fDate').value  = n ? (n.notice_date||'').split(' ')[0].split('T')[0] : today();
-  document.getElementById('fStat').value  = n ? n.status : 'active';
-  document.getElementById('mdTitle').innerHTML = n
-    ? '<i class="fa fa-edit"></i> Edit Notice'
-    : '<i class="fa fa-plus"></i> Create Notice';
-  document.getElementById('mo').classList.add('open');
+/* ── FORM ── */
+function resetForm() {
+  document.getElementById('fId').value    = '0';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fDesc').value  = '';
+  document.getElementById('fCat').value   = 'general';
+  document.getElementById('fPri').value   = 'normal';
+  document.getElementById('fDate').value  = today();
+  document.getElementById('fStat').value  = 'active';
+  document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Notice';
+  document.getElementById('btnTxt').textContent  = 'Save Notice';
+  document.getElementById('formAlert').style.display = 'none';
 }
-function closeModal() { document.getElementById('mo').classList.remove('open'); }
-function bgClose(e)   { if (e.target.id === 'mo') closeModal(); }
 
 function editNotice(id) {
-  var n = notices.find(function(x){ return String(x.id)===String(id); });
-  if (n) openModal(n);
-  else toast('Notice not found','err');
+  var n = allNotices.find(function(x){ return String(x.id)===String(id); });
+  if (!n) { toast('Notice not found','err'); return; }
+  document.getElementById('fId').value    = n.id;
+  document.getElementById('fTitle').value = n.title;
+  document.getElementById('fDesc').value  = n.description;
+  document.getElementById('fCat').value   = n.category;
+  document.getElementById('fPri').value   = n.priority;
+  document.getElementById('fDate').value  = (n.notice_date||'').split(' ')[0].split('T')[0] || today();
+  document.getElementById('fStat').value  = n.status;
+  document.getElementById('formTitle').innerHTML = '<i class="fa fa-edit"></i> Edit Notice';
+  document.getElementById('btnTxt').textContent  = 'Update Notice';
+  document.querySelector('.panel').scrollTop = 0;
 }
 
-/* ── SAVE ── */
 function saveNotice() {
   var payload = {
     id:          parseInt(document.getElementById('fId').value),
@@ -331,7 +311,7 @@ function saveNotice() {
     notice_date: document.getElementById('fDate').value,
     status:      document.getElementById('fStat').value
   };
-  if (!payload.title || !payload.description) { toast('Title and description required','err'); return; }
+  if (!payload.title || !payload.description) { showAlert('Title and description required','err'); return; }
 
   fetch('notice-save.php', {
     method: 'POST',
@@ -341,61 +321,55 @@ function saveNotice() {
   .then(function(r){ return r.text(); })
   .then(function(txt){
     var d;
-    try { d = JSON.parse(txt); } catch(e) { toast('Server error: ' + txt.substring(0,60),'err'); return; }
-    if (d.success) { toast(d.message,'ok'); closeModal(); loadNotices(); }
-    else toast(d.message||'Save failed','err');
+    try { d = JSON.parse(txt); } catch(e) { showAlert('Server error: ' + txt.substring(0,60),'err'); return; }
+    if (d.success) { showAlert(d.message,'ok'); resetForm(); loadNotices(); }
+    else showAlert(d.message||'Save failed','err');
   })
-  .catch(function(e){ toast('Network error: ' + e.message,'err'); });
+  .catch(function(e){ showAlert('Network error: ' + e.message,'err'); });
 }
 
 /* ── TOGGLE ── */
 function toggleNotice(id, curStatus) {
-  var newStatus = curStatus === 'active' ? 'inactive' : 'active';
-  var n = notices.find(function(x){ return String(x.id)===String(id); });
+  var newStatus = curStatus==='active' ? 'inactive' : 'active';
+  var n = allNotices.find(function(x){ return String(x.id)===String(id); });
   if (!n) { toast('Notice not found','err'); return; }
   var payload = {
-    id:          parseInt(n.id),
-    title:       n.title,
-    description: n.description,
-    category:    n.category,
-    priority:    n.priority,
+    id: parseInt(n.id), title: n.title, description: n.description,
+    category: n.category, priority: n.priority,
     notice_date: (n.notice_date||'').split(' ')[0].split('T')[0] || today(),
-    status:      newStatus
+    status: newStatus
   };
-  fetch('notice-save.php', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  })
-  .then(function(r){ return r.text(); })
-  .then(function(txt){
-    var d;
-    try { d = JSON.parse(txt); } catch(e) { toast('Server error: ' + txt.substring(0,60),'err'); return; }
-    if (d.success) { toast('Status changed to ' + newStatus,'ok'); loadNotices(); }
-    else toast(d.message||'Update failed','err');
-  })
-  .catch(function(e){ toast('Network error: ' + e.message,'err'); });
+  fetch('notice-save.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)})
+    .then(function(r){ return r.text(); })
+    .then(function(txt){
+      var d; try { d=JSON.parse(txt); } catch(e){ toast('Server error','err'); return; }
+      if (d.success) { toast('Status → ' + newStatus,'ok'); loadNotices(); }
+      else toast(d.message||'Failed','err');
+    })
+    .catch(function(e){ toast('Network error: ' + e.message,'err'); });
 }
 
 /* ── DELETE ── */
 function deleteNotice(id) {
   if (!confirm('Delete this notice? This cannot be undone.')) return;
-  fetch('notice-delete.php', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({id: parseInt(id)})
-  })
-  .then(function(r){ return r.text(); })
-  .then(function(txt){
-    var d;
-    try { d = JSON.parse(txt); } catch(e) { toast('Server error: ' + txt.substring(0,60),'err'); return; }
-    if (d.success) { toast('Notice deleted','ok'); loadNotices(); }
-    else toast(d.message||'Delete failed','err');
-  })
-  .catch(function(e){ toast('Network error: ' + e.message,'err'); });
+  fetch('notice-delete.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:parseInt(id)})})
+    .then(function(r){ return r.text(); })
+    .then(function(txt){
+      var d; try { d=JSON.parse(txt); } catch(e){ toast('Server error','err'); return; }
+      if (d.success) { toast('Notice deleted','ok'); loadNotices(); }
+      else toast(d.message||'Delete failed','err');
+    })
+    .catch(function(e){ toast('Network error: ' + e.message,'err'); });
 }
 
 /* ── HELPERS ── */
+function showAlert(msg, type) {
+  var el = document.getElementById('formAlert');
+  el.className = 'alert alert-' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(function(){ el.style.display='none'; }, 4000);
+}
 function toast(msg, type) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -403,16 +377,13 @@ function toast(msg, type) {
   t.style.display = 'block';
   setTimeout(function(){ t.style.display='none'; }, 3000);
 }
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
-function today() { return new Date().toISOString().split('T')[0]; }
-function fmtDate(d) {
-  try { return new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
-  catch(e) { return d; }
-}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function fmtDate(d){ try{ return new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }catch(e){ return d; } }
 
+document.getElementById('filterPri').addEventListener('change', filterLocal);
+document.getElementById('fDate').value = today();
 loadNotices();
 </script>
 </body>

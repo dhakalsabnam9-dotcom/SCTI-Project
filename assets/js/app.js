@@ -10,11 +10,6 @@ function loadPage(pageName) {
     }, 100);
   }
 
-  // Initialize programs after DOM is injected
-  if (pageName === 'programs') {
-    initPrograms();
-  }
-
   // Initialize gallery after DOM is injected
   if (pageName === 'gallery') {
     initGallery();
@@ -23,6 +18,11 @@ function loadPage(pageName) {
   // Initialize notices after DOM is injected
   if (pageName === 'notices') {
     initNotices();
+  }
+
+  // Initialize programs after DOM is injected
+  if (pageName === 'programs') {
+    initPrograms();
   }
   
   // Scroll to top smoothly

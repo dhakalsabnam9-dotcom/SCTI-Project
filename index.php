@@ -89,7 +89,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/pages/login.js"></script>
 <script src="assets/js/pages/signup.js"></script>
 <script src="assets/js/pages.js"></script>
-<script src="assets/js/app.js?v=32"></script>
+<script src="assets/js/app.js?v=35"></script>
 
 </body>
 </html>

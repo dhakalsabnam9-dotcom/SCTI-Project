@@ -55,9 +55,8 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .toolbar select:focus,.toolbar input:focus{outline:none;border-color:#004080;}
     .btn-refresh{padding:9px 16px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.2s;}
     .btn-refresh:hover{transform:translateY(-1px);}
-    /* PROGRAM GRID */
-    .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
-    .pcard{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:.25s;}
+    .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;}
+    .pcard{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:.25s;position:relative;}
     .pcard:hover{transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,64,128,.18);}
     .pcard-banner{height:5px;}
     .banner-blue{background:linear-gradient(90deg,#004080,#0059b3);}
@@ -66,18 +65,14 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .banner-purple{background:linear-gradient(90deg,#6f42c1,#e83e8c);}
     .banner-red{background:linear-gradient(90deg,#dc3545,#c82333);}
     .banner-teal{background:linear-gradient(90deg,#17a2b8,#138496);}
+    .pcard-img{height:110px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+    .pcard-img-bg{position:absolute;inset:0;opacity:.08;}
+    .pcard-icon-big{font-size:44px;color:white;position:relative;z-index:1;}
     .pcard-body{padding:14px;}
-    .pcard-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;margin-bottom:10px;}
-    .icon-blue{background:linear-gradient(135deg,#004080,#0059b3);}
-    .icon-green{background:linear-gradient(135deg,#28a745,#20c997);}
-    .icon-orange{background:linear-gradient(135deg,#fd7e14,#ffc107);}
-    .icon-purple{background:linear-gradient(135deg,#6f42c1,#e83e8c);}
-    .icon-red{background:linear-gradient(135deg,#dc3545,#c82333);}
-    .icon-teal{background:linear-gradient(135deg,#17a2b8,#138496);}
     .pcard-title{font-weight:700;color:#222;font-size:13px;margin-bottom:2px;line-height:1.3;}
     .pcard-code{color:#aaa;font-size:10px;margin-bottom:6px;}
     .pcard-desc{color:#888;font-size:11px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:8px;}
-    .pcard-meta{font-size:10px;color:#ccc;margin-bottom:9px;display:flex;flex-direction:column;gap:3px;}
+    .pcard-meta{font-size:10px;color:#bbb;margin-bottom:9px;display:flex;flex-direction:column;gap:3px;}
     .pcard-meta span{display:flex;align-items:center;gap:4px;}
     .pcard-meta i{color:#004080;}
     .pbdg{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:8px;}
@@ -90,8 +85,30 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .pbtn-edit:hover{background:#ffc107;color:#fff;}
     .pbtn-del{background:#f8d7da;color:#721c24;}
     .pbtn-del:hover{background:#dc3545;color:#fff;}
+    .pbtn-view{background:#e8f0fe;color:#004080;}
+    .pbtn-view:hover{background:#004080;color:#fff;}
     .empty{text-align:center;padding:60px 20px;color:#ccc;grid-column:1/-1;}
     .empty i{font-size:56px;display:block;margin-bottom:12px;}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;}
+    .modal.on{display:flex;}
+    .mbox{background:#fff;padding:26px;border-radius:14px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.2);}
+    .mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;}
+    .mhead h3{margin:0;color:#004080;font-size:16px;display:flex;align-items:center;gap:8px;}
+    .mclose{background:none;border:none;font-size:22px;cursor:pointer;color:#bbb;line-height:1;}
+    .mclose:hover{color:#333;}
+    .btn-save{width:100%;padding:11px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+    .btn-save:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,64,128,.3);}
+    .btn-cancel{width:100%;padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
+    .btn-cancel:hover{background:#e0e0e0;}
+    .view-modal-head{padding:20px 22px 0;}
+    .view-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;color:white;margin-bottom:12px;}
+    .view-title{font-size:20px;font-weight:800;color:#1a202c;margin-bottom:4px;}
+    .view-code{font-size:12px;color:#aaa;margin-bottom:16px;}
+    .view-body{padding:0 22px 22px;}
+    .view-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5;font-size:13px;color:#555;}
+    .view-row:last-child{border-bottom:none;}
+    .view-row i{color:#004080;width:16px;margin-top:2px;flex-shrink:0;}
+    .view-row strong{color:#222;min-width:90px;flex-shrink:0;}
     .toast{position:fixed;bottom:22px;right:22px;color:white;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:99999;display:none;}
     .toast.ok{background:#28a745;}
     .toast.err{background:#dc3545;}
@@ -127,23 +144,19 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
       <div class="fg">
         <label>Color</label>
         <select id="fColor" class="fc">
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-          <option value="orange">Orange</option>
-          <option value="purple">Purple</option>
-          <option value="red">Red</option>
-          <option value="teal">Teal</option>
+          <option value="blue">Blue</option><option value="green">Green</option>
+          <option value="orange">Orange</option><option value="purple">Purple</option>
+          <option value="red">Red</option><option value="teal">Teal</option>
         </select>
       </div>
     </div>
     <div class="fg">
-      <label>Icon (Font Awesome class)</label>
+      <label>Icon</label>
       <select id="fIcon" class="fc">
         <option value="fa-graduation-cap">Graduation Cap</option>
         <option value="fa-laptop-code">Laptop Code</option>
         <option value="fa-hard-hat">Hard Hat</option>
         <option value="fa-building">Building</option>
-        <option value="fa-paw">Paw</option>
         <option value="fa-bolt">Bolt</option>
         <option value="fa-tools">Tools</option>
         <option value="fa-flask">Flask</option>
@@ -157,7 +170,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     </div>
     <div class="fg"><label>Assessment</label><input type="text" id="fAssess" class="fc" placeholder="e.g. 50% Internal + 50% External"></div>
     <div class="fg"><label>Description</label><textarea id="fDesc" class="fc" placeholder="Short description..."></textarea></div>
-    <div class="fg"><label>Course Content (pipe-separated)</label><textarea id="fContent" class="fc" placeholder="Topic 1|Topic 2|Topic 3"></textarea></div>
+    <div class="fg"><label>Course Content <small style="color:#aaa">(pipe-separated)</small></label><textarea id="fContent" class="fc" placeholder="Topic 1|Topic 2|Topic 3"></textarea></div>
     <div class="fg">
       <label>Status</label>
       <select id="fStat" class="fc">
@@ -185,10 +198,73 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     </div>
   </div>
 </div>
+<!-- View Modal -->
+<div class="modal" id="viewModal">
+  <div class="mbox" style="padding:0;">
+    <div class="mhead" style="padding:16px 20px;"><h3><i class="fa fa-eye"></i> Program Details</h3><button class="mclose" onclick="closeMod('viewModal')">×</button></div>
+    <div class="view-modal-head" id="viewHead"></div>
+    <div class="view-body" id="viewBody"></div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+  <div class="mbox">
+    <div class="mhead"><h3><i class="fa fa-edit"></i> Edit Program</h3><button class="mclose" onclick="closeMod('editModal')">×</button></div>
+    <div id="editAlert" class="alert"></div>
+    <input type="hidden" id="eId">
+    <div class="fg"><label>Title *</label><input type="text" id="eTitle" class="fc"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fg"><label>Code *</label><input type="text" id="eCode" class="fc"></div>
+      <div class="fg"><label>Color</label>
+        <select id="eColor" class="fc">
+          <option value="blue">Blue</option><option value="green">Green</option>
+          <option value="orange">Orange</option><option value="purple">Purple</option>
+          <option value="red">Red</option><option value="teal">Teal</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Icon</label>
+      <select id="eIcon" class="fc">
+        <option value="fa-graduation-cap">Graduation Cap</option>
+        <option value="fa-laptop-code">Laptop Code</option>
+        <option value="fa-hard-hat">Hard Hat</option>
+        <option value="fa-building">Building</option>
+        <option value="fa-bolt">Bolt</option>
+        <option value="fa-tools">Tools</option>
+        <option value="fa-flask">Flask</option>
+        <option value="fa-book">Book</option>
+        <option value="fa-stethoscope">Stethoscope</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fg"><label>Duration</label><input type="text" id="eDuration" class="fc"></div>
+      <div class="fg"><label>Affiliation</label><input type="text" id="eAffil" class="fc"></div>
+    </div>
+    <div class="fg"><label>Assessment</label><input type="text" id="eAssess" class="fc"></div>
+    <div class="fg"><label>Description</label><textarea id="eDesc" class="fc"></textarea></div>
+    <div class="fg"><label>Course Content <small style="color:#aaa">(pipe-separated)</small></label><textarea id="eContent" class="fc"></textarea></div>
+    <div class="fg"><label>Status</label>
+      <select id="eStat" class="fc">
+        <option value="active">Active</option>
+        <option value="upcoming">Upcoming</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <button class="btn-save" onclick="updateProgram()"><i class="fa fa-save"></i> Save Changes</button>
+    <button class="btn-cancel" onclick="closeMod('editModal')">Cancel</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <footer>© 2025 SCTI — Admin Panel</footer>
 <script>
 var allPrograms = [];
+var gradMap = {blue:'linear-gradient(135deg,#004080,#0059b3)',green:'linear-gradient(135deg,#28a745,#20c997)',orange:'linear-gradient(135deg,#fd7e14,#ffc107)',purple:'linear-gradient(135deg,#6f42c1,#e83e8c)',red:'linear-gradient(135deg,#dc3545,#c82333)',teal:'linear-gradient(135deg,#17a2b8,#138496)'};
+
+function openMod(id)  { document.getElementById(id).classList.add('on'); }
+function closeMod(id) { document.getElementById(id).classList.remove('on'); }
+
 function loadPrograms() {
   var status = document.getElementById('filterStatus').value;
   var grid = document.getElementById('pgrid');
@@ -203,92 +279,140 @@ function loadPrograms() {
     })
     .catch(function(e){ grid.innerHTML='<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>'+e.message+'</p></div>'; });
 }
+
 function updateStats() {
   document.getElementById('sTotal').textContent    = allPrograms.length;
   document.getElementById('sActive').textContent   = allPrograms.filter(function(p){return p.status==='active';}).length;
   document.getElementById('sUpcoming').textContent = allPrograms.filter(function(p){return p.status==='upcoming';}).length;
   document.getElementById('sInactive').textContent = allPrograms.filter(function(p){return p.status==='inactive';}).length;
 }
+
 function filterLocal() {
   var q = document.getElementById('searchInput').value.toLowerCase();
   var list = allPrograms.filter(function(p){ return !q || (p.title||'').toLowerCase().indexOf(q)>-1 || (p.code||'').toLowerCase().indexOf(q)>-1; });
   renderGrid(list);
 }
+
 function renderGrid(list) {
   var grid = document.getElementById('pgrid');
   if (!list.length) { grid.innerHTML='<div class="empty"><i class="fa fa-graduation-cap"></i><p>No programs found</p></div>'; return; }
   grid.innerHTML = list.map(buildCard).join('');
 }
+
 function buildCard(p) {
-  var color = p.color||'blue';
-  var icon  = p.icon||'fa-graduation-cap';
-  var bdgCls = p.status==='active' ? 'pbdg-active' : p.status==='upcoming' ? 'pbdg-upcoming' : 'pbdg-inactive';
-  var bdgLbl = cap(p.status);
+  var color  = p.color||'blue';
+  var icon   = p.icon||'fa-graduation-cap';
+  var grad   = gradMap[color]||gradMap.blue;
+  var bdgCls = p.status==='active'?'pbdg-active':p.status==='upcoming'?'pbdg-upcoming':'pbdg-inactive';
   return '<div class="pcard">'
     +'<div class="pcard-banner banner-'+color+'"></div>'
+    +'<div class="pcard-img" style="background:'+grad+'">'
+    +'<div class="pcard-img-bg" style="background:'+grad+'"></div>'
+    +'<i class="fa '+icon+' pcard-icon-big"></i>'
+    +'</div>'
     +'<div class="pcard-body">'
-    +'<div class="pcard-icon icon-'+color+'"><i class="fa '+icon+'"></i></div>'
     +'<div class="pcard-title">'+esc(p.title)+'</div>'
     +'<div class="pcard-code">'+esc(p.code)+' | '+esc(p.affiliation||'')+'</div>'
     +'<div class="pcard-desc">'+esc(p.description||'')+'</div>'
     +'<div class="pcard-meta">'
-    +'<span><i class="fa fa-clock"></i> '+esc(p.duration||'')+'</span>'
-    +'<span><i class="fa fa-chart-bar"></i> '+esc(p.assessment||'')+'</span>'
+    +'<span><i class="fa fa-clock"></i>'+esc(p.duration||'—')+'</span>'
+    +'<span><i class="fa fa-chart-bar"></i>'+esc(p.assessment||'—')+'</span>'
     +'</div>'
-    +'<span class="pbdg '+bdgCls+'">'+bdgLbl+'</span>'
+    +'<span class="pbdg '+bdgCls+'">'+cap(p.status)+'</span>'
     +'<div class="pcard-actions">'
+    +'<button class="pbtn pbtn-view" onclick="viewProgram('+p.id+')"><i class="fa fa-eye"></i> View</button>'
     +'<button class="pbtn pbtn-edit" onclick="editProgram('+p.id+')"><i class="fa fa-edit"></i> Edit</button>'
-    +'<button class="pbtn pbtn-del"  onclick="deleteProgram('+p.id+')"><i class="fa fa-trash"></i> Del</button>'
+    +'<button class="pbtn pbtn-del"  onclick="deleteProgram('+p.id+')"><i class="fa fa-trash"></i></button>'
     +'</div>'
     +'</div></div>';
 }
+
+function viewProgram(id) {
+  var p = allPrograms.find(function(x){ return String(x.id)===String(id); });
+  if (!p) return;
+  var color = p.color||'blue';
+  var grad  = gradMap[color]||gradMap.blue;
+  var bdgCls = p.status==='active'?'pbdg-active':p.status==='upcoming'?'pbdg-upcoming':'pbdg-inactive';
+  document.getElementById('viewHead').innerHTML =
+    '<div class="view-icon" style="background:'+grad+'"><i class="fa '+(p.icon||'fa-graduation-cap')+'"></i></div>'
+    +'<div class="view-title">'+esc(p.title)+'</div>'
+    +'<div class="view-code">'+esc(p.code)+' &nbsp;|&nbsp; '+esc(p.affiliation||'')+'&nbsp;&nbsp;<span class="pbdg '+bdgCls+'">'+cap(p.status)+'</span></div>';
+  var topics = (p.content||'').split('|').filter(function(t){return t.trim();});
+  document.getElementById('viewBody').innerHTML =
+    '<div class="view-row"><i class="fa fa-align-left"></i><strong>Description</strong><span>'+esc(p.description||'—')+'</span></div>'
+    +'<div class="view-row"><i class="fa fa-clock"></i><strong>Duration</strong><span>'+esc(p.duration||'—')+'</span></div>'
+    +'<div class="view-row"><i class="fa fa-chart-bar"></i><strong>Assessment</strong><span>'+esc(p.assessment||'—')+'</span></div>'
+    +'<div class="view-row"><i class="fa fa-list"></i><strong>Topics</strong><span>'+(topics.length?topics.map(function(t){return '• '+esc(t.trim());}).join('<br>'):'—')+'</span></div>';
+  openMod('viewModal');
+}
+
+function editProgram(id) {
+  var p = allPrograms.find(function(x){ return String(x.id)===String(id); });
+  if (!p) { toast('Not found','err'); return; }
+  document.getElementById('eId').value=p.id;
+  document.getElementById('eTitle').value=p.title||'';
+  document.getElementById('eCode').value=p.code||'';
+  document.getElementById('eColor').value=p.color||'blue';
+  document.getElementById('eIcon').value=p.icon||'fa-graduation-cap';
+  document.getElementById('eDuration').value=p.duration||'';
+  document.getElementById('eAffil').value=p.affiliation||'';
+  document.getElementById('eAssess').value=p.assessment||'';
+  document.getElementById('eDesc').value=p.description||'';
+  document.getElementById('eContent').value=p.content||'';
+  document.getElementById('eStat').value=p.status||'active';
+  document.getElementById('editAlert').style.display='none';
+  openMod('editModal');
+}
+
+function updateProgram() {
+  var payload = {
+    id:parseInt(document.getElementById('eId').value),
+    title:document.getElementById('eTitle').value.trim(),
+    code:document.getElementById('eCode').value.trim(),
+    color:document.getElementById('eColor').value,
+    icon:document.getElementById('eIcon').value,
+    duration:document.getElementById('eDuration').value.trim(),
+    affiliation:document.getElementById('eAffil').value.trim(),
+    assessment:document.getElementById('eAssess').value.trim(),
+    description:document.getElementById('eDesc').value.trim(),
+    content:document.getElementById('eContent').value.trim(),
+    status:document.getElementById('eStat').value
+  };
+  if (!payload.title||!payload.code) { showEditAlert('Title and code required','err'); return; }
+  fetch('program-save.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+    .then(function(r){return r.text();})
+    .then(function(txt){
+      var d; try{d=JSON.parse(txt);}catch(e){showEditAlert('Server error','err');return;}
+      if(d.success){toast('Updated successfully','ok');closeMod('editModal');loadPrograms();}
+      else showEditAlert(d.message||'Failed','err');
+    })
+    .catch(function(e){showEditAlert('Network error','err');});
+}
+
 function resetForm() {
   document.getElementById('fId').value='0';
-  document.getElementById('fTitle').value='';
-  document.getElementById('fCode').value='';
+  ['fTitle','fCode','fDuration','fAffil','fAssess','fDesc','fContent'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('fColor').value='blue';
   document.getElementById('fIcon').value='fa-graduation-cap';
-  document.getElementById('fDuration').value='';
-  document.getElementById('fAffil').value='';
-  document.getElementById('fAssess').value='';
-  document.getElementById('fDesc').value='';
-  document.getElementById('fContent').value='';
   document.getElementById('fStat').value='active';
   document.getElementById('formTitle').innerHTML='<i class="fa fa-plus-circle"></i> Add Program';
   document.getElementById('btnTxt').textContent='Save Program';
   document.getElementById('formAlert').style.display='none';
 }
-function editProgram(id) {
-  var p = allPrograms.find(function(x){ return String(x.id)===String(id); });
-  if (!p) { toast('Not found','err'); return; }
-  document.getElementById('fId').value=p.id;
-  document.getElementById('fTitle').value=p.title||'';
-  document.getElementById('fCode').value=p.code||'';
-  document.getElementById('fColor').value=p.color||'blue';
-  document.getElementById('fIcon').value=p.icon||'fa-graduation-cap';
-  document.getElementById('fDuration').value=p.duration||'';
-  document.getElementById('fAffil').value=p.affiliation||'';
-  document.getElementById('fAssess').value=p.assessment||'';
-  document.getElementById('fDesc').value=p.description||'';
-  document.getElementById('fContent').value=p.content||'';
-  document.getElementById('fStat').value=p.status||'active';
-  document.getElementById('formTitle').innerHTML='<i class="fa fa-edit"></i> Edit Program';
-  document.getElementById('btnTxt').textContent='Update Program';
-  document.querySelector('.panel').scrollTop=0;
-}
+
 function saveProgram() {
   var payload = {
-    id: parseInt(document.getElementById('fId').value),
-    title: document.getElementById('fTitle').value.trim(),
-    code: document.getElementById('fCode').value.trim(),
-    color: document.getElementById('fColor').value,
-    icon: document.getElementById('fIcon').value,
-    duration: document.getElementById('fDuration').value.trim(),
-    affiliation: document.getElementById('fAffil').value.trim(),
-    assessment: document.getElementById('fAssess').value.trim(),
-    description: document.getElementById('fDesc').value.trim(),
-    content: document.getElementById('fContent').value.trim(),
-    status: document.getElementById('fStat').value
+    id:parseInt(document.getElementById('fId').value),
+    title:document.getElementById('fTitle').value.trim(),
+    code:document.getElementById('fCode').value.trim(),
+    color:document.getElementById('fColor').value,
+    icon:document.getElementById('fIcon').value,
+    duration:document.getElementById('fDuration').value.trim(),
+    affiliation:document.getElementById('fAffil').value.trim(),
+    assessment:document.getElementById('fAssess').value.trim(),
+    description:document.getElementById('fDesc').value.trim(),
+    content:document.getElementById('fContent').value.trim(),
+    status:document.getElementById('fStat').value
   };
   if (!payload.title||!payload.code) { showAlert('Title and code required','err'); return; }
   fetch('program-save.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
@@ -300,21 +424,25 @@ function saveProgram() {
     })
     .catch(function(e){showAlert('Network error: '+e.message,'err');});
 }
+
 function deleteProgram(id) {
   if (!confirm('Delete this program?')) return;
   fetch('program-delete.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:parseInt(id)})})
     .then(function(r){return r.text();})
     .then(function(txt){
       var d; try{d=JSON.parse(txt);}catch(e){toast('Server error','err');return;}
-      if(d.success){toast('Program deleted','ok');loadPrograms();}
+      if(d.success){toast('Deleted','ok');loadPrograms();}
       else toast(d.message||'Failed','err');
     })
-    .catch(function(e){toast('Network error: '+e.message,'err');});
+    .catch(function(e){toast('Network error','err');});
 }
+
 function showAlert(msg,type){var el=document.getElementById('formAlert');el.className='alert alert-'+type;el.textContent=msg;el.style.display='block';setTimeout(function(){el.style.display='none';},4000);}
+function showEditAlert(msg,type){var el=document.getElementById('editAlert');el.className='alert alert-'+type;el.textContent=msg;el.style.display='block';}
 function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'ok');t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+
 loadPrograms();
 </script>
 </body>

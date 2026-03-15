@@ -351,12 +351,13 @@ function glbBgClick(e) {
 //  FILTERS
 // =============================================
 function setupGalleryFilters() {
-  document.querySelectorAll('.glp-filter').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.glp-filter').forEach(b => b.classList.remove('active'));
+  // Re-attach onclick to all filter buttons after dynamic ones are added
+  document.querySelectorAll('.glp-filter').forEach(function(btn) {
+    btn.onclick = function() {
+      document.querySelectorAll('.glp-filter').forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
       loadGalleryImages(btn.dataset.category);
-    });
+    };
   });
 }
 

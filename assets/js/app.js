@@ -10,6 +10,11 @@ function loadPage(pageName) {
     }, 100);
   }
 
+  // Initialize programs after DOM is injected
+  if (pageName === 'programs') {
+    initPrograms();
+  }
+
   // Initialize gallery after DOM is injected
   if (pageName === 'gallery') {
     initGallery();

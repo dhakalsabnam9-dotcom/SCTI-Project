@@ -82,8 +82,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <!-- ===== JAVASCRIPT ===== -->
 <script src="assets/js/menu.js"></script>
 <script src="assets/js/pages/home.js"></script>
-<script src="assets/js/pages/programs.js"></script>
-<script src="assets/js/pages/gallery.js?v=31"></script>
+<script src="assets/js/pages/programs.js?v=35"></script>
+<script src="assets/js/pages/gallery.js?v=34"></script>
 <script src="assets/js/pages/notices.js?v=33"></script>
 <script src="assets/js/pages/contact.js"></script>
 <script src="assets/js/pages/login.js"></script>

@@ -37,10 +37,28 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 
 <!-- ===== TOP HEADER ===== -->
 <div class="top-header">
-  <marquee>
-    Examination Notification | Genius 2025 | Enrollment Open 2025–26
-  </marquee>
+  <span class="ticker-label"><i class="fa fa-bullhorn"></i> NOTICE</span>
+  <div class="ticker-outer">
+    <div class="ticker-text" id="tickerText">
+      📢 Examination form submission deadline is 25th Poush 2081 &nbsp;&nbsp;|&nbsp;&nbsp; 🎓 Annual Sports Day on 1st Magh 2081 — All students must participate &nbsp;&nbsp;|&nbsp;&nbsp; 📝 Enrollment for new batch 2025–26 is now open &nbsp;&nbsp;|&nbsp;&nbsp; 🏫 College closed on 15th Poush for national holiday &nbsp;&nbsp;|&nbsp;&nbsp; 📋 Result of 1st semester internal exam published — check notice board &nbsp;&nbsp;|&nbsp;&nbsp; 🔔 Library books must be returned before Magh 5th &nbsp;&nbsp;|&nbsp;&nbsp; 🎉 Congratulations to all distinction holders of board exam &nbsp;&nbsp;|&nbsp;&nbsp; 📌 Parent-teacher meeting on Magh 10th at 10:00 AM &nbsp;&nbsp;|&nbsp;&nbsp;
+    </div>
+  </div>
 </div>
+<script>
+(function(){
+  var el = document.getElementById('tickerText');
+  if (!el) return;
+  var pos = el.parentElement.offsetWidth;
+  el.style.transform = 'translateX(' + pos + 'px)';
+  function tick() {
+    pos -= 1;
+    if (pos < -(el.offsetWidth)) pos = el.parentElement.offsetWidth;
+    el.style.transform = 'translateX(' + pos + 'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
 
 <!-- ===== HEADER & MENU (STICKY) ===== -->
 <header class="header">
@@ -83,8 +101,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/menu.js"></script>
 <script src="assets/js/pages/home.js"></script>
 <script src="assets/js/pages/programs.js?v=35"></script>
-<script src="assets/js/pages/gallery.js?v=34"></script>
-<script src="assets/js/pages/notices.js?v=33"></script>
+<script src="assets/js/pages/gallery.js?v=36"></script>
+<script src="assets/js/pages/notices.js?v=39"></script>
 <script src="assets/js/pages/contact.js"></script>
 <script src="assets/js/pages/login.js"></script>
 <script src="assets/js/pages/signup.js"></script>

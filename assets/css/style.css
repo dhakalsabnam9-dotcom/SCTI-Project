@@ -32,7 +32,46 @@ body {
 .top-header {
   background: #00264d;
   color: white;
-  padding: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  overflow: hidden;
+}
+.ticker-label {
+  background: #e63946;
+  color: white;
+  padding: 0 14px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ticker-outer {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ticker-outer marquee {
+  color: rgba(255,255,255,.9);
+  letter-spacing: .2px;
+  width: 100%;
+}
+.ticker-text {
+  white-space: nowrap;
+  color: rgba(255,255,255,.9);
+  font-size: 13px;
+  letter-spacing: .2px;
+  will-change: transform;
 }
 
 /* ===== HEADER ===== */

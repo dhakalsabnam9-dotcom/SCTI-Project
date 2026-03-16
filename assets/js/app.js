@@ -35,7 +35,9 @@ function loadPage(pageName) {
   document.querySelectorAll('.menu ul li a').forEach(link => {
     link.classList.remove('active');
   });
-  event.target.classList.add('active');
+  if (typeof event !== 'undefined' && event && event.target) {
+    event.target.classList.add('active');
+  }
 }
 
 // Contact form handler

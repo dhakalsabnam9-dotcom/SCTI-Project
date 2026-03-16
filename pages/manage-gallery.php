@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     header('Location: ../index.php'); exit();
@@ -12,7 +12,6 @@ require_once '../includes/config.php';
   <title>Gallery Manager | SCTI Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;}
@@ -125,7 +124,7 @@ require_once '../includes/config.php';
   </style>
 </head>
 <body>
-<div class="top-header"><marquee>Gallery Manager — Upload and manage images for the SCTI website</marquee></div>
+<div class="top-header"><marquee>Gallery Manager � Upload and manage images for the SCTI website</marquee></div>
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-images"></i> Gallery Manager</h1>
@@ -137,10 +136,10 @@ require_once '../includes/config.php';
   </div>
 </div>
 <div class="stats">
-  <div class="stat"><div class="stat-ico ico-teal"><i class="fa fa-images"></i></div><div><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Total Images</div></div></div>
-  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-tags"></i></div><div><div class="stat-val" id="sCats">—</div><div class="stat-lbl">Categories</div></div></div>
-  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-calendar"></i></div><div><div class="stat-val" id="sToday">—</div><div class="stat-lbl">Added Today</div></div></div>
-  <div class="stat"><div class="stat-ico ico-orange"><i class="fa fa-filter"></i></div><div><div class="stat-val" id="sShowing">—</div><div class="stat-lbl">Showing</div></div></div>
+  <div class="stat"><div class="stat-ico ico-teal"><i class="fa fa-images"></i></div><div><div class="stat-val" id="sTotal">�</div><div class="stat-lbl">Total Images</div></div></div>
+  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-tags"></i></div><div><div class="stat-val" id="sCats">�</div><div class="stat-lbl">Categories</div></div></div>
+  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-calendar"></i></div><div><div class="stat-val" id="sToday">�</div><div class="stat-lbl">Added Today</div></div></div>
+  <div class="stat"><div class="stat-ico ico-orange"><i class="fa fa-filter"></i></div><div><div class="stat-val" id="sShowing">�</div><div class="stat-lbl">Showing</div></div></div>
 </div>
 <div class="layout">
   <div class="panel">
@@ -151,7 +150,7 @@ require_once '../includes/config.php';
         <input type="file" id="fileInput" name="image" accept="image/*" required>
         <i class="fa fa-cloud-upload-alt"></i>
         <p><strong>Drag &amp; drop</strong> or click to browse</p>
-        <p>JPG, PNG, GIF, WEBP — max 10MB</p>
+        <p>JPG, PNG, GIF, WEBP � max 10MB</p>
       </div>
       <div class="preview-card" id="previewCard">
         <div class="pc-inner">
@@ -167,7 +166,7 @@ require_once '../includes/config.php';
       <div class="fg"><label>Image Title *</label><input type="text" name="title" class="fc" placeholder="Enter image title" required></div>
       <div class="fg"><label>Category</label>
         <div class="cat-row">
-          <select name="category" id="upCat" class="fc"><option value="">— None —</option></select>
+          <select name="category" id="upCat" class="fc"><option value="">� None �</option></select>
           <button type="button" class="btn-sm-cat" onclick="openCatModal()"><i class="fa fa-cog"></i> Manage</button>
         </div>
       </div>
@@ -188,7 +187,7 @@ require_once '../includes/config.php';
 <!-- Category Modal -->
 <div class="modal" id="catModal">
   <div class="mbox">
-    <div class="mhead"><h3><i class="fa fa-tags"></i> Manage Categories</h3><button class="mclose" onclick="closeMod('catModal')">×</button></div>
+    <div class="mhead"><h3><i class="fa fa-tags"></i> Manage Categories</h3><button class="mclose" onclick="closeMod('catModal')">�</button></div>
     <ul class="cat-ul" id="catList"><li style="color:#aaa;text-align:center;padding:20px">Loading...</li></ul>
     <div class="addcat">
       <input type="text" id="newCat" placeholder="New category name..." maxlength="100">
@@ -200,12 +199,12 @@ require_once '../includes/config.php';
 <!-- Edit Modal -->
 <div class="modal" id="editModal">
   <div class="mbox">
-    <div class="mhead"><h3><i class="fa fa-edit"></i> Edit Image</h3><button class="mclose" onclick="closeMod('editModal')">×</button></div>
+    <div class="mhead"><h3><i class="fa fa-edit"></i> Edit Image</h3><button class="mclose" onclick="closeMod('editModal')">�</button></div>
     <div id="editAlert" class="alert"></div>
     <form id="editForm">
       <input type="hidden" id="editId" name="id">
       <div class="fg"><label>Title *</label><input type="text" id="editTitle" name="title" class="fc" required></div>
-      <div class="fg"><label>Category</label><select id="editCat" name="category" class="fc"><option value="">— None —</option></select></div>
+      <div class="fg"><label>Category</label><select id="editCat" name="category" class="fc"><option value="">� None �</option></select></div>
       <div class="fg"><label>Description</label><textarea id="editDesc" name="description" class="fc"></textarea></div>
       <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save Changes</button>
       <button type="button" class="btn-cancel" onclick="closeMod('editModal')">Cancel</button>
@@ -213,7 +212,7 @@ require_once '../includes/config.php';
   </div>
 </div>
 
-<footer class="footer" style="margin-top:0"><p>© 2025 SCTI — Admin Panel</p></footer>
+<footer class="footer" style="margin-top:0"><p>� 2025 SCTI � Admin Panel</p></footer>
 
 <script>
 let cats = [];
@@ -221,7 +220,7 @@ let cats = [];
 function openMod(id)  { document.getElementById(id).classList.add('on'); }
 function closeMod(id) { document.getElementById(id).classList.remove('on'); }
 
-// ── Categories ──────────────────────────────────────────────
+// -- Categories ----------------------------------------------
 async function loadCats() {
   try {
     const r = await fetch('gallery-categories.php');
@@ -236,9 +235,9 @@ async function loadCats() {
 
 function fillCatSelects() {
   const opts = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-  document.getElementById('upCat').innerHTML    = '<option value="">— None —</option>' + opts;
+  document.getElementById('upCat').innerHTML    = '<option value="">� None �</option>' + opts;
   document.getElementById('filterCat').innerHTML = '<option value="">All Categories</option>' + opts;
-  document.getElementById('editCat').innerHTML  = '<option value="">— None —</option>' + opts;
+  document.getElementById('editCat').innerHTML  = '<option value="">� None �</option>' + opts;
 }
 
 function renderCatList() {
@@ -271,7 +270,7 @@ async function delCat(id, name) {
 
 function openCatModal() { loadCats(); openMod('catModal'); }
 
-// ── File picker ─────────────────────────────────────────────
+// -- File picker ---------------------------------------------
 const dz = document.getElementById('dz');
 const fi = document.getElementById('fileInput');
 
@@ -311,7 +310,7 @@ function fmtBytes(b) {
   return (b/1048576).toFixed(1) + ' MB';
 }
 
-// ── Upload ──────────────────────────────────────────────────
+// -- Upload --------------------------------------------------
 document.getElementById('upForm').addEventListener('submit', async e => {
   e.preventDefault();
   const al = document.getElementById('upAlert');
@@ -332,7 +331,7 @@ document.getElementById('upForm').addEventListener('submit', async e => {
   btn.disabled = false; btn.innerHTML = '<i class="fa fa-upload"></i> Upload Image';
 });
 
-// ── Gallery ─────────────────────────────────────────────────
+// -- Gallery -------------------------------------------------
 async function loadGallery() {
   const cat    = document.getElementById('filterCat').value;
   const search = document.getElementById('searchInput').value;
@@ -378,13 +377,13 @@ async function loadGallery() {
   }
 }
 
-// ── Quick view ──────────────────────────────────────────────
+// -- Quick view ----------------------------------------------
 function quickView(path, title) {
   const m = document.createElement('div');
   m.className = 'modal on'; m.style.zIndex = '2000';
   m.innerHTML = `<div class="mbox" style="max-width:90%;padding:0;overflow:hidden;">
     <div style="position:relative;">
-      <button onclick="this.closest('.modal').remove()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;z-index:10">×</button>
+      <button onclick="this.closest('.modal').remove()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;z-index:10">�</button>
       <img src="${path}" alt="${title}" style="width:100%;max-height:80vh;object-fit:contain;display:block">
       <div style="padding:12px;background:#fff"><strong style="color:#17a2b8">${title}</strong></div>
     </div>
@@ -393,7 +392,7 @@ function quickView(path, title) {
   m.addEventListener('click', e => { if (e.target === m) m.remove(); });
 }
 
-// ── Edit ────────────────────────────────────────────────────
+// -- Edit ----------------------------------------------------
 async function editImg(id) {
   try {
     const r = await fetch(`gallery-get.php?id=${id}`);
@@ -403,7 +402,7 @@ async function editImg(id) {
     document.getElementById('editId').value    = img.id;
     document.getElementById('editTitle').value = img.title;
     document.getElementById('editDesc').value  = img.description || '';
-    document.getElementById('editCat').innerHTML = '<option value="">— None —</option>' +
+    document.getElementById('editCat').innerHTML = '<option value="">� None �</option>' +
       cats.map(c => `<option value="${c.name}" ${c.name===img.category?'selected':''}>${c.name}</option>`).join('');
     openMod('editModal');
   } catch(err) { alert('Error: ' + err.message); }
@@ -429,7 +428,7 @@ document.getElementById('editForm').addEventListener('submit', async e => {
   btn.disabled = false; btn.innerHTML = '<i class="fa fa-save"></i> Save Changes';
 });
 
-// ── Delete ──────────────────────────────────────────────────
+// -- Delete --------------------------------------------------
 async function delImg(id) {
   if (!confirm('Delete this image?')) return;
   const r = await fetch('gallery-delete.php', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id})});
@@ -438,7 +437,7 @@ async function delImg(id) {
   else alert(d.message || 'Delete failed');
 }
 
-// ── Helpers ─────────────────────────────────────────────────
+// -- Helpers -------------------------------------------------
 function showAlert(el, msg, type) {
   el.className = 'alert alert-' + type;
   el.textContent = msg;

@@ -1,10 +1,13 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
-    header('Location: ../index.php');
-    exit();
+    header('Location: ../index.php'); exit();
 }
-$fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
+require_once '../includes/config.php';
+try {
+    $db = getDBConnection();
+    $students = $db->query("SELECT * FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
+} catch(Exception $e) { $students = []; }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,255 +15,179 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
   <meta charset="UTF-8">
   <title>Students | SCTI Teacher Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-    
-    .page-header {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;
-      box-shadow: 0 4px 15px rgba(40,167,69,0.2);
-    }
-    .page-header h1 { margin: 0 0 10px 0; font-size: 28px; }
-    .breadcrumb { opacity: 1; font-size: 14px; background: transparent; padding: 0; }
-    .breadcrumb a { color: white; text-decoration: none; }
-    
-    .filter-bar {
-      background: white; padding: 20px; border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;
-      display: flex; gap: 15px; flex-wrap: wrap; align-items: center;
-    }
-    .filter-select {
-      padding: 10px 15px; border: 2px solid #dee2e6;
-      border-radius: 6px; font-size: 14px;
-    }
-    .search-input {
-      flex: 1; padding: 10px 15px; border: 2px solid #dee2e6;
-      border-radius: 6px; font-size: 14px; min-width: 250px;
-    }
-    
-    .students-table-container {
-      background: white; border-radius: 10px; padding: 30px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto;
-    }
-    
-    .students-table {
-      width: 100%; border-collapse: collapse;
-    }
-    .students-table th {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white; padding: 15px; text-align: left;
-      font-weight: 600; border: 1px solid #20c997;
-    }
-    .students-table td {
-      padding: 15px; border-bottom: 1px solid #dee2e6;
-    }
-    .students-table tr:hover {
-      background: #f8f9fa;
-    }
-    
-    .student-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: linear-gradient(135deg, #28a745, #20c997);
-      display: inline-flex; align-items: center; justify-content: center;
-      color: white; font-weight: bold;
-    }
-    
-    .status-badge {
-      padding: 6px 12px; border-radius: 20px; font-size: 12px;
-      font-weight: 600; display: inline-block;
-    }
-    .status-active { background: #d4edda; color: #155724; }
-    .status-inactive { background: #f8d7da; color: #721c24; }
-    
-    .action-btn {
-      padding: 6px 12px; border: none; border-radius: 4px;
-      cursor: pointer; font-size: 12px; transition: all 0.3s;
-      margin-right: 5px;
-    }
-    .btn-view {
-      background: #004080; color: white;
-    }
-    .btn-view:hover {
-      background: #0059b3;
-    }
-    .btn-message {
-      background: #28a745; color: white;
-    }
-    .btn-message:hover {
-      background: #20c997;
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',sans-serif;background:#f5f7fa}
+    .top-header{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:10px 0;text-align:center;font-size:14px}
+    .container{max-width:1400px;margin:0 auto;padding:20px}
+    .page-header{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:30px;border-radius:10px;margin-bottom:30px;box-shadow:0 4px 15px rgba(40,167,69,.2)}
+    .page-header h1{margin:0 0 8px;font-size:28px}
+    .breadcrumb{font-size:14px}
+    .breadcrumb a{color:white;text-decoration:none}
+    .filter-bar{background:white;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:30px;display:flex;gap:15px;flex-wrap:wrap;align-items:center}
+    .filter-select{padding:10px 15px;border:2px solid #dee2e6;border-radius:6px;font-size:14px}
+    .search-input{flex:1;padding:10px 15px;border:2px solid #dee2e6;border-radius:6px;font-size:14px;min-width:250px}
+    .table-wrap{background:white;border-radius:10px;padding:0;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+    .students-table{width:100%;border-collapse:collapse}
+    .students-table th{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:15px 16px;text-align:left;font-weight:600;font-size:13px}
+    .students-table td{padding:14px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;vertical-align:middle}
+    .students-table tr:last-child td{border-bottom:none}
+    .students-table tbody tr:hover{background:#f8fffe}
+    .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#28a745,#20c997);display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;flex-shrink:0}
+    .student-name{display:flex;align-items:center;gap:10px}
+    .status-badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block}
+    .status-active{background:#d4edda;color:#155724}
+    .status-inactive{background:#f8d7da;color:#721c24}
+    .status-suspended{background:#fff3cd;color:#856404}
+    .action-btn{padding:7px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:5px}
+    .btn-view{background:#004080;color:white}
+    .btn-view:hover{background:#0059b3}
+    .btn-msg{background:#28a745;color:white}
+    .btn-msg:hover{background:#20c997}
+    .empty-row td{text-align:center;padding:50px;color:#aaa;font-size:15px}
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:white;border-radius:14px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mIn .25s ease}
+    @keyframes mIn{from{transform:translateY(-28px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-head{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;border-radius:14px 14px 0 0}
+    .modal-head h2{margin:0;font-size:19px}
+    .modal-close{background:rgba(255,255,255,.2);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+    .modal-close:hover{background:rgba(255,255,255,.35)}
+    .modal-body{padding:28px}
+    .profile-top{display:flex;align-items:center;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #eee}
+    .profile-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#28a745,#20c997);display:flex;align-items:center;justify-content:center;color:white;font-size:24px;font-weight:700;flex-shrink:0}
+    .profile-name{font-size:20px;font-weight:800;color:#1a202c;margin-bottom:4px}
+    .profile-id{font-size:13px;color:#888}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .info-item label{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+    .info-item span{font-size:14px;color:#333;font-weight:600}
+    .footer{background:#2c3e50;color:white;text-align:center;padding:20px;border-radius:10px;margin-top:40px}
   </style>
 </head>
 <body>
-
-<div class="top-header">
-  <marquee>Student Management - View and manage your students</marquee>
-</div>
-
+<div class="top-header">Student Management — View and manage your students</div>
 <div class="container">
-  
   <div class="page-header">
     <h1><i class="fa fa-users"></i> My Students</h1>
-    <div class="breadcrumb">
-      <a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Students
-    </div>
+    <div class="breadcrumb"><a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Students</div>
   </div>
-
   <div class="filter-bar">
-    <select class="filter-select">
-      <option>All Classes</option>
-      <option>Programming Fundamentals</option>
-      <option>Database Management</option>
-      <option>Web Development</option>
-      <option>Data Structures</option>
+    <select class="filter-select" id="filterCourse" onchange="applyFilter()">
+      <option value="">All Classes</option>
+      <?php
+      $courses = array_unique(array_column($students, 'course'));
+      foreach($courses as $c) { if($c) echo '<option value="'.htmlspecialchars($c).'">'.htmlspecialchars($c).'</option>'; }
+      ?>
     </select>
-    <select class="filter-select">
-      <option>All Semesters</option>
-      <option>Semester 1</option>
-      <option>Semester 2</option>
-      <option>Semester 3</option>
+    <select class="filter-select" id="filterSem" onchange="applyFilter()">
+      <option value="">All Semesters</option>
+      <?php for($i=1;$i<=8;$i++) echo "<option value='$i'>Semester $i</option>"; ?>
     </select>
-    <input type="text" class="search-input" placeholder="Search by name, ID, or email...">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by name, ID, or email..." oninput="applyFilter()">
   </div>
-
-  <div class="students-table-container">
-    <table class="students-table">
+  <div class="table-wrap">
+    <table class="students-table" id="studentsTable">
       <thead>
         <tr>
-          <th>Student</th>
-          <th>Student ID</th>
-          <th>Email</th>
-          <th>Program</th>
-          <th>Attendance</th>
-          <th>GPA</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>Student</th><th>Student ID</th><th>Email</th>
+          <th>Program</th><th>Semester</th><th>Status</th><th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
+      <tbody id="studentsBody">
+        <?php if(empty($students)): ?>
+        <tr class="empty-row"><td colspan="7"><i class="fa fa-users" style="font-size:40px;display:block;margin-bottom:12px;opacity:.3"></i>No students found in database.</td></tr>
+        <?php else: foreach($students as $s):
+          $initials = strtoupper(substr($s['full_name'],0,1));
+          $parts = explode(' ',$s['full_name']);
+          if(count($parts)>1) $initials = strtoupper(substr($parts[0],0,1).substr($parts[count($parts)-1],0,1));
+          $badgeCls = $s['status']==='active' ? 'status-active' : ($s['status']==='suspended' ? 'status-suspended' : 'status-inactive');
+        ?>
+        <tr data-name="<?=htmlspecialchars(strtolower($s['full_name']))?>"
+            data-id="<?=htmlspecialchars(strtolower($s['student_id']))?>"
+            data-email="<?=htmlspecialchars(strtolower($s['email']))?>"
+            data-course="<?=htmlspecialchars($s['course']??'')?>"
+            data-sem="<?=htmlspecialchars($s['semester']??'')?>">
+          <td><div class="student-name"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
+          <td><?=htmlspecialchars($s['student_id'])?></td>
+          <td><?=htmlspecialchars($s['email'])?></td>
+          <td><?=htmlspecialchars($s['course']??'—')?></td>
+          <td><?= $s['semester'] ? 'Sem '.$s['semester'] : '—' ?></td>
+          <td><span class="status-badge <?=$badgeCls?>"><?=ucfirst($s['status'])?></span></td>
           <td>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="student-avatar">RS</div>
-              <span>Ram Sharma</span>
-            </div>
-          </td>
-          <td>STU20251001</td>
-          <td>ram.sharma@scti.edu.np</td>
-          <td>B.Tech IT</td>
-          <td>92%</td>
-          <td>3.8</td>
-          <td><span class="status-badge status-active">Active</span></td>
-          <td>
-            <button class="action-btn btn-view" onclick="alert('View profile coming soon!');">
-              <i class="fa fa-eye"></i> View
-            </button>
-            <button class="action-btn btn-message" onclick="alert('Message coming soon!');">
-              <i class="fa fa-envelope"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="student-avatar">SP</div>
-              <span>Sita Poudel</span>
-            </div>
-          </td>
-          <td>STU20251002</td>
-          <td>sita.poudel@scti.edu.np</td>
-          <td>B.Tech IT</td>
-          <td>88%</td>
-          <td>3.6</td>
-          <td><span class="status-badge status-active">Active</span></td>
-          <td>
-            <button class="action-btn btn-view" onclick="alert('View profile coming soon!');">
-              <i class="fa fa-eye"></i> View
-            </button>
-            <button class="action-btn btn-message" onclick="alert('Message coming soon!');">
-              <i class="fa fa-envelope"></i>
-            </button>
+            <button class="action-btn btn-view" onclick="viewStudent(<?=$s['id']?>)"><i class="fa fa-eye"></i> View</button>
+            <button class="action-btn btn-msg" onclick="msgStudent('<?=htmlspecialchars($s['email'])?>','<?=htmlspecialchars($s['full_name'])?>')"><i class="fa fa-envelope"></i></button>
           </td>
         </tr>
-        <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="student-avatar">HT</div>
-              <span>Hari Thapa</span>
-            </div>
-          </td>
-          <td>STU20251003</td>
-          <td>hari.thapa@scti.edu.np</td>
-          <td>B.Tech IT</td>
-          <td>75%</td>
-          <td>3.2</td>
-          <td><span class="status-badge status-active">Active</span></td>
-          <td>
-            <button class="action-btn btn-view" onclick="alert('View profile coming soon!');">
-              <i class="fa fa-eye"></i> View
-            </button>
-            <button class="action-btn btn-message" onclick="alert('Message coming soon!');">
-              <i class="fa fa-envelope"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="student-avatar">GK</div>
-              <span>Gita KC</span>
-            </div>
-          </td>
-          <td>STU20251004</td>
-          <td>gita.kc@scti.edu.np</td>
-          <td>B.Tech IT</td>
-          <td>95%</td>
-          <td>3.9</td>
-          <td><span class="status-badge status-active">Active</span></td>
-          <td>
-            <button class="action-btn btn-view" onclick="alert('View profile coming soon!');">
-              <i class="fa fa-eye"></i> View
-            </button>
-            <button class="action-btn btn-message" onclick="alert('Message coming soon!');">
-              <i class="fa fa-envelope"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="student-avatar">PG</div>
-              <span>Prakash Gurung</span>
-            </div>
-          </td>
-          <td>STU20251005</td>
-          <td>prakash.gurung@scti.edu.np</td>
-          <td>B.Tech IT</td>
-          <td>82%</td>
-          <td>3.4</td>
-          <td><span class="status-badge status-active">Active</span></td>
-          <td>
-            <button class="action-btn btn-view" onclick="alert('View profile coming soon!');">
-              <i class="fa fa-eye"></i> View
-            </button>
-            <button class="action-btn btn-message" onclick="alert('Message coming soon!');">
-              <i class="fa fa-envelope"></i>
-            </button>
-          </td>
-        </tr>
+        <?php endforeach; endif; ?>
       </tbody>
     </table>
   </div>
+</div>
+<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
 
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2><i class="fa fa-user"></i> Student Profile</h2>
+      <button class="modal-close" onclick="document.getElementById('viewModal').classList.remove('open')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="viewModalBody">Loading...</div>
+  </div>
 </div>
 
-<footer class="footer" style="margin-top: 40px;">
-  <p>© 2025 SCTI - Teacher Portal</p>
-</footer>
+<script>
+var studentsData = <?php echo json_encode($students); ?>;
 
+function viewStudent(id) {
+  var s = studentsData.find(function(x){ return parseInt(x.id)===id; });
+  if (!s) return;
+  var parts = s.full_name.split(' ');
+  var initials = parts.length > 1 ? (parts[0][0]+parts[parts.length-1][0]).toUpperCase() : s.full_name.substring(0,2).toUpperCase();
+  document.getElementById('viewModalBody').innerHTML =
+    '<div class="profile-top">'
+    + '<div class="profile-avatar">' + initials + '</div>'
+    + '<div><div class="profile-name">' + esc(s.full_name) + '</div><div class="profile-id">' + esc(s.student_id) + '</div></div>'
+    + '</div>'
+    + '<div class="info-grid">'
+    + infoItem('Email', s.email)
+    + infoItem('Phone', s.phone || '—')
+    + infoItem('Program', s.course || '—')
+    + infoItem('Semester', s.semester ? 'Semester ' + s.semester : '—')
+    + infoItem('Status', s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : '—')
+    + infoItem('Joined', s.created_at ? new Date(s.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '—')
+    + infoItem('Address', s.address || '—')
+    + infoItem('Username', s.username || '—')
+    + '</div>';
+  document.getElementById('viewModal').classList.add('open');
+}
+
+function infoItem(label, val) {
+  return '<div class="info-item"><label>' + label + '</label><span>' + esc(String(val)) + '</span></div>';
+}
+
+function msgStudent(email, name) {
+  window.location.href = 'mailto:' + email + '?subject=Message from SCTI Teacher&body=Dear ' + encodeURIComponent(name) + ',';
+}
+
+function applyFilter() {
+  var course  = document.getElementById('filterCourse').value.toLowerCase();
+  var sem     = document.getElementById('filterSem').value;
+  var search  = document.getElementById('searchInput').value.toLowerCase();
+  var rows    = document.querySelectorAll('#studentsBody tr[data-name]');
+  rows.forEach(function(row) {
+    var matchCourse = !course || row.dataset.course.toLowerCase() === course;
+    var matchSem    = !sem    || row.dataset.sem === sem;
+    var matchSearch = !search || row.dataset.name.includes(search) || row.dataset.id.includes(search) || row.dataset.email.includes(search);
+    row.style.display = (matchCourse && matchSem && matchSearch) ? '' : 'none';
+  });
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.getElementById('viewModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+</script>
 </body>
 </html>

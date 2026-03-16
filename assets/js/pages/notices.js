@@ -1,238 +1,245 @@
-// =============================================
-//  NOTICE BOARD PAGE
+﻿// =============================================
+//  NOTICE BOARD PAGE — Full-Width Enhanced UI
 // =============================================
 const noticesPage = `
   <style>
-    .nbp-wrap{background:#f4f6fb;min-height:60vh}
-    .nbp-hero{position:relative;background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 60%,#a78bfa 100%);padding:52px 20px 0;text-align:center;overflow:hidden}
-    .nbp-hero-inner{position:relative;z-index:2;color:white;padding-bottom:28px}
-    .nbp-hero-icon{font-size:48px;margin-bottom:12px;opacity:.9}
-    .nbp-hero-inner h1{font-size:38px;font-weight:900;margin:0 0 10px;letter-spacing:-1px}
-    .nbp-hero-inner p{font-size:15px;opacity:.82;max-width:480px;margin:0 auto 22px;line-height:1.6}
-    .nbp-hero-counters{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
-    .nbp-counter-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:30px;padding:8px 20px;font-size:14px;font-weight:700;color:white}
-    .nbp-hero-wave{position:relative;z-index:2;line-height:0}
-    .nbp-hero-wave svg{width:100%;height:50px;display:block}
-    .nbp-filter-bar{background:white;border-bottom:2px solid #e8ecf2;box-shadow:0 3px 12px rgba(0,0,0,.07);margin-bottom:0}
-    .nbp-filters{display:flex;gap:8px;padding:14px 20px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
+    .nbp-wrap{background:#f0f2f8;min-height:100vh}
+    .nbp-hero{position:relative;background:linear-gradient(135deg,#1e0a4e 0%,#4c1d95 45%,#7c3aed 80%,#a78bfa 100%);padding:70px 20px 0;text-align:center;overflow:hidden}
+    .nbp-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+    .nbp-hero-inner{position:relative;z-index:2;color:white;padding-bottom:36px}
+    .nbp-hero-icon{font-size:56px;margin-bottom:16px;filter:drop-shadow(0 4px 16px rgba(0,0,0,.35))}
+    .nbp-hero-inner h1{font-size:46px;font-weight:900;margin:0 0 12px;letter-spacing:-2px;text-shadow:0 2px 16px rgba(0,0,0,.3)}
+    .nbp-hero-inner p{font-size:16px;opacity:.85;max-width:560px;margin:0 auto 28px;line-height:1.7}
+    .nbp-hero-stats{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+    .nbp-stat-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);border-radius:30px;padding:10px 24px;font-size:14px;font-weight:700;color:white;backdrop-filter:blur(6px)}
+    .nbp-hero-wave{position:relative;z-index:2;line-height:0;margin-top:10px}
+    .nbp-hero-wave svg{width:100%;height:60px;display:block}
+    .nbp-filter-bar{background:white;border-bottom:2px solid #e4e8f0;box-shadow:0 4px 18px rgba(0,0,0,.08);position:sticky;top:80px;z-index:100}
+    .nbp-filters{display:flex;gap:8px;padding:14px 32px;overflow-x:auto;scrollbar-width:none;align-items:center}
     .nbp-filters::-webkit-scrollbar{display:none}
-    .nbp-filter{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:2px solid #dde3ed;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:all .2s ease;outline:none}
-    .nbp-filter:hover{border-color:#7c3aed;color:#7c3aed;background:white}
-    .nbp-filter.nbp-active{background:linear-gradient(135deg,#4c1d95,#7c3aed);border-color:transparent;color:white;box-shadow:0 4px 14px rgba(124,58,237,.3)}
-    .nbp-content{background:#f4f6fb;padding:36px 0 60px;min-height:400px}
-    .nbp-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px}
+    .nbp-filter-label{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-right:6px;white-space:nowrap;flex-shrink:0}
+    .nbp-filter{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border:2px solid #e0e6ef;background:#f8fafc;color:#5a6a80;border-radius:24px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:all .22s;outline:none;flex-shrink:0}
+    .nbp-filter:hover{border-color:#7c3aed;color:#7c3aed;background:white;transform:translateY(-1px);box-shadow:0 4px 12px rgba(124,58,237,.12)}
+    .nbp-filter.nbp-active{background:linear-gradient(135deg,#4c1d95,#7c3aed);border-color:transparent;color:white;box-shadow:0 4px 18px rgba(124,58,237,.38);transform:translateY(-1px)}
+    .nbp-main{padding:36px 32px 80px}
+    .nbp-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px;gap:18px}
     .nbp-dots{display:flex;gap:10px}
     .nbp-dots span{width:14px;height:14px;border-radius:50%;background:#7c3aed;animation:nbpBounce 1.3s ease-in-out infinite}
     .nbp-dots span:nth-child(2){animation-delay:.18s;background:#a78bfa}
     .nbp-dots span:nth-child(3){animation-delay:.36s;background:#c4b5fd}
     @keyframes nbpBounce{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1.2);opacity:1}}
     .nbp-loading p{color:#8a9ab5;font-size:14px;font-weight:500}
-    .nbp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center}
-    .nbp-empty i{font-size:64px;color:#c5cfe0;margin-bottom:18px}
-    .nbp-empty h3{margin:0 0 8px;color:#4a5568;font-size:20px;font-weight:700}
+    .nbp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px;text-align:center}
+    .nbp-empty i{font-size:72px;color:#c5cfe0;margin-bottom:20px}
+    .nbp-empty h3{margin:0 0 10px;color:#4a5568;font-size:22px;font-weight:700}
     .nbp-empty p{margin:0;color:#8a9ab5;font-size:14px}
-    .nbp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-    .nbp-card{border-radius:16px;overflow:hidden;background:white;box-shadow:0 4px 16px rgba(0,0,0,.09);transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column}
-    .nbp-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,.15)}
-    .nbp-card-top{padding:20px 20px 14px;flex:1}
-    .nbp-card-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-    .nbp-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:capitalize}
-    .nbp-badge-urgent{background:#f8d7da;color:#721c24}
-    .nbp-badge-high{background:#fff3cd;color:#856404}
-    .nbp-badge-normal{background:#e8ecf2;color:#4a5568}
-    .nbp-badge-cat{color:white;font-size:10px}
-    .nbp-card-title{font-size:16px;font-weight:800;color:#1a202c;margin:0 0 10px;line-height:1.4}
-    .nbp-card-body{font-size:13px;color:#555;line-height:1.65;margin:0}
-    .nbp-card-foot{padding:12px 20px 16px;border-top:1px solid #eef1f6;display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .nbp-card-date{display:flex;align-items:center;gap:6px;font-size:12px;color:#8a9ab5;font-weight:500}
-    .nbp-card-date i{color:#7c3aed}
-    @media(max-width:768px){
-      .nbp-hero-inner h1{font-size:26px}
-      .nbp-grid{grid-template-columns:repeat(2,1fr);gap:14px}
-    }
-    @media(max-width:480px){
-      .nbp-grid{grid-template-columns:1fr;gap:12px}
-    }
+    .nbp-list{display:flex;flex-direction:column;gap:20px;width:100%}
+    .nbp-card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 3px 16px rgba(0,0,0,.08);transition:transform .28s,box-shadow .28s;border-left:6px solid #7c3aed;width:100%}
+    .nbp-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.14)}
+    .nbp-card.nbp-urgent-card{border-left-color:#dc2626}
+    .nbp-card.nbp-exam-card{border-left-color:#3b82f6}
+    .nbp-card.nbp-admission-card{border-left-color:#10b981}
+    .nbp-card.nbp-event-card{border-left-color:#f97316}
+    .nbp-card.nbp-holiday-card{border-left-color:#eab308}
+    .nbp-card.nbp-general-card{border-left-color:#06b6d4}
+    .nbp-card-accent{height:4px;width:100%}
+    .nbp-card-inner{display:flex;align-items:stretch}
+    .nbp-card-icon-col{width:88px;flex-shrink:0;display:flex;align-items:flex-start;justify-content:center;padding:26px 0}
+    .nbp-cat-icon{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+    .nbp-card-content{flex:1;padding:22px 32px 22px 0;min-width:0}
+    .nbp-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .nbp-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:capitalize;display:inline-flex;align-items:center;gap:4px}
+    .nbp-badge-urgent{background:#fee2e2;color:#991b1b}
+    .nbp-badge-high{background:#fef3c7;color:#92400e}
+    .nbp-badge-normal{background:#ede9fe;color:#5b21b6}
+    .nbp-badge-cat{color:white}
+    .nbp-card-date{font-size:12px;color:#aaa;font-weight:500;margin-left:auto;white-space:nowrap;display:flex;align-items:center;gap:5px}
+    .nbp-card-date i{color:#a78bfa}
+    .nbp-card-title{font-size:20px;font-weight:800;color:#1a202c;margin:0 0 10px;line-height:1.35}
+    .nbp-card-desc{font-size:14px;color:#4a5568;line-height:1.8;margin:0 0 18px;white-space:pre-line}
+    .nbp-card-divider{border:none;border-top:1px dashed #e8ecf2;margin:0 0 14px}
+    .nbp-card-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .nbp-card-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;background:#f3f0ff;color:#6d28d9}
+    .nbp-read-btn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:10px;font-size:13px;font-weight:700;color:white;border:none;cursor:pointer;transition:.2s}
+    .nbp-read-btn:hover{opacity:.88;transform:translateY(-1px)}
+    .nbp-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .nbp-section-title{font-size:22px;font-weight:800;color:#1a202c;display:flex;align-items:center;gap:10px}
+    .nbp-section-title i{color:#7c3aed}
+    .nbp-count-badge{background:linear-gradient(135deg,#4c1d95,#7c3aed);color:white;border-radius:20px;padding:5px 16px;font-size:13px;font-weight:700}
+    .nbp-urgent-banner{background:linear-gradient(135deg,#7f1d1d,#dc2626);border-radius:16px;padding:18px 28px;margin-bottom:28px;display:flex;align-items:center;gap:16px;color:white;box-shadow:0 6px 20px rgba(220,38,38,.3)}
+    .nbp-urgent-banner i.nbp-pulse{font-size:28px;flex-shrink:0;animation:nbpPulse 1.5s ease-in-out infinite}
+    @keyframes nbpPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.1)}}
+    .nbp-urgent-banner-text h3{font-size:16px;font-weight:800;margin:0 0 4px}
+    .nbp-urgent-banner-text p{font-size:13px;opacity:.88;margin:0}
+    @media(max-width:768px){.nbp-main{padding:24px 16px 60px}.nbp-hero-inner h1{font-size:30px}.nbp-card-icon-col{width:60px}.nbp-cat-icon{width:40px;height:40px;font-size:18px}.nbp-card-content{padding:16px 16px 16px 0}.nbp-card-title{font-size:16px}}
+    @media(max-width:480px){.nbp-card-inner{flex-direction:column}.nbp-card-icon-col{width:100%;padding:18px 20px 0;flex-direction:row;justify-content:flex-start;gap:12px;align-items:center}.nbp-card-content{padding:12px 18px 18px}.nbp-card-date{margin-left:0}}
   </style>
   <div class="nbp-wrap">
-
     <div class="nbp-hero">
       <div class="nbp-hero-inner">
         <div class="nbp-hero-icon"><i class="fa fa-bullhorn"></i></div>
         <h1>Notice Board</h1>
-        <p>Stay updated with the latest announcements and important dates at SCTI</p>
-        <div class="nbp-hero-counters" id="nbpCounters" style="display:none">
-          <div class="nbp-counter-pill"><i class="fa fa-bell"></i><span id="nbpTotal">0</span> Notices</div>
-          <div class="nbp-counter-pill"><i class="fa fa-exclamation-circle"></i><span id="nbpUrgent">0</span> Urgent</div>
+        <p>Stay updated with the latest announcements, exam schedules, events and important dates at SCTI</p>
+        <div class="nbp-hero-stats" id="nbpCounters" style="display:none">
+          <div class="nbp-stat-pill"><i class="fa fa-bell"></i><span id="nbpTotal">0</span>&nbsp;Total Notices</div>
+          <div class="nbp-stat-pill"><i class="fa fa-circle-exclamation"></i><span id="nbpUrgent">0</span>&nbsp;Urgent</div>
+          <div class="nbp-stat-pill"><i class="fa fa-calendar-check"></i><span id="nbpRecent">0</span>&nbsp;This Month</div>
         </div>
       </div>
       <div class="nbp-hero-wave">
         <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
-          <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f4f6fb"/>
+          <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="#f0f2f8"/>
         </svg>
       </div>
     </div>
-
     <div class="nbp-filter-bar">
-      <div class="nbp-filters" id="nbpFilters">
-        <button class="nbp-filter nbp-active" onclick="nbpFilter(this,'')" type="button">
-          <i class="fa fa-border-all"></i> All
-        </button>
-        <button class="nbp-filter" onclick="nbpFilter(this,'urgent')" type="button">
-          <i class="fa fa-exclamation-circle"></i> Urgent
-        </button>
-        <button class="nbp-filter" onclick="nbpFilter(this,'admission')" type="button">
-          <i class="fa fa-door-open"></i> Admission
-        </button>
-        <button class="nbp-filter" onclick="nbpFilter(this,'exam')" type="button">
-          <i class="fa fa-pen-to-square"></i> Exam
-        </button>
-        <button class="nbp-filter" onclick="nbpFilter(this,'event')" type="button">
-          <i class="fa fa-calendar-days"></i> Events
-        </button>
-        <button class="nbp-filter" onclick="nbpFilter(this,'holiday')" type="button">
-          <i class="fa fa-umbrella-beach"></i> Holiday
-        </button>
-        <button class="nbp-filter" onclick="nbpFilter(this,'general')" type="button">
-          <i class="fa fa-info-circle"></i> General
-        </button>
+      <div class="nbp-filters">
+        <span class="nbp-filter-label">Filter:</span>
+        <button class="nbp-filter nbp-active" onclick="nbpFilter(this,'')" type="button"><i class="fa fa-border-all"></i> All</button>
+        <button class="nbp-filter" onclick="nbpFilter(this,'urgent')" type="button"><i class="fa fa-circle-exclamation"></i> Urgent</button>
+        <button class="nbp-filter" onclick="nbpFilter(this,'admission')" type="button"><i class="fa fa-door-open"></i> Admission</button>
+        <button class="nbp-filter" onclick="nbpFilter(this,'exam')" type="button"><i class="fa fa-pen-to-square"></i> Exam</button>
+        <button class="nbp-filter" onclick="nbpFilter(this,'event')" type="button"><i class="fa fa-calendar-days"></i> Events</button>
+        <button class="nbp-filter" onclick="nbpFilter(this,'holiday')" type="button"><i class="fa fa-umbrella-beach"></i> Holiday</button>
+        <button class="nbp-filter" onclick="nbpFilter(this,'general')" type="button"><i class="fa fa-info-circle"></i> General</button>
       </div>
     </div>
-
-    <div class="nbp-content">
-      <div class="container">
-        <div id="nbpLoading" class="nbp-loading">
-          <div class="nbp-dots"><span></span><span></span><span></span></div>
-          <p>Loading notices...</p>
+    <div class="nbp-main">
+      <div id="nbpLoading" class="nbp-loading">
+        <div class="nbp-dots"><span></span><span></span><span></span></div>
+        <p>Loading notices...</p>
+      </div>
+      <div id="nbpBoard" style="display:none">
+        <div id="nbpUrgentBanner"></div>
+        <div class="nbp-section-header">
+          <div class="nbp-section-title"><i class="fa fa-list-ul"></i> All Notices</div>
+          <div class="nbp-count-badge" id="nbpCountLabel">0 notices</div>
         </div>
-        <div id="nbpGrid" class="nbp-grid" style="display:none"></div>
-        <div id="nbpEmpty" class="nbp-empty" style="display:none">
-          <i class="fa fa-bullhorn"></i>
-          <h3>No Notices</h3>
-          <p>No notices found in this category.</p>
-        </div>
+        <div id="nbpList" class="nbp-list"></div>
+      </div>
+      <div id="nbpEmpty" class="nbp-empty" style="display:none">
+        <i class="fa fa-bullhorn"></i>
+        <h3>No Notices Found</h3>
+        <p>No notices in this category right now.</p>
       </div>
     </div>
   </div>
 `;
 
-// =============================================
-//  STATE
-// =============================================
 var nbpAllNotices = [];
+var nbpActiveFilter = '';
 
-var NBP_CAT_COLORS = {
-  urgent:    { from:'#991b1b', to:'#dc2626' },
-  admission: { from:'#065f46', to:'#10b981' },
-  exam:      { from:'#1e3a8a', to:'#3b82f6' },
-  event:     { from:'#7c2d12', to:'#f97316' },
-  holiday:   { from:'#713f12', to:'#eab308' },
-  general:   { from:'#164e63', to:'#06b6d4' },
-  def:       { from:'#4c1d95', to:'#7c3aed' }
+var NBP_CAT = {
+  urgent:    { from:'#991b1b', to:'#dc2626', icon:'fa-circle-exclamation', cls:'nbp-urgent-card',    label:'Urgent' },
+  admission: { from:'#065f46', to:'#10b981', icon:'fa-door-open',          cls:'nbp-admission-card', label:'Admission' },
+  exam:      { from:'#1e3a8a', to:'#3b82f6', icon:'fa-pen-to-square',      cls:'nbp-exam-card',      label:'Exam' },
+  event:     { from:'#7c2d12', to:'#f97316', icon:'fa-calendar-days',      cls:'nbp-event-card',     label:'Event' },
+  holiday:   { from:'#713f12', to:'#eab308', icon:'fa-umbrella-beach',     cls:'nbp-holiday-card',   label:'Holiday' },
+  general:   { from:'#164e63', to:'#06b6d4', icon:'fa-info-circle',        cls:'nbp-general-card',   label:'General' },
+  def:       { from:'#4c1d95', to:'#7c3aed', icon:'fa-bell',               cls:'',                   label:'Notice' }
 };
 
-// =============================================
-//  FILTER CLICK — global so onclick works
-// =============================================
 function nbpFilter(btn, cat) {
-  document.querySelectorAll('.nbp-filter').forEach(function(b) {
-    b.classList.remove('nbp-active');
-  });
+  nbpActiveFilter = cat;
+  document.querySelectorAll('.nbp-filter').forEach(function(b){ b.classList.remove('nbp-active'); });
   btn.classList.add('nbp-active');
   nbpRender(cat);
 }
 
-// =============================================
-//  LOAD
-// =============================================
 function initNotices() {
-  if (!document.getElementById('nbpGrid')) return;
+  if (!document.getElementById('nbpList')) return;
   nbpAllNotices = [];
-
-  var grid    = document.getElementById('nbpGrid');
   var loading = document.getElementById('nbpLoading');
+  var board   = document.getElementById('nbpBoard');
   var empty   = document.getElementById('nbpEmpty');
-
   loading.style.display = 'flex';
-  grid.style.display    = 'none';
+  board.style.display   = 'none';
   empty.style.display   = 'none';
-
   fetch('pages/notice-list.php?status=active')
-    .then(function(r) { return r.json(); })
-    .then(function(result) {
+    .then(function(r){ return r.json(); })
+    .then(function(result){
       loading.style.display = 'none';
       if (result.success && result.notices && result.notices.length > 0) {
         nbpAllNotices = result.notices;
-
-        var tc = document.getElementById('nbpTotal');
-        var uc = document.getElementById('nbpUrgent');
-        var cw = document.getElementById('nbpCounters');
-        if (tc) tc.textContent = result.notices.length;
-        if (uc) uc.textContent = result.notices.filter(function(n){ return n.priority==='urgent'; }).length;
-        if (cw) cw.style.display = 'flex';
-
+        nbpUpdateCounters(result.notices);
         nbpRender('');
       } else {
         empty.style.display = 'flex';
       }
     })
-    .catch(function(err) {
+    .catch(function(err){
       console.error('Notices error:', err);
-      loading.style.display = 'none';
-      var empty2 = document.getElementById('nbpEmpty');
-      if (empty2) empty2.style.display = 'flex';
+      document.getElementById('nbpLoading').style.display = 'none';
+      document.getElementById('nbpEmpty').style.display   = 'flex';
     });
 }
 
-// =============================================
-//  RENDER
-// =============================================
+function nbpUpdateCounters(notices) {
+  var now = new Date(), month = now.getMonth(), year = now.getFullYear();
+  var recent = notices.filter(function(n){ var d=new Date(n.notice_date); return d.getMonth()===month && d.getFullYear()===year; }).length;
+  var tc=document.getElementById('nbpTotal'), uc=document.getElementById('nbpUrgent'), rc=document.getElementById('nbpRecent'), cw=document.getElementById('nbpCounters');
+  if(tc) tc.textContent = notices.length;
+  if(uc) uc.textContent = notices.filter(function(n){ return n.priority==='urgent'; }).length;
+  if(rc) rc.textContent = recent;
+  if(cw) cw.style.display = 'flex';
+}
+
 function nbpRender(category) {
-  var grid  = document.getElementById('nbpGrid');
-  var empty = document.getElementById('nbpEmpty');
-  if (!grid) return;
-
-  var list = nbpAllNotices.slice();
-  if (category === 'urgent') {
-    list = list.filter(function(n){ return n.priority === 'urgent'; });
-  } else if (category) {
-    list = list.filter(function(n){ return n.category === category; });
-  }
-
-  if (!list.length) {
-    grid.style.display  = 'none';
-    empty.style.display = 'flex';
-    return;
-  }
-
-  grid.innerHTML     = list.map(nbpBuildCard).join('');
-  grid.style.display = 'grid';
+  var board=document.getElementById('nbpBoard'), list=document.getElementById('nbpList');
+  var empty=document.getElementById('nbpEmpty'), label=document.getElementById('nbpCountLabel');
+  var urgBanner=document.getElementById('nbpUrgentBanner');
+  if (!list) return;
+  var items = nbpAllNotices.slice();
+  if (category === 'urgent') { items = items.filter(function(n){ return n.priority==='urgent'; }); }
+  else if (category) { items = items.filter(function(n){ return n.category===category; }); }
+  if (!items.length) { board.style.display='none'; empty.style.display='flex'; return; }
+  board.style.display = 'block';
   empty.style.display = 'none';
+  if (label) label.textContent = items.length + ' notice' + (items.length!==1?'s':'');
+  var urgents = nbpAllNotices.filter(function(n){ return n.priority==='urgent'; });
+  if (urgBanner) {
+    if (!category && urgents.length > 0) {
+      urgBanner.innerHTML = '<div class="nbp-urgent-banner"><i class="fa fa-triangle-exclamation nbp-pulse"></i><div class="nbp-urgent-banner-text"><h3>' + urgents.length + ' Urgent Notice' + (urgents.length>1?'s':'') + '</h3><p>' + nbpEsc(urgents[0].title) + (urgents.length>1?' and '+(urgents.length-1)+' more...':'') + '</p></div></div>';
+    } else { urgBanner.innerHTML = ''; }
+  }
+  list.innerHTML = items.map(nbpBuildCard).join('');
 }
 
 function nbpBuildCard(n) {
-  var c   = NBP_CAT_COLORS[n.category] || NBP_CAT_COLORS.def;
-  var dt  = '';
-  try { dt = new Date(n.notice_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); } catch(e){ dt = n.notice_date; }
+  var cfg = NBP_CAT[n.category] || NBP_CAT.def;
+  var dt  = nbpFmtDate(n.notice_date);
   var pl  = n.priority.charAt(0).toUpperCase() + n.priority.slice(1);
-  var cl  = n.category.charAt(0).toUpperCase() + n.category.slice(1);
   var pc  = n.priority==='urgent' ? 'nbp-badge-urgent' : n.priority==='high' ? 'nbp-badge-high' : 'nbp-badge-normal';
-
-  return '<div class="nbp-card">'
-    + '<div class="nbp-card-top">'
-    +   '<div class="nbp-card-badges">'
-    +     '<span class="nbp-badge ' + pc + '">' + pl + '</span>'
-    +     '<span class="nbp-badge nbp-badge-cat" style="background:linear-gradient(135deg,' + c.from + ',' + c.to + ')">' + cl + '</span>'
+  return '<div class="nbp-card ' + cfg.cls + '">'
+    + '<div class="nbp-card-accent" style="background:linear-gradient(90deg,' + cfg.from + ',' + cfg.to + ')"></div>'
+    + '<div class="nbp-card-inner">'
+    +   '<div class="nbp-card-icon-col"><div class="nbp-cat-icon" style="background:linear-gradient(135deg,' + cfg.from + ',' + cfg.to + ')"><i class="fa ' + cfg.icon + '"></i></div></div>'
+    +   '<div class="nbp-card-content">'
+    +     '<div class="nbp-card-meta">'
+    +       '<span class="nbp-badge ' + pc + '"><i class="fa fa-circle-dot"></i> ' + pl + '</span>'
+    +       '<span class="nbp-badge nbp-badge-cat" style="background:linear-gradient(135deg,' + cfg.from + ',' + cfg.to + ')"><i class="fa ' + cfg.icon + '"></i> ' + cfg.label + '</span>'
+    +       '<span class="nbp-card-date"><i class="fa fa-calendar"></i> ' + dt + '</span>'
+    +     '</div>'
+    +     '<h3 class="nbp-card-title">' + nbpEsc(n.title) + '</h3>'
+    +     '<p class="nbp-card-desc">' + nbpEsc(n.description) + '</p>'
+    +     '<hr class="nbp-card-divider">'
+    +     '<div class="nbp-card-footer">'
+    +       '<span class="nbp-card-tag"><i class="fa fa-tag"></i> ' + cfg.label + '</span>'
+    +       '<span class="nbp-card-tag"><i class="fa fa-calendar-days"></i> ' + dt + '</span>'
+    +       '<button class="nbp-read-btn" style="background:linear-gradient(135deg,' + cfg.from + ',' + cfg.to + ')" onclick="nbpScrollTop()"><i class="fa fa-arrow-up"></i> Back to Top</button>'
+    +     '</div>'
     +   '</div>'
-    +   '<h3 class="nbp-card-title">' + nbpEsc(n.title) + '</h3>'
-    +   '<p class="nbp-card-body">' + nbpEsc(n.description) + '</p>'
-    + '</div>'
-    + '<div class="nbp-card-foot">'
-    +   '<div class="nbp-card-date"><i class="fa fa-calendar"></i> ' + dt + '</div>'
     + '</div>'
     + '</div>';
 }
 
+function nbpScrollTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+function nbpFmtDate(d) {
+  try { return new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+  catch(e){ return d; }
+}
+
 function nbpEsc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }

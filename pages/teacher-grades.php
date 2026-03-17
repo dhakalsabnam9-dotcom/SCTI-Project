@@ -10,13 +10,13 @@ try {
     $students = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
 } catch(Exception $e) { $students = []; }
 
-// Load existing grades
+// Load existing grades — keyed by [student_db_id][subject][exam_type]
 $gradesMap = [];
 try {
     $db = getDBConnection();
-    $rows = $db->query("SELECT student_id, subject, internal_marks, external_marks FROM grades")->fetchAll();
+    $rows = $db->query("SELECT student_db_id, subject, exam_type, internal_marks, external_marks FROM grades")->fetchAll();
     foreach ($rows as $r) {
-        $gradesMap[$r['student_id']][$r['subject']] = $r;
+        $gradesMap[$r['student_db_id']][$r['subject']][$r['exam_type']] = $r;
     }
 } catch(Exception $e) {}
 
@@ -114,7 +114,8 @@ $subjects = ['Programming Fundamentals','Database Management','Web Development',
           $parts = explode(' ', $s['full_name']);
           $initials = strtoupper(substr($parts[0],0,1).(count($parts)>1?substr($parts[count($parts)-1],0,1):''));
           $subj = $subjects[0];
-          $g = $gradesMap[$s['student_id']][$subj] ?? null;
+          $examT = 'Mid-Term';
+          $g = $gradesMap[$s['student_id']][$subj][$examT] ?? null;
           $internal = $g ? $g['internal_marks'] : '';
           $external = $g ? $g['external_marks'] : '';
         ?>
@@ -171,9 +172,11 @@ function calcTotal(inp) {
 
 function loadSubjectGrades() {
   var subj = document.getElementById('subjectSel').value;
+  var exam = document.getElementById('examType').value;
   document.querySelectorAll('#gradesBody tr[data-student-db-id]').forEach(function(row) {
     var sid = row.dataset.studentDbId;
-    var g = (gradesData[sid] && gradesData[sid][subj]) ? gradesData[sid][subj] : null;
+    var g = (gradesData[sid] && gradesData[sid][subj] && gradesData[sid][subj][exam])
+              ? gradesData[sid][subj][exam] : null;
     row.querySelector('.internal-input').value = g ? g.internal_marks : '';
     row.querySelector('.external-input').value = g ? g.external_marks : '';
     calcTotal(row.querySelector('.internal-input'));
@@ -181,6 +184,7 @@ function loadSubjectGrades() {
 }
 
 document.getElementById('subjectSel').addEventListener('change', loadSubjectGrades);
+document.getElementById('examType').addEventListener('change', loadSubjectGrades);
 
 function saveGrades() {
   var subject  = document.getElementById('subjectSel').value;
@@ -208,10 +212,11 @@ function saveGrades() {
   .then(function(res){
     btn.disabled = false; btn.innerHTML = '<i class="fa fa-save"></i> Save Grades';
     if (res.success) {
-      // update local cache
+      // update local cache with subject+exam_type key
       records.forEach(function(r){
         if (!gradesData[r.student_db_id]) gradesData[r.student_db_id] = {};
-        gradesData[r.student_db_id][subject] = {internal_marks:r.internal, external_marks:r.external};
+        if (!gradesData[r.student_db_id][subject]) gradesData[r.student_db_id][subject] = {};
+        gradesData[r.student_db_id][subject][examType] = {internal_marks:r.internal, external_marks:r.external};
       });
       showToast('ok', res.message || 'Grades saved!');
     } else { showToast('err', res.message || 'Save failed.'); }

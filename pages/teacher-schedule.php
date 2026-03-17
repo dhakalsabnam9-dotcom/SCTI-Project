@@ -3,7 +3,13 @@ session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
 }
-$fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
+$fullName  = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
+$teacherId = $_SESSION['user_id'] ?? 0;
+require_once '../includes/config.php';
+try {
+    $db = getDBConnection();
+    $totalStudents = $db->query("SELECT COUNT(*) FROM students WHERE status='active'")->fetchColumn();
+} catch(Exception $e) { $totalStudents = 0; }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +21,8 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+    .top-header { background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 10px 20px; font-size: 14px; }
+    .footer { background: #2c3e50; color: white; text-align: center; padding: 20px; margin-top: 30px; }
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     .page-header {
       background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
@@ -77,7 +85,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
     <div class="stat-box"><div class="num">4</div><div class="lbl">Classes Today</div></div>
     <div class="stat-box"><div class="num">5</div><div class="lbl">Subjects Teaching</div></div>
     <div class="stat-box"><div class="num">18</div><div class="lbl">Hours/Week</div></div>
-    <div class="stat-box"><div class="num">120</div><div class="lbl">Total Students</div></div>
+    <div class="stat-box"><div class="num"><?php echo $totalStudents; ?></div><div class="lbl">Total Students</div></div>
   </div>
 
   <div class="card">
@@ -153,6 +161,6 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
     </div>
   </div>
 </div>
-<footer class="footer" style="margin-top:30px;"><p>© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer" style="background:#2c3e50;color:white;text-align:center;padding:20px;margin-top:30px;"><p>© 2025 SCTI - Teacher Portal</p></footer>
 </body>
 </html>

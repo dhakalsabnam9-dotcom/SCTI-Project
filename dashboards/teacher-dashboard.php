@@ -9,6 +9,17 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
 
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Teacher';
 $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
+$teacherId = $_SESSION['user_id'] ?? 0;
+
+require_once '../includes/config.php';
+try {
+    $db = getDBConnection();
+    $totalStudents    = $db->query("SELECT COUNT(*) FROM students WHERE status='active'")->fetchColumn();
+    $pendingAssign    = $db->query("SELECT COUNT(*) FROM assignments WHERE teacher_id=$teacherId")->fetchColumn();
+} catch(Exception $e) {
+    $totalStudents = 0;
+    $pendingAssign = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -190,15 +201,15 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-students.php'">
+    <div class="stat-card" onclick="window.location.href='../pages/teacher-students.php'">
       <div class="stat-icon green"><i class="fa fa-users"></i></div>
       <div class="stat-info">
-        <h3>120</h3>
+        <h3><?php echo $totalStudents; ?></h3>
         <p>Total Students</p>
       </div>
     </div>
 
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-classes.php'">
+    <div class="stat-card" onclick="window.location.href='../pages/teacher-classes.php'">
       <div class="stat-icon blue"><i class="fa fa-book"></i></div>
       <div class="stat-info">
         <h3>5</h3>
@@ -206,15 +217,15 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
       </div>
     </div>
 
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-assignments.php'">
+    <div class="stat-card" onclick="window.location.href='../pages/teacher-assignments.php'">
       <div class="stat-icon orange"><i class="fa fa-file-alt"></i></div>
       <div class="stat-info">
-        <h3>12</h3>
-        <p>Pending Assignments</p>
+        <h3><?php echo $pendingAssign; ?></h3>
+        <p>Assignments</p>
       </div>
     </div>
 
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/teacher-schedule.php'">
+    <div class="stat-card" onclick="window.location.href='../pages/teacher-schedule.php'">
       <div class="stat-icon purple"><i class="fa fa-calendar"></i></div>
       <div class="stat-info">
         <h3>4</h3>

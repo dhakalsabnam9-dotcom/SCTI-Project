@@ -127,14 +127,81 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'teacher';
         </div>
       </div>
 
-      <div style="text-align:right;">
-        <button class="edit-btn" onclick="alert('Edit profile feature coming soon!');">
-          <i class="fa fa-edit"></i> Edit Profile
-        </button>
+      <div class="info-card">
+        <h3><i class="fa fa-lock"></i> Change Password</h3>
+        <div id="cpMsg" style="display:none;padding:10px;border-radius:6px;margin-bottom:15px;font-size:14px;"></div>
+        <div class="info-grid">
+          <div class="info-item" style="grid-column:1/-1;">
+            <label>Current Password</label>
+            <input type="password" id="cpCurrent" placeholder="Enter current password"
+              style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+          </div>
+          <div class="info-item">
+            <label>New Password</label>
+            <input type="password" id="cpNew" placeholder="Min. 6 characters"
+              style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+          </div>
+          <div class="info-item">
+            <label>Confirm New Password</label>
+            <input type="password" id="cpConfirm" placeholder="Repeat new password"
+              style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+          </div>
+        </div>
+        <div style="margin-top:15px;">
+          <button class="edit-btn" onclick="changePassword()">
+            <i class="fa fa-key"></i> Update Password
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <footer class="footer" style="margin-top:30px;"><p>© 2025 SCTI - Teacher Portal</p></footer>
+<script>
+function changePassword() {
+  var current = document.getElementById('cpCurrent').value.trim();
+  var newPw   = document.getElementById('cpNew').value.trim();
+  var confirm = document.getElementById('cpConfirm').value.trim();
+  var msg     = document.getElementById('cpMsg');
+
+  if (!current || !newPw || !confirm) {
+    showMsg('All fields are required.', 'error'); return;
+  }
+  if (newPw.length < 6) {
+    showMsg('New password must be at least 6 characters.', 'error'); return;
+  }
+  if (newPw !== confirm) {
+    showMsg('New passwords do not match.', 'error'); return;
+  }
+
+  var fd = new FormData();
+  fd.append('current_password', current);
+  fd.append('new_password', newPw);
+  fd.append('confirm_password', confirm);
+
+  fetch('../pages/change-password.php', { method: 'POST', body: fd })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        showMsg(data.message, 'success');
+        document.getElementById('cpCurrent').value = '';
+        document.getElementById('cpNew').value = '';
+        document.getElementById('cpConfirm').value = '';
+      } else {
+        showMsg(data.message, 'error');
+      }
+    })
+    .catch(function(){ showMsg('Network error. Please try again.', 'error'); });
+}
+
+function showMsg(text, type) {
+  var el = document.getElementById('cpMsg');
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#d4edda' : '#f8d7da';
+  el.style.color      = type === 'success' ? '#155724' : '#721c24';
+  el.style.border     = '1px solid ' + (type === 'success' ? '#c3e6cb' : '#f5c6cb');
+  el.textContent = text;
+}
+</script>
 </body>
 </html>

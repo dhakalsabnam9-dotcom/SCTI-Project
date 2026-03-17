@@ -64,6 +64,23 @@ try {
     .info-item label{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
     .info-item span{font-size:14px;color:#333;font-weight:600}
     .footer{background:#2c3e50;color:white;text-align:center;padding:20px;border-radius:10px;margin-top:40px}
+    /* MESSAGE MODAL */
+    .msg-to{font-size:14px;color:#555;margin-bottom:18px;padding:10px 14px;background:#f0faf3;border-radius:8px;border-left:4px solid #28a745}
+    .msg-to strong{color:#155724}
+    .msg-label{font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+    .msg-input{width:100%;padding:10px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:14px;font-family:inherit;transition:.2s}
+    .msg-input:focus{outline:none;border-color:#28a745;box-shadow:0 0 0 3px rgba(40,167,69,.1)}
+    .msg-textarea{width:100%;padding:10px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:120px;transition:.2s}
+    .msg-textarea:focus{outline:none;border-color:#28a745;box-shadow:0 0 0 3px rgba(40,167,69,.1)}
+    .msg-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+    .btn-send{background:linear-gradient(135deg,#28a745,#20c997);color:white;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+    .btn-send:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(40,167,69,.35)}
+    .btn-cancel{background:#f8f9fa;color:#555;border:2px solid #dee2e6;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+    .btn-cancel:hover{background:#e9ecef}
+    .msg-success{display:none;text-align:center;padding:30px 20px}
+    .msg-success i{font-size:52px;color:#28a745;margin-bottom:14px;display:block}
+    .msg-success p{font-size:16px;color:#333;font-weight:600}
+    .msg-success small{color:#888;font-size:13px}
   </style>
 </head>
 <body>
@@ -138,6 +155,43 @@ try {
   </div>
 </div>
 
+<!-- MESSAGE MODAL -->
+<div class="modal-overlay" id="msgModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2><i class="fa fa-envelope"></i> Send Message</h2>
+      <button class="modal-close" onclick="closeMsgModal()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <!-- Form view -->
+      <div id="msgForm">
+        <div class="msg-to">To: <strong id="msgToName"></strong> &nbsp;·&nbsp; <span id="msgToEmail" style="color:#888;font-size:13px;"></span></div>
+        <div style="margin-bottom:16px;">
+          <label class="msg-label">Subject</label>
+          <input type="text" id="msgSubject" class="msg-input" placeholder="Enter subject...">
+        </div>
+        <div>
+          <label class="msg-label">Message</label>
+          <textarea id="msgBody" class="msg-textarea" placeholder="Write your message here..."></textarea>
+        </div>
+        <div class="msg-actions">
+          <button class="btn-cancel" onclick="closeMsgModal()">Cancel</button>
+          <button class="btn-send" onclick="sendMessage()"><i class="fa fa-paper-plane"></i> Send Message</button>
+        </div>
+      </div>
+      <!-- Success view -->
+      <div class="msg-success" id="msgSuccess">
+        <i class="fa fa-check-circle"></i>
+        <p>Message Sent!</p>
+        <small id="msgSuccessText"></small>
+        <div style="margin-top:20px;">
+          <button class="btn-send" onclick="closeMsgModal()"><i class="fa fa-check"></i> Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 var studentsData = <?php echo json_encode($students); ?>;
 
@@ -169,7 +223,32 @@ function infoItem(label, val) {
 }
 
 function msgStudent(email, name) {
-  window.location.href = 'mailto:' + email + '?subject=Message from SCTI Teacher&body=Dear ' + encodeURIComponent(name) + ',';
+  document.getElementById('msgToName').textContent  = name;
+  document.getElementById('msgToEmail').textContent = email;
+  document.getElementById('msgSubject').value = '';
+  document.getElementById('msgBody').value    = '';
+  document.getElementById('msgForm').style.display    = 'block';
+  document.getElementById('msgSuccess').style.display = 'none';
+  document.getElementById('msgModal').classList.add('open');
+}
+
+function closeMsgModal() {
+  document.getElementById('msgModal').classList.remove('open');
+}
+
+function sendMessage() {
+  var subject = document.getElementById('msgSubject').value.trim();
+  var body    = document.getElementById('msgBody').value.trim();
+  var name    = document.getElementById('msgToName').textContent;
+  var email   = document.getElementById('msgToEmail').textContent;
+
+  if (!subject) { document.getElementById('msgSubject').focus(); return; }
+  if (!body)    { document.getElementById('msgBody').focus();    return; }
+
+  // Show success (in a real system you'd POST to a messages API here)
+  document.getElementById('msgForm').style.display    = 'none';
+  document.getElementById('msgSuccess').style.display = 'block';
+  document.getElementById('msgSuccessText').textContent = 'Your message to ' + name + ' (' + email + ') has been sent.';
 }
 
 function applyFilter() {
@@ -188,6 +267,7 @@ function applyFilter() {
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 document.getElementById('viewModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+document.getElementById('msgModal').addEventListener('click',  function(e){ if(e.target===this) closeMsgModal(); });
 </script>
 </body>
 </html>

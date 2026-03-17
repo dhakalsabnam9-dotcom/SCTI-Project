@@ -13,7 +13,7 @@ try {
     $stmt->execute([$teacherId]);
     $t = $stmt->fetch() ?: [];
     $totalStudents = $db->query("SELECT COUNT(*) FROM students WHERE status='active'")->fetchColumn();
-    $stmt2 = $db->prepare("SELECT COUNT(*) FROM assignments WHERE teacher_id=?");
+    $stmt2 = $db->prepare("SELECT COUNT(*) FROM assignments WHERE created_by=?");
     $stmt2->execute([$teacherId]);
     $totalAssignments = $stmt2->fetchColumn();
 } catch(Exception $e) { $totalStudents = 0; $totalAssignments = 0; }

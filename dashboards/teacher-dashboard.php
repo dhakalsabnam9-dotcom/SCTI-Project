@@ -15,7 +15,9 @@ require_once '../includes/config.php';
 try {
     $db = getDBConnection();
     $totalStudents    = $db->query("SELECT COUNT(*) FROM students WHERE status='active'")->fetchColumn();
-    $pendingAssign    = $db->query("SELECT COUNT(*) FROM assignments WHERE teacher_id=$teacherId")->fetchColumn();
+    $stmt2 = $db->prepare("SELECT COUNT(*) FROM assignments WHERE created_by=?");
+    $stmt2->execute([$teacherId]);
+    $pendingAssign = $stmt2->fetchColumn();
 } catch(Exception $e) {
     $totalStudents = 0;
     $pendingAssign = 0;

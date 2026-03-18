@@ -1,12 +1,29 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
-    header('Location: ../index.php');
-    exit();
+    header('Location: ../index.php'); exit();
 }
-$fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Student';
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'student';
-$email = isset($_SESSION['email']) ? $_SESSION['email'] : 'student@scti.edu.np';
+require_once '../includes/config.php';
+
+$studentId = $_SESSION['user_id'] ?? 0;
+$s = [];
+try {
+    $db = getDBConnection();
+    $stmt = $db->prepare("SELECT * FROM students WHERE id = ? LIMIT 1");
+    $stmt->execute([$studentId]);
+    $s = $stmt->fetch() ?: [];
+} catch(Exception $e) { $s = []; }
+
+$fullName    = $s['full_name']   ?? ($_SESSION['full_name'] ?? 'Student');
+$username    = $s['username']    ?? ($_SESSION['username']  ?? 'student');
+$email       = $s['email']       ?? '—';
+$phone       = $s['phone']       ?? '—';
+$address     = $s['address']     ?? '—';
+$program     = $s['program']     ?? '—';
+$semester    = $s['semester']    ?? '—';
+$studentDbId = $s['student_id']  ?? '—';
+$status      = ucfirst($s['status'] ?? 'active');
+$joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_at'])) : '—';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,267 +33,233 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : 'student@scti.edu.np';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    
-    .page-header {
-      background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
-      color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;
-      box-shadow: 0 4px 15px rgba(0,64,128,0.2);
-    }
-    .page-header h1 { margin: 0 0 10px 0; font-size: 28px; }
-    .breadcrumb { opacity: 1; font-size: 14px; background: transparent; padding: 0; }
-    .breadcrumb a { color: white; text-decoration: none; }
-    
-    .profile-grid {
-      display: grid; grid-template-columns: 1fr 2fr; gap: 25px;
-    }
-    
-    .profile-sidebar {
-      background: white; padding: 30px; border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .profile-avatar {
-      width: 150px; height: 150px; border-radius: 50%;
-      background: linear-gradient(135deg, #004080, #0059b3);
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 60px; margin: 0 auto 20px;
-      box-shadow: 0 4px 15px rgba(0,64,128,0.2);
-    }
-    .profile-name {
-      font-size: 24px; font-weight: 600; color: #333;
-      margin-bottom: 5px;
-    }
-    .profile-role {
-      color: #666; margin-bottom: 20px;
-    }
-    .profile-stats {
-      margin-top: 30px; text-align: left;
-    }
-    .stat-item {
-      padding: 15px 0; border-bottom: 1px solid #eee;
-      display: flex; justify-content: space-between;
-    }
-    .stat-item:last-child { border-bottom: none; }
-    .stat-label { color: #666; }
-    .stat-value { font-weight: 600; color: #004080; }
-    
-    .profile-main {
-      background: white; padding: 30px; border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .section-title {
-      color: #004080; margin-bottom: 20px; padding-bottom: 10px;
-      border-bottom: 2px solid #004080;
-    }
-    
-    .info-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr);
-      gap: 20px; margin-bottom: 30px;
-    }
-    .info-item {
-      padding: 15px; background: #f8f9fa; border-radius: 8px;
-    }
-    .info-label {
-      font-size: 12px; color: #666; margin-bottom: 5px;
-      text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .info-value {
-      font-size: 16px; color: #333; font-weight: 600;
-    }
-    
-    .btn-edit {
-      background: linear-gradient(135deg, #004080, #0059b3);
-      color: white; padding: 12px 30px; border: none;
-      border-radius: 6px; cursor: pointer; font-size: 16px;
-      transition: all 0.3s; margin-top: 20px;
-    }
-    .btn-edit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,64,128,0.3);
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',sans-serif;background:#f5f7fa}
+    .top-header{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:10px 20px;font-size:14px}
+    .footer{background:#2c3e50;color:white;text-align:center;padding:20px;margin-top:30px}
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+    .page-header{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:30px;border-radius:10px;margin-bottom:30px;box-shadow:0 4px 15px rgba(0,64,128,.2)}
+    .page-header h1{margin:0 0 8px;font-size:28px}
+    .breadcrumb{background:transparent!important;padding:0;font-size:14px}
+    .breadcrumb a{color:white;text-decoration:none}
+    .profile-grid{display:grid;grid-template-columns:300px 1fr;gap:25px}
+    .profile-card{background:white;border-radius:10px;padding:30px;box-shadow:0 2px 10px rgba(0,0,0,.1);text-align:center}
+    .avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#004080,#0059b3);display:flex;align-items:center;justify-content:center;font-size:48px;color:white;margin:0 auto 20px}
+    .profile-name{font-size:22px;font-weight:700;color:#333;margin-bottom:5px}
+    .profile-role{display:inline-block;background:#cce5ff;color:#004080;padding:5px 15px;border-radius:20px;font-size:13px;margin-bottom:20px}
+    .profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+    .pstat{background:#f8f9fa;border-radius:8px;padding:12px}
+    .pstat .num{font-size:16px;font-weight:700;color:#004080}
+    .pstat .lbl{font-size:11px;color:#666}
+    .info-card{background:white;border-radius:10px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:20px}
+    .info-card h3{color:#004080;margin-bottom:20px;font-size:18px;border-bottom:2px solid #f0f0f0;padding-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+    .info-item label{display:block;font-size:12px;color:#999;margin-bottom:4px;text-transform:uppercase}
+    .info-item span{font-size:15px;color:#333;font-weight:500}
+    .edit-btn{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:14px;transition:.3s;display:inline-flex;align-items:center;gap:8px}
+    .edit-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,64,128,.3)}
+    .edit-btn-sm{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:white;border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mIn .25s ease}
+    @keyframes mIn{from{transform:translateY(-24px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-head{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:20px 26px;display:flex;justify-content:space-between;align-items:center;border-radius:14px 14px 0 0}
+    .modal-head h2{margin:0;font-size:18px}
+    .modal-close{background:rgba(255,255,255,.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+    .modal-close:hover{background:rgba(255,255,255,.35)}
+    .modal-body{padding:26px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:5px;text-transform:uppercase}
+    .form-control{width:100%;padding:10px 14px;border:2px solid #dee2e6;border-radius:7px;font-size:14px;font-family:inherit;transition:.2s}
+    .form-control:focus{outline:none;border-color:#004080}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .btn-save{width:100%;background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:13px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:6px}
+    .btn-save:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,64,128,.35)}
+    .btn-save:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .toast{display:none;position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:99999;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+    .toast.show{display:flex;animation:tIn .3s ease}
+    .toast-ok{background:#28a745;color:white}.toast-err{background:#dc3545;color:white}
+    @keyframes tIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
   </style>
 </head>
 <body>
-
-<div class="top-header">
-  <marquee>My Profile - View and manage your personal information</marquee>
-</div>
-
+<div class="top-header">My Profile - View and manage your personal information</div>
 <div class="container">
-  
   <div class="page-header">
-    <h1><i class="fa fa-user"></i> My Profile</h1>
-    <div class="breadcrumb">
-      <a href="../dashboards/student-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Profile
-    </div>
+    <h1><i class="fa fa-user-graduate"></i> My Profile</h1>
+    <div class="breadcrumb"><a href="../dashboards/student-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / My Profile</div>
   </div>
 
   <div class="profile-grid">
-    
-    <div class="profile-sidebar">
-      <div class="profile-avatar">
-        <i class="fa fa-user"></i>
-      </div>
-      <div class="profile-name"><?php echo htmlspecialchars($fullName); ?></div>
-      <div class="profile-role">Student - B.Tech IT</div>
-      
-      <div class="profile-stats">
-        <div class="stat-item">
-          <span class="stat-label">Student ID</span>
-          <span class="stat-value">STU20251234</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Semester</span>
-          <span class="stat-value">3rd Semester</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Batch</span>
-          <span class="stat-value">2024-2028</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Status</span>
-          <span class="stat-value" style="color: #28a745;">Active</span>
+    <div>
+      <div class="profile-card">
+        <div class="avatar"><i class="fa fa-user-graduate"></i></div>
+        <div class="profile-name"><?=htmlspecialchars($fullName)?></div>
+        <div class="profile-role">Student</div>
+        <div class="profile-stats">
+          <div class="pstat"><div class="num"><?=htmlspecialchars($studentDbId)?></div><div class="lbl">Student ID</div></div>
+          <div class="pstat"><div class="num"><?=htmlspecialchars($semester !== '—' ? $semester : '—')?></div><div class="lbl">Semester</div></div>
+          <div class="pstat"><div class="num"><?=$status?></div><div class="lbl">Status</div></div>
+          <div class="pstat"><div class="num"><?=htmlspecialchars($program !== '—' ? substr($program,0,6) : '—')?></div><div class="lbl">Program</div></div>
         </div>
       </div>
     </div>
 
-    <div class="profile-main">
-      <h2 class="section-title"><i class="fa fa-info-circle"></i> Personal Information</h2>
-      
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Full Name</div>
-          <div class="info-value"><?php echo htmlspecialchars($fullName); ?></div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Username</div>
-          <div class="info-value"><?php echo htmlspecialchars($username); ?></div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Email Address</div>
-          <div class="info-value"><?php echo htmlspecialchars($email); ?></div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Phone Number</div>
-          <div class="info-value">+977-9841234567</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Date of Birth</div>
-          <div class="info-value">Jan 15, 2005</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Gender</div>
-          <div class="info-value">Male</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Address</div>
-          <div class="info-value">Kamalamai-5, Sindhuli</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Guardian Contact</div>
-          <div class="info-value">+977-9841234568</div>
+    <div>
+      <div class="info-card">
+        <h3>
+          <span><i class="fa fa-id-card"></i> Personal Information</span>
+          <button class="edit-btn-sm" onclick="openEdit()"><i class="fa fa-edit"></i> Edit</button>
+        </h3>
+        <div class="info-grid">
+          <div class="info-item"><label>Full Name</label><span><?=htmlspecialchars($fullName)?></span></div>
+          <div class="info-item"><label>Username</label><span><?=htmlspecialchars($username)?></span></div>
+          <div class="info-item"><label>Email</label><span><?=htmlspecialchars($email)?></span></div>
+          <div class="info-item"><label>Phone</label><span><?=htmlspecialchars($phone)?></span></div>
+          <div class="info-item"><label>Status</label><span><?=$status?></span></div>
+          <div class="info-item"><label>Joined</label><span><?=$joinedDate?></span></div>
+          <div class="info-item" style="grid-column:1/-1"><label>Address</label><span><?=htmlspecialchars($address)?></span></div>
         </div>
       </div>
 
-      <h2 class="section-title" style="margin-top: 30px;"><i class="fa fa-graduation-cap"></i> Academic Information</h2>
-      
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Program</div>
-          <div class="info-value">B.Tech Ed in IT</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Enrollment Date</div>
-          <div class="info-value">Nov 12, 2024</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Current GPA</div>
-          <div class="info-value">3.6 / 4.0</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Credits Completed</div>
-          <div class="info-value">45 / 120</div>
+      <div class="info-card">
+        <h3><span><i class="fa fa-graduation-cap"></i> Academic Information</span></h3>
+        <div class="info-grid">
+          <div class="info-item"><label>Student ID</label><span><?=htmlspecialchars($studentDbId)?></span></div>
+          <div class="info-item"><label>Program</label><span><?=htmlspecialchars($program)?></span></div>
+          <div class="info-item"><label>Semester</label><span><?=htmlspecialchars($semester !== '—' ? $semester : '—')?></span></div>
+          <div class="info-item"><label>Enrollment Date</label><span><?=$joinedDate?></span></div>
         </div>
       </div>
 
-      <h2 class="section-title" style="margin-top:30px;"><i class="fa fa-lock"></i> Change Password</h2>
-      <div id="cpMsg" style="display:none;padding:10px;border-radius:6px;margin-bottom:15px;font-size:14px;"></div>
-      <div class="info-grid">
-        <div class="info-item" style="grid-column:1/-1;">
-          <div class="info-label">Current Password</div>
-          <input type="password" id="cpCurrent" placeholder="Enter current password"
-            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+      <div class="info-card">
+        <h3><span><i class="fa fa-lock"></i> Change Password</span></h3>
+        <div id="cpMsg" style="display:none;padding:10px;border-radius:6px;margin-bottom:15px;font-size:14px;"></div>
+        <div class="info-grid">
+          <div class="info-item" style="grid-column:1/-1;">
+            <label>Current Password</label>
+            <input type="password" id="cpCurrent" placeholder="Enter current password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+          </div>
+          <div class="info-item">
+            <label>New Password</label>
+            <input type="password" id="cpNew" placeholder="Min. 6 characters" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+          </div>
+          <div class="info-item">
+            <label>Confirm New Password</label>
+            <input type="password" id="cpConfirm" placeholder="Repeat new password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+          </div>
         </div>
-        <div class="info-item">
-          <div class="info-label">New Password</div>
-          <input type="password" id="cpNew" placeholder="Min. 6 characters"
-            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
-        </div>
-        <div class="info-item">
-          <div class="info-label">Confirm New Password</div>
-          <input type="password" id="cpConfirm" placeholder="Repeat new password"
-            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-top:4px;">
+        <div style="margin-top:15px;">
+          <button class="edit-btn" onclick="changePassword()"><i class="fa fa-key"></i> Update Password</button>
         </div>
       </div>
-      <button class="btn-edit" onclick="changePassword()" style="margin-top:15px;">
-        <i class="fa fa-key"></i> Update Password
-      </button>
     </div>
-
   </div>
+</div>
+<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
 
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2><i class="fa fa-edit"></i> Edit Profile</h2>
+      <button class="modal-close" onclick="closeEdit()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="editMsg" style="display:none;padding:10px;border-radius:6px;margin-bottom:14px;font-size:14px;"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="eFull" class="form-control" value="<?=htmlspecialchars($fullName)?>">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" id="ePhone" class="form-control" value="<?=htmlspecialchars($phone !== '—' ? $phone : '')?>">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="eAddress" class="form-control" value="<?=htmlspecialchars($address !== '—' ? $address : '')?>">
+      </div>
+      <button class="btn-save" id="saveProfileBtn" onclick="saveProfile()"><i class="fa fa-save"></i> Save Changes</button>
+    </div>
+  </div>
 </div>
 
-<footer class="footer" style="margin-top: 40px;">
-  <p>© 2025 SCTI - Student Portal</p>
-</footer>
+<div class="toast toast-ok" id="toastOk"><i class="fa fa-check-circle"></i><span id="toastOkMsg">Saved!</span></div>
+<div class="toast toast-err" id="toastErr"><i class="fa fa-times-circle"></i><span id="toastErrMsg">Error</span></div>
 
 <script>
+function openEdit()  { document.getElementById('editModal').classList.add('open'); }
+function closeEdit() { document.getElementById('editModal').classList.remove('open'); }
+document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEdit(); });
+
+function saveProfile() {
+  var fd = new FormData();
+  fd.append('full_name', document.getElementById('eFull').value.trim());
+  fd.append('phone',     document.getElementById('ePhone').value.trim());
+  fd.append('address',   document.getElementById('eAddress').value.trim());
+  var btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
+  fetch('update-profile.php', {method:'POST', body:fd})
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      btn.disabled = false; btn.innerHTML = '<i class="fa fa-save"></i> Save Changes';
+      if (res.success) { closeEdit(); showToast('ok', res.message); setTimeout(function(){ location.reload(); }, 1000); }
+      else { showEditMsg(res.message, 'error'); }
+    })
+    .catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Changes'; showToast('err','Network error.'); });
+}
+
+function showEditMsg(text, type) {
+  var el = document.getElementById('editMsg');
+  el.style.display = 'block';
+  el.style.background = type==='success' ? '#d4edda' : '#f8d7da';
+  el.style.color      = type==='success' ? '#155724' : '#721c24';
+  el.style.border     = '1px solid ' + (type==='success' ? '#c3e6cb' : '#f5c6cb');
+  el.textContent = text;
+}
+
 function changePassword() {
   var current = document.getElementById('cpCurrent').value.trim();
   var newPw   = document.getElementById('cpNew').value.trim();
   var confirm = document.getElementById('cpConfirm').value.trim();
-
-  if (!current || !newPw || !confirm) {
-    showMsg('All fields are required.', 'error'); return;
-  }
-  if (newPw.length < 6) {
-    showMsg('New password must be at least 6 characters.', 'error'); return;
-  }
-  if (newPw !== confirm) {
-    showMsg('New passwords do not match.', 'error'); return;
-  }
-
+  if (!current || !newPw || !confirm) { showCpMsg('All fields are required.','error'); return; }
+  if (newPw.length < 6) { showCpMsg('New password must be at least 6 characters.','error'); return; }
+  if (newPw !== confirm) { showCpMsg('New passwords do not match.','error'); return; }
   var fd = new FormData();
   fd.append('current_password', current);
   fd.append('new_password', newPw);
   fd.append('confirm_password', confirm);
-
-  fetch('../pages/change-password.php', { method: 'POST', body: fd })
+  fetch('change-password.php', {method:'POST', body:fd})
     .then(function(r){ return r.json(); })
-    .then(function(data) {
+    .then(function(data){
       if (data.success) {
-        showMsg(data.message, 'success');
-        document.getElementById('cpCurrent').value = '';
-        document.getElementById('cpNew').value = '';
-        document.getElementById('cpConfirm').value = '';
-      } else {
-        showMsg(data.message, 'error');
-      }
+        showCpMsg(data.message,'success');
+        document.getElementById('cpCurrent').value='';
+        document.getElementById('cpNew').value='';
+        document.getElementById('cpConfirm').value='';
+      } else { showCpMsg(data.message,'error'); }
     })
-    .catch(function(){ showMsg('Network error. Please try again.', 'error'); });
+    .catch(function(){ showCpMsg('Network error. Please try again.','error'); });
 }
 
-function showMsg(text, type) {
+function showCpMsg(text, type) {
   var el = document.getElementById('cpMsg');
   el.style.display = 'block';
-  el.style.background = type === 'success' ? '#d4edda' : '#f8d7da';
-  el.style.color      = type === 'success' ? '#155724' : '#721c24';
-  el.style.border     = '1px solid ' + (type === 'success' ? '#c3e6cb' : '#f5c6cb');
+  el.style.background = type==='success' ? '#d4edda' : '#f8d7da';
+  el.style.color      = type==='success' ? '#155724' : '#721c24';
+  el.style.border     = '1px solid ' + (type==='success' ? '#c3e6cb' : '#f5c6cb');
   el.textContent = text;
+}
+
+function showToast(type, msg) {
+  var id  = type==='ok' ? 'toastOk'  : 'toastErr';
+  var mid = type==='ok' ? 'toastOkMsg' : 'toastErrMsg';
+  document.getElementById(mid).textContent = msg;
+  var t = document.getElementById(id);
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 </script>
 </body>

@@ -389,7 +389,6 @@ $conn = null;
         <li><a href="../index.html#notices">Notice Board</a></li>
         <li><a href="../index.html#contact">Contact Us</a></li>
         <li><a href="login-simple.php">Login</a></li>
-        <li><a href="signup.php">Sign Up</a></li>
       </ul>
     </nav>
 
@@ -411,7 +410,7 @@ $conn = null;
         
         <div class="credentials-info">
           <strong><i class="fa fa-info-circle"></i> Login Information:</strong>
-          <p>Use the username and password you created during signup. If you don't have an account, please register first.</p>
+          <p>Use your username and password provided by the administration to login.</p>
         </div>
         
         <?php if (!empty($error)): ?>
@@ -471,7 +470,7 @@ $conn = null;
         </button>
 
         <div class="login-footer">
-          <p>Don't have an account? <a href="signup.php">Register Here</a></p>
+          <p>Contact your administrator if you need access.</p>
         </div>
 
       </form>

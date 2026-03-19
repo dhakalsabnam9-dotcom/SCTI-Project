@@ -146,8 +146,7 @@ const programsPage = `
               </div>
             </div>
             <div class="prp-cta-row">
-              <a href="#" onclick="loadPage('signup');return false;" class="prp-btn prp-btn-primary"><i class="fa fa-user-plus"></i> Apply Now</a>
-              <a href="#" onclick="loadPage('contact');return false;" class="prp-btn prp-btn-outline"><i class="fa fa-envelope"></i> Contact Us</a>
+              <a href="#" onclick="loadPage('contact');return false;" class="prp-btn prp-btn-primary"><i class="fa fa-envelope"></i> Contact Us</a>
             </div>
           </div>
         </div>
@@ -243,7 +242,7 @@ function prpBuildCard(p) {
     + '<div class="prp-card-foot">'
     +   '<div class="prp-info-row"><i class="fa fa-clock"></i> Duration: ' + prpEsc(p.duration || '') + '</div>'
     +   '<div class="prp-info-row"><i class="fa fa-chart-bar"></i> ' + prpEsc(p.assessment || '') + '</div>'
-    +   '<button class="prp-cta" onclick="loadPage(\'signup\')"><i class="fa fa-user-plus"></i> Apply Now</button>'
+    +   '<button class="prp-cta" onclick="loadPage(\'contact\')"><i class="fa fa-envelope"></i> Contact Us</button>'
     + '</div>'
     + '</div>';
 }

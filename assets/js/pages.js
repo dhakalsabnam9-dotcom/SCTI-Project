@@ -5,6 +5,5 @@ const pages = {
   gallery: galleryPage,
   notices: noticesPage,
   contact: contactPage,
-  login: loginPage,
-  signup: signupPage
+  login: loginPage
 };

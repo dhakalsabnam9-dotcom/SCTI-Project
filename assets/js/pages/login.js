@@ -65,7 +65,7 @@ const loginPage = `
           
           <div class="credentials-info">
             <strong><i class="fa fa-info-circle"></i> Login Information:</strong>
-            <p>Use the username and password you created during signup. If you don't have an account, please register first.</p>
+            <p>Use your username and password provided by the administration to login.</p>
           </div>
           
           <div id="loginMessage"></div>
@@ -123,7 +123,7 @@ const loginPage = `
           </button>
 
           <div class="login-footer">
-            <p>Don't have an account? <a href="#" onclick="loadPage('signup'); return false;">Register Here</a></p>
+            <p>Contact your administrator if you need access.</p>
           </div>
 
         </form>

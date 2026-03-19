@@ -80,7 +80,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
         <li><a href="#" onclick="loadPage('notices'); return false;">Notice Board</a></li>
         <li><a href="#" onclick="loadPage('contact'); return false;">Contact Us</a></li>
         <li><a href="#" onclick="loadPage('login'); return false;">Login</a></li>
-        <li><a href="#" onclick="loadPage('signup'); return false;">Sign Up</a></li>
       </ul>
     </nav>
 
@@ -104,9 +103,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/pages/gallery.js?v=36"></script>
 <script src="assets/js/pages/notices.js?v=44"></script>
 <script src="assets/js/pages/contact.js?v=44"></script>
-<script src="assets/js/pages/login.js"></script>
-<script src="assets/js/pages/signup.js"></script>
-<script src="assets/js/pages.js"></script>
+<script src="assets/js/pages/login.js?v=2"></script>
+<script src="assets/js/pages.js?v=2"></script>
 <script src="assets/js/app.js?v=37"></script>
 <script>
 // Handle ?page= URL parameter

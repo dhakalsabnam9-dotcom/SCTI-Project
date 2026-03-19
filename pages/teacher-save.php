@@ -24,6 +24,8 @@ try {
     $phone      = trim($data['phone']      ?? '');
     $qual       = trim($data['qualification'] ?? '');
     $exp        = trim($data['experience'] ?? '');
+    $designation= trim($data['designation'] ?? '');
+    $address    = trim($data['address']    ?? '');
     $subjects   = trim($data['subjects']   ?? '');
     $status     = in_array($data['status'] ?? '', ['active','inactive']) ? $data['status'] : 'active';
 
@@ -50,9 +52,9 @@ try {
             exit();
         }
         $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $db->prepare("INSERT INTO teachers (username, email, password, full_name, teacher_id, department, phone, qualification, experience, subjects, status, created_at)
-                              VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())");
-        $stmt->execute([$username, $email, $hashed, $name, $teacher_id, $dept, $phone, $qual, $exp, $subjects, $status]);
+        $stmt = $db->prepare("INSERT INTO teachers (username, email, password, full_name, teacher_id, department, phone, qualification, experience, designation, address, subjects, status, created_at)
+                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())");
+        $stmt->execute([$username, $email, $hashed, $name, $teacher_id, $dept, $phone, $qual, $exp, $designation, $address, $subjects, $status]);
         $newId = $db->lastInsertId();
         ob_end_clean();
         echo json_encode(['success'=>true,'message'=>'Teacher added successfully','id'=>$newId]);
@@ -60,11 +62,11 @@ try {
         // UPDATE — only hash password if a new one is provided
         if ($password) {
             $hashed = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $db->prepare("UPDATE teachers SET full_name=?, username=?, email=?, password=?, teacher_id=?, department=?, phone=?, qualification=?, experience=?, subjects=?, status=? WHERE id=?");
-            $stmt->execute([$name, $username, $email, $hashed, $teacher_id, $dept, $phone, $qual, $exp, $subjects, $status, $id]);
+            $stmt = $db->prepare("UPDATE teachers SET full_name=?, username=?, email=?, password=?, teacher_id=?, department=?, phone=?, qualification=?, experience=?, designation=?, address=?, subjects=?, status=? WHERE id=?");
+            $stmt->execute([$name, $username, $email, $hashed, $teacher_id, $dept, $phone, $qual, $exp, $designation, $address, $subjects, $status, $id]);
         } else {
-            $stmt = $db->prepare("UPDATE teachers SET full_name=?, username=?, email=?, teacher_id=?, department=?, phone=?, qualification=?, experience=?, subjects=?, status=? WHERE id=?");
-            $stmt->execute([$name, $username, $email, $teacher_id, $dept, $phone, $qual, $exp, $subjects, $status, $id]);
+            $stmt = $db->prepare("UPDATE teachers SET full_name=?, username=?, email=?, teacher_id=?, department=?, phone=?, qualification=?, experience=?, designation=?, address=?, subjects=?, status=? WHERE id=?");
+            $stmt->execute([$name, $username, $email, $teacher_id, $dept, $phone, $qual, $exp, $designation, $address, $subjects, $status, $id]);
         }
         ob_end_clean();
         echo json_encode(['success'=>true,'message'=>'Teacher updated successfully']);

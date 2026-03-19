@@ -83,7 +83,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
   </style>
 </head>
 <body>
-<div class="top-bar"><marquee>Student Manager — Add and manage all students at SCTI</marquee></div>
+<div class="top-bar"><marquee>Student Manager ï¿½ Add and manage all students at SCTI</marquee></div>
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-user-graduate"></i> Manage Students</h1>
@@ -164,9 +164,12 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
         <label>Semester</label>
         <select id="fSemester" class="fc">
           <option value="">Select...</option>
-          <option>Semester 1</option><option>Semester 2</option>
-          <option>Semester 3</option><option>Semester 4</option>
-          <option>Semester 5</option><option>Semester 6</option>
+          <option value="Semester 1">Semester 1</option>
+          <option value="Semester 2">Semester 2</option>
+          <option value="Semester 3">Semester 3</option>
+          <option value="Semester 4">Semester 4</option>
+          <option value="Semester 5">Semester 5</option>
+          <option value="Semester 6">Semester 6</option>
         </select>
       </div>
     </div>
@@ -217,7 +220,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>© 2025 SCTI — Admin Panel</footer>
+<footer>ï¿½ 2025 SCTI ï¿½ Admin Panel</footer>
 
 <script>
 var allStudents = [];
@@ -279,7 +282,7 @@ function saveStudent() {
     program:    program,
     email:      document.getElementById('fEmail').value.trim(),
     phone:      document.getElementById('fPhone').value.trim(),
-    semester:   document.getElementById('fSemester').value,
+    semester:   document.getElementById('fSemester').value ? parseInt(document.getElementById('fSemester').value) : null,
     address:    document.getElementById('fAddress').value.trim(),
     status:     document.getElementById('fStatus').value
   };
@@ -412,7 +415,7 @@ function renderTable(list) {
       + '<td><div class="student-cell"><span class="avatar-sm">'+init+'</span>'+esc(s.full_name)+'</div></td>'
       + '<td>'+esc(s.student_id||'-')+'</td>'
       + '<td>'+esc(s.program||'-')+'</td>'
-      + '<td>'+esc(s.semester||'-')+'</td>'
+      + '<td>'+(s.semester ? s.semester : '-')+'</td>'
       + '<td>'+esc(s.email||s.phone||'-')+'</td>'
       + '<td><span class="badge '+bdg+'">'+cap(s.status)+'</span></td>'
       + '<td><div class="action-btns">'

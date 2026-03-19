@@ -24,8 +24,8 @@ try {
         $dept    = trim($_POST['department']       ?? '');
         $desig   = trim($_POST['designation']      ?? '');
         $qual    = trim($_POST['qualification']    ?? '');
-        $exp     = intval($_POST['experience_years'] ?? 0);
-        $stmt = $db->prepare("UPDATE teachers SET full_name=?, phone=?, address=?, department=?, designation=?, qualification=?, experience_years=? WHERE id=?");
+        $exp     = trim($_POST['experience_years'] ?? '');
+        $stmt = $db->prepare("UPDATE teachers SET full_name=?, phone=?, address=?, department=?, designation=?, qualification=?, experience=? WHERE id=?");
         $stmt->execute([$fullName, $phone, $address, $dept, $desig, $qual, $exp ?: null, $userId]);
     } else {
         $stmt = $db->prepare("UPDATE students SET full_name=?, phone=?, address=? WHERE id=?");

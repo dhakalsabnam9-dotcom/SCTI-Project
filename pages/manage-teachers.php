@@ -227,6 +227,16 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
         <input type="text" id="fExp" class="fc" placeholder="e.g. 5 Years">
       </div>
       <div class="fg">
+        <label>Designation</label>
+        <input type="text" id="fDesignation" class="fc" placeholder="e.g. Lecturer">
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label>Address</label>
+        <input type="text" id="fAddress" class="fc" placeholder="e.g. Sindhuli">
+      </div>
+      <div class="fg">
         <label>Status</label>
         <select id="fStatus" class="fc">
           <option value="active">Active</option>
@@ -374,6 +384,8 @@ function saveTeacher() {
     phone:         document.getElementById('fPhone').value.trim(),
     qualification: document.getElementById('fQual').value.trim(),
     experience:    document.getElementById('fExp').value.trim(),
+    designation:   document.getElementById('fDesignation').value.trim(),
+    address:       document.getElementById('fAddress').value.trim(),
     subjects:      document.getElementById('fSubjects').value.trim(),
     status:        document.getElementById('fStatus').value
   };
@@ -424,6 +436,8 @@ function editTeacher(id) {
   document.getElementById('fPhone').value    = t.phone || '';
   document.getElementById('fQual').value     = t.qualification || '';
   document.getElementById('fExp').value      = t.experience || '';
+  document.getElementById('fDesignation').value = t.designation || '';
+  document.getElementById('fAddress').value  = t.address || '';
   document.getElementById('fSubjects').value = t.subjects || '';
   document.getElementById('fStatus').value   = t.status || 'active';
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-edit"></i> Edit Teacher';
@@ -483,7 +497,7 @@ function confirmDelete() {
 // ── RESET FORM ────────────────────────────────────────────────
 function resetForm() {
   document.getElementById('fId').value = '0';
-  ['fName','fTeacherId','fUsername','fPassword','fEmail','fPhone','fQual','fExp','fSubjects']
+  ['fName','fTeacherId','fUsername','fPassword','fEmail','fPhone','fQual','fExp','fDesignation','fAddress','fSubjects']
     .forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('fDept').value   = '';
   document.getElementById('fStatus').value = 'active';

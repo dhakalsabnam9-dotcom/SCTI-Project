@@ -37,6 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     $passwordOk = password_verify($password, $user['password']) || ($password === $user['password']);
                     if ($passwordOk) {
+                        // Check account status
+                        if (isset($user['status']) && $user['status'] !== 'active') {
+                            $_SESSION['user_id']   = $user['id'];
+                            $_SESSION['username']  = $user['username'];
+                            $_SESSION['user_type'] = $userType;
+                            $_SESSION['full_name'] = $user['full_name'];
+                            $_SESSION['email']     = $user['email'];
+                            $_SESSION['logged_in'] = true;
+                            if ($isAjax) {
+                                header('Content-Type: application/json');
+                                echo json_encode(['success'=>true,'redirect'=>'../pages/account-inactive.php','userType'=>$userType,'inactive'=>true]);
+                                exit();
+                            }
+                            header("Location: account-inactive.php"); exit();
+                        }
                         $_SESSION['user_id']   = $user['id'];
                         $_SESSION['username']  = $user['username'];
                         $_SESSION['user_type'] = $userType;
@@ -44,9 +59,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $_SESSION['email']     = $user['email'];
                         $_SESSION['logged_in'] = true;
 
+                        // Update last_login and updated_at
+                        $updateResult = false;
+                        $updateError  = '';
+                        try {
+                            $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+                            if ($mysqli->connect_error) {
+                                $updateError = 'Connect error: ' . $mysqli->connect_error;
+                            } else {
+                                $uid = (int)$user['id'];
+                                $sql = "UPDATE `$table` SET `last_login`=NOW(), `updated_at`=NOW() WHERE `id`=$uid";
+                                $updateResult = $mysqli->query($sql);
+                                $updateError  = $mysqli->error;
+                                $mysqli->close();
+                            }
+                        } catch(Exception $ex) {
+                            $updateError = $ex->getMessage();
+                        }
+
                         if ($isAjax) {
                             header('Content-Type: application/json');
-                            echo json_encode(['success'=>true,'redirect'=>$redirect,'userType'=>$userType]);
+                            echo json_encode([
+                                'success'       => true,
+                                'redirect'      => $redirect,
+                                'userType'      => $userType,
+                                'update_result' => $updateResult,
+                                'update_error'  => $updateError,
+                                'user_id'       => $user['id'],
+                                'table'         => $table
+                            ]);
                             exit();
                         }
                         header("Location: " . $redirect);

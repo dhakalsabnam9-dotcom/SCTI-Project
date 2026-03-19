@@ -20,7 +20,8 @@ try {
     $program    = trim($data['program']      ?? '');
     $email      = trim($data['email']        ?? '');
     $phone      = trim($data['phone']        ?? '');
-    $semester   = trim($data['semester']     ?? '');
+    $semRaw     = $data['semester'] ?? '';
+    $semester   = ($semRaw !== '' && $semRaw !== null) ? trim($semRaw) : null;
     $address    = trim($data['address']      ?? '');
     $status     = in_array($data['status'] ?? '', ['active','inactive']) ? $data['status'] : 'active';
 

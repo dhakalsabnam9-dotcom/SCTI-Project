@@ -27,7 +27,7 @@ $department    = $t['department']       ?? '—';
 $designation   = $t['designation']      ?? '—';
 $teacherDbId   = $t['teacher_id']       ?? '—';
 $qualification = $t['qualification']    ?? '—';
-$expYears      = $t['experience_years'] ?? '—';
+$expYears      = $t['experience']        ?? '—';
 $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at'])) : '—';
 ?>
 <!DOCTYPE html>

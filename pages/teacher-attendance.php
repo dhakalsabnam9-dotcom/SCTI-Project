@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
@@ -70,7 +70,7 @@ $today = date('Y-m-d');
   </style>
 </head>
 <body>
-<div class="top-header">Attendance Management â€” Mark and save student attendance</div>
+<div class="top-header">Attendance Management — Mark and save student attendance</div>
 <div class="container">
   <div class="page-header">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
@@ -171,7 +171,7 @@ $today = date('Y-m-d');
     </div>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
 
 <div class="toast toast-ok" id="toastOk"><i class="fa fa-check-circle"></i><span id="toastOkMsg">Saved!</span></div>
 <div class="toast toast-err" id="toastErr"><i class="fa fa-times-circle"></i><span id="toastErrMsg">Error</span></div>
@@ -291,11 +291,11 @@ function loadHistory() {
         var cls = st==='present'?'#d4edda;color:#155724':st==='absent'?'#f8d7da;color:#721c24':'#fff3cd;color:#856404';
         return '<tr>'
           + '<td>'+esc(r.attendance_date)+'</td>'
-          + '<td>'+esc(r.student_name||'â€”')+'</td>'
-          + '<td>'+esc(r.class_name||'â€”')+'</td>'
-          + '<td style="font-size:12px;color:#666">'+esc(r.period||'â€”')+'</td>'
+          + '<td>'+esc(r.student_name||'—')+'</td>'
+          + '<td>'+esc(r.class_name||'—')+'</td>'
+          + '<td style="font-size:12px;color:#666">'+esc(r.period||'—')+'</td>'
           + '<td><span style="background:'+cls+';padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">'+cap(st)+'</span></td>'
-          + '<td style="font-size:12px;color:#666">'+esc(r.remarks||'â€”')+'</td>'
+          + '<td style="font-size:12px;color:#666">'+esc(r.remarks||'—')+'</td>'
           + '</tr>';
       }).join('');
     })

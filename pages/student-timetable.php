@@ -16,6 +16,8 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Student';
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+    .top-header{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:10px 20px;font-size:14px}
+    .footer{background:#2c3e50;color:white;text-align:center;padding:20px}
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     
     .page-header {
@@ -226,7 +228,7 @@ $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Student';
 
 </div>
 
-<footer class="footer" style="margin-top: 40px;">
+<footer class="footer">
   <p>© 2025 SCTI - Student Portal</p>
 </footer>
 

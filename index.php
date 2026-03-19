@@ -27,7 +27,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
   <meta http-equiv="Expires" content="0">
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- External CSS -->
   <link rel="stylesheet" href="assets/css/style.css?v=32">
@@ -102,12 +102,22 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/pages/home.js"></script>
 <script src="assets/js/pages/programs.js?v=35"></script>
 <script src="assets/js/pages/gallery.js?v=36"></script>
-<script src="assets/js/pages/notices.js?v=42"></script>
-<script src="assets/js/pages/contact.js"></script>
+<script src="assets/js/pages/notices.js?v=44"></script>
+<script src="assets/js/pages/contact.js?v=44"></script>
 <script src="assets/js/pages/login.js"></script>
 <script src="assets/js/pages/signup.js"></script>
 <script src="assets/js/pages.js"></script>
-<script src="assets/js/app.js?v=36"></script>
+<script src="assets/js/app.js?v=37"></script>
+<script>
+// Handle ?page= URL parameter
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var pg = params.get('page');
+  if (pg && typeof pages !== 'undefined' && pages[pg]) {
+    window.onload = function(){ loadPage(pg); };
+  }
+})();
+</script>
 
 </body>
 </html>

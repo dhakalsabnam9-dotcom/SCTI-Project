@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
@@ -79,7 +79,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
   </style>
 </head>
 <body>
-<div class="top-header"><marquee>Assignment Management â€” Create, edit and delete assignments</marquee></div>
+<div class="top-header"><marquee>Assignment Management — Create, edit and delete assignments</marquee></div>
 <div class="container">
   <div class="page-header">
     <div>
@@ -105,7 +105,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading assignments...</p></div>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="asgModal">

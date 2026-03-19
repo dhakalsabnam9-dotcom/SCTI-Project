@@ -28,6 +28,7 @@ try {
         exam_type VARCHAR(50),
         internal_marks DECIMAL(5,2) DEFAULT 0,
         external_marks DECIMAL(5,2) DEFAULT 0,
+        total_marks DECIMAL(5,2) GENERATED ALWAYS AS (internal_marks + external_marks) STORED,
         marked_by INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

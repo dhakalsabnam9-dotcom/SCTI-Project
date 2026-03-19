@@ -10,16 +10,6 @@ try {
     $students = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
 } catch(Exception $e) { $students = []; }
 
-// Load existing grades — keyed by [student_db_id][subject][exam_type]
-$gradesMap = [];
-try {
-    $db = getDBConnection();
-    $rows = $db->query("SELECT student_db_id, subject, exam_type, internal_marks, external_marks FROM grades")->fetchAll();
-    foreach ($rows as $r) {
-        $gradesMap[$r['student_db_id']][$r['subject']][$r['exam_type']] = $r;
-    }
-} catch(Exception $e) {}
-
 $subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
 ?>
 <!DOCTYPE html>
@@ -113,18 +103,13 @@ $subjects = ['Programming Fundamentals','Database Management','Web Development',
         <?php else: foreach($students as $i=>$s):
           $parts = explode(' ', $s['full_name']);
           $initials = strtoupper(substr($parts[0],0,1).(count($parts)>1?substr($parts[count($parts)-1],0,1):''));
-          $subj = $subjects[0];
-          $examT = 'Mid-Term';
-          $g = $gradesMap[$s['student_id']][$subj][$examT] ?? null;
-          $internal = $g ? $g['internal_marks'] : '';
-          $external = $g ? $g['external_marks'] : '';
         ?>
         <tr data-student-id="<?=$s['id']?>" data-student-db-id="<?=htmlspecialchars($s['student_id'])?>">
           <td><?=$i+1?></td>
           <td><div class="stu-info"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
           <td><?=htmlspecialchars($s['student_id'])?></td>
-          <td><input type="number" class="grade-input internal-input" min="0" max="40" value="<?=htmlspecialchars($internal)?>" placeholder="0-40" oninput="calcTotal(this)"></td>
-          <td><input type="number" class="grade-input external-input" min="0" max="60" value="<?=htmlspecialchars($external)?>" placeholder="0-60" oninput="calcTotal(this)"></td>
+          <td><input type="number" class="grade-input internal-input" min="0" max="40" placeholder="0-40" oninput="calcTotal(this)"></td>
+          <td><input type="number" class="grade-input external-input" min="0" max="60" placeholder="0-60" oninput="calcTotal(this)"></td>
           <td class="total-cell">—</td>
           <td class="grade-cell">—</td>
         </tr>

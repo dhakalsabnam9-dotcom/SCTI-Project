@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     header('Location: ../index.php'); exit();
@@ -83,7 +83,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
   </style>
 </head>
 <body>
-<div class="top-bar"><marquee>Student Manager â€” Add and manage all students at SCTI</marquee></div>
+<div class="top-bar"><marquee>Student Manager — Add and manage all students at SCTI</marquee></div>
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-user-graduate"></i> Manage Students</h1>
@@ -217,7 +217,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>Â© 2025 SCTI â€” Admin Panel</footer>
+<footer>© 2025 SCTI — Admin Panel</footer>
 
 <script>
 var allStudents = [];

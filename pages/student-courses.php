@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -62,8 +62,8 @@ try {
 }
 
 $fullName = $student['full_name'] ?? ($_SESSION['full_name'] ?? 'Student');
-$program  = $student['course']   ?? 'â€”';
-$semester = $student['semester'] ?? 'â€”';
+$program  = $student['course']   ?? '—';
+$semester = $student['semester'] ?? '—';
 
 function progressColor($pct) {
     if ($pct >= 80) return '#28a745';
@@ -181,6 +181,6 @@ function progressGradient($pct) {
     <?php endif; ?>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
 </body>
 </html>

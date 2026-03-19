@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -16,14 +16,14 @@ try {
 
 $fullName    = $s['full_name']   ?? ($_SESSION['full_name'] ?? 'Student');
 $username    = $s['username']    ?? ($_SESSION['username']  ?? 'student');
-$email       = $s['email']       ?? 'â€”';
-$phone       = $s['phone']       ?? 'â€”';
-$address     = $s['address']     ?? 'â€”';
-$program     = $s['course']      ?? 'â€”';
-$semester    = $s['semester']    ?? 'â€”';
-$studentDbId = $s['student_id']  ?? 'â€”';
+$email       = $s['email']       ?? '—';
+$phone       = $s['phone']       ?? '—';
+$address     = $s['address']     ?? '—';
+$program     = $s['course']      ?? '—';
+$semester    = $s['semester']    ?? '—';
+$studentDbId = $s['student_id']  ?? '—';
 $status      = ucfirst($s['status'] ?? 'active');
-$joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_at'])) : 'â€”';
+$joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_at'])) : '—';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,9 +103,9 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
         <div class="profile-role">Student</div>
         <div class="profile-stats">
           <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($studentDbId)?></div><div class="lbl">Student ID</div></a>
-          <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($semester !== 'â€”' ? $semester : 'â€”')?></div><div class="lbl">Semester</div></a>
+          <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($semester !== '—' ? $semester : '—')?></div><div class="lbl">Semester</div></a>
           <a class="pstat" href="student-attendance.php" title="View Attendance"><div class="num"><?=$status?></div><div class="lbl">Status</div></a>
-          <a class="pstat" href="student-courses.php" title="View Program"><div class="num"><?=htmlspecialchars($program !== 'â€”' ? substr($program,0,6) : 'â€”')?></div><div class="lbl">Program</div></a>
+          <a class="pstat" href="student-courses.php" title="View Program"><div class="num"><?=htmlspecialchars($program !== '—' ? substr($program,0,6) : '—')?></div><div class="lbl">Program</div></a>
         </div>
       </div>
     </div>
@@ -132,7 +132,7 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
         <div class="info-grid">
           <div class="info-item"><label>Student ID</label><span><?=htmlspecialchars($studentDbId)?></span></div>
           <div class="info-item"><label>Program</label><span><?=htmlspecialchars($program)?></span></div>
-          <div class="info-item"><label>Semester</label><span><?=htmlspecialchars($semester !== 'â€”' ? $semester : 'â€”')?></span></div>
+          <div class="info-item"><label>Semester</label><span><?=htmlspecialchars($semester !== '—' ? $semester : '—')?></span></div>
           <div class="info-item"><label>Enrollment Date</label><span><?=$joinedDate?></span></div>
         </div>
       </div>
@@ -161,7 +161,7 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
     </div>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
 
 <!-- EDIT PROFILE MODAL -->
 <div class="modal-overlay" id="editModal">
@@ -179,12 +179,12 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
         </div>
         <div class="form-group">
           <label>Phone</label>
-          <input type="text" id="ePhone" class="form-control" value="<?=htmlspecialchars($phone !== 'â€”' ? $phone : '')?>">
+          <input type="text" id="ePhone" class="form-control" value="<?=htmlspecialchars($phone !== '—' ? $phone : '')?>">
         </div>
       </div>
       <div class="form-group">
         <label>Address</label>
-        <input type="text" id="eAddress" class="form-control" value="<?=htmlspecialchars($address !== 'â€”' ? $address : '')?>">
+        <input type="text" id="eAddress" class="form-control" value="<?=htmlspecialchars($address !== '—' ? $address : '')?>">
       </div>
       <button class="btn-save" id="saveProfileBtn" onclick="saveProfile()"><i class="fa fa-save"></i> Save Changes</button>
     </div>

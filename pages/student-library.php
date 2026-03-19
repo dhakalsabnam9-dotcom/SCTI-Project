@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -67,7 +67,7 @@ $coverIcons = ['fa-book-open','fa-database','fa-code','fa-laptop-code','fa-brain
     .search-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(111,66,193,.35)}
     .search-btn:active{transform:translateY(0)}
 
-    /* STAT CARDS â€” same style as dashboard */
+    /* STAT CARDS — same style as dashboard */
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:30px}
     .stat-card{background:white;padding:25px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:20px;transition:all .3s cubic-bezier(.25,.8,.25,1);cursor:pointer;position:relative;overflow:hidden;border:2px solid transparent}
     .stat-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(111,66,193,.07),transparent);transition:left .5s}
@@ -135,7 +135,7 @@ $coverIcons = ['fa-book-open','fa-database','fa-code','fa-laptop-code','fa-brain
 </head>
 <body>
 <div class="top-header">
-  <marquee>Library â€” Browse, borrow, and explore our extensive collection of books</marquee>
+  <marquee>Library — Browse, borrow, and explore our extensive collection of books</marquee>
 </div>
 <div class="container">
 
@@ -191,7 +191,7 @@ $coverIcons = ['fa-book-open','fa-database','fa-code','fa-laptop-code','fa-brain
         $dlCount = intval($m['downloads'] ?? 0);
         $title   = htmlspecialchars($m['title']);
         $desc    = htmlspecialchars($m['file_size'] ?? '');
-        $date    = !empty($m['created_at']) ? date('M d, Y', strtotime($m['created_at'])) : 'â€”';
+        $date    = !empty($m['created_at']) ? date('M d, Y', strtotime($m['created_at'])) : '—';
         $mid     = intval($m['id']);
         $jsArgs  = "$mid, '".addslashes($m['title'])."', '".addslashes($m['teacher_name'] ?? 'Teacher')."', '".addslashes($m['subject'] ?? 'General')."', '".addslashes($m['file_size'] ?? '')."', $dlCount, '$date', '$ext'";
     ?>
@@ -220,7 +220,7 @@ $coverIcons = ['fa-book-open','fa-database','fa-code','fa-laptop-code','fa-brain
   </div>
 
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
 
 <!-- Details Modal -->
 <div class="modal-overlay" id="detailModal">

@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -113,8 +113,8 @@ try {
         ?>
         <tr>
           <td><?=date('M d, Y', strtotime($r['attendance_date']))?></td>
-          <td><?=htmlspecialchars($r['class_name'] ?? 'â€”')?></td>
-          <td style="font-size:12px;color:#666"><?=htmlspecialchars($r['period'] ?? 'â€”')?></td>
+          <td><?=htmlspecialchars($r['class_name'] ?? '—')?></td>
+          <td style="font-size:12px;color:#666"><?=htmlspecialchars($r['period'] ?? '—')?></td>
           <td><span class="status-badge <?=$badgeCls?>"><?=ucfirst($st)?></span></td>
           <td><?=htmlspecialchars($r['remarks'] ?? ($st==='present'?'On time':($st==='late'?'Late arrival':'Absent')))?></td>
         </tr>
@@ -124,6 +124,6 @@ try {
     <?php endif; ?>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
 </body>
 </html>

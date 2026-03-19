@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -35,7 +35,7 @@ try {
     $attPct = ($attRow['total'] > 0) ? round(($attRow['present'] / $attRow['total']) * 100) : 0;
 
     // Grades / GPA
-    $gradeStmt = $db->prepare("SELECT AVG(total_marks) as avg_marks FROM grades WHERE student_id=?");
+    $gradeStmt = $db->prepare("SELECT AVG(internal_marks + external_marks) as avg_marks FROM grades WHERE student_id=?");
     $gradeStmt->execute([$studentId]);
     $gradeRow = $gradeStmt->fetch();
     $avgMarks = floatval($gradeRow['avg_marks'] ?? 0);
@@ -78,7 +78,7 @@ function timeAgo($dt) {
     .user-info{display:flex;align-items:center;gap:20px}
     .logout-btn{background:rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:5px;text-decoration:none;transition:.3s}
     .logout-btn:hover{background:rgba(255,255,255,.3)}
-    /* ── STAT CARDS ── */
+    /* -- STAT CARDS -- */
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:30px}
     .stat-card{border-radius:16px;padding:24px 22px;display:flex;align-items:center;gap:18px;cursor:pointer;position:relative;overflow:hidden;transition:all .35s cubic-bezier(.25,.8,.25,1);box-shadow:0 4px 18px rgba(0,0,0,.12);border:none}
     .stat-card::after{content:'';position:absolute;top:-40%;right:-30%;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);transition:transform .4s}
@@ -97,7 +97,7 @@ function timeAgo($dt) {
     .stat-info p{margin:5px 0 0;color:rgba(255,255,255,.85);font-size:13px;font-weight:500}
     .card-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4);font-size:14px;transition:all .3s;opacity:0}
     .stat-card:hover .card-arrow{opacity:1;color:rgba(255,255,255,.9);right:10px}
-    /* ── QUICK LINKS ── */
+    /* -- QUICK LINKS -- */
     .quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
     .quick-link{border-radius:14px;color:white;padding:22px 14px;text-decoration:none;text-align:center;transition:all .35s cubic-bezier(.25,.8,.25,1);display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.15)}
     .quick-link::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%);transition:width .55s,height .55s}
@@ -233,6 +233,6 @@ function timeAgo($dt) {
     </div>
   </div>
 </div>
-<footer class="footer" style="margin-top:40px"><p>© 2025 Sindhuli Community Technical Institute (SCTI) - Student Portal</p></footer>
+<footer class="footer" style="margin-top:40px"><p>� 2025 Sindhuli Community Technical Institute (SCTI) - Student Portal</p></footer>
 </body>
 </html>

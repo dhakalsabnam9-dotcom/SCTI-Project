@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
@@ -84,7 +84,7 @@ try {
   </style>
 </head>
 <body>
-<div class="top-header">Student Management â€” View and manage your students</div>
+<div class="top-header">Student Management — View and manage your students</div>
 <div class="container">
   <div class="page-header">
     <h1><i class="fa fa-users"></i> My Students</h1>
@@ -129,8 +129,8 @@ try {
           <td><div class="student-name"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
           <td><?=htmlspecialchars($s['student_id'])?></td>
           <td><?=htmlspecialchars($s['email'])?></td>
-          <td><?=htmlspecialchars($s['course']??'â€”')?></td>
-          <td><?= $s['semester'] ? 'Sem '.$s['semester'] : 'â€”' ?></td>
+          <td><?=htmlspecialchars($s['course']??'—')?></td>
+          <td><?= $s['semester'] ? 'Sem '.$s['semester'] : '—' ?></td>
           <td><span class="status-badge <?=$badgeCls?>"><?=ucfirst($s['status'])?></span></td>
           <td>
             <button class="action-btn btn-view" onclick="viewStudent(<?=$s['id']?>)"><i class="fa fa-eye"></i> View</button>
@@ -142,7 +142,7 @@ try {
     </table>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
 
 <!-- VIEW MODAL -->
 <div class="modal-overlay" id="viewModal">
@@ -165,7 +165,7 @@ try {
     <div class="modal-body">
       <!-- Form view -->
       <div id="msgForm">
-        <div class="msg-to">To: <strong id="msgToName"></strong> &nbsp;Â·&nbsp; <span id="msgToEmail" style="color:#888;font-size:13px;"></span></div>
+        <div class="msg-to">To: <strong id="msgToName"></strong> &nbsp;·&nbsp; <span id="msgToEmail" style="color:#888;font-size:13px;"></span></div>
         <div style="margin-bottom:16px;">
           <label class="msg-label">Subject</label>
           <input type="text" id="msgSubject" class="msg-input" placeholder="Enter subject...">
@@ -207,13 +207,13 @@ function viewStudent(id) {
     + '</div>'
     + '<div class="info-grid">'
     + infoItem('Email', s.email)
-    + infoItem('Phone', s.phone || 'â€”')
-    + infoItem('Program', s.course || 'â€”')
-    + infoItem('Semester', s.semester ? 'Semester ' + s.semester : 'â€”')
-    + infoItem('Status', s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : 'â€”')
-    + infoItem('Joined', s.created_at ? new Date(s.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'â€”')
-    + infoItem('Address', s.address || 'â€”')
-    + infoItem('Username', s.username || 'â€”')
+    + infoItem('Phone', s.phone || '—')
+    + infoItem('Program', s.course || '—')
+    + infoItem('Semester', s.semester ? 'Semester ' + s.semester : '—')
+    + infoItem('Status', s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : '—')
+    + infoItem('Joined', s.created_at ? new Date(s.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '—')
+    + infoItem('Address', s.address || '—')
+    + infoItem('Username', s.username || '—')
     + '</div>';
   document.getElementById('viewModal').classList.add('open');
 }

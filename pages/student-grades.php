@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -15,7 +15,7 @@ try {
     $semester = $stuData['semester'] ?? '';
 
     // Get grades for this student
-    $stmt = $db->prepare("SELECT g.*, s.full_name as student_name FROM grades g LEFT JOIN students s ON g.student_id = s.id WHERE g.student_id = ? ORDER BY g.subject ASC");
+    $stmt = $db->prepare("SELECT g.*, (g.internal_marks + g.external_marks) as total_marks, s.full_name as student_name FROM grades g LEFT JOIN students s ON g.student_id = s.id WHERE g.student_id = ? ORDER BY g.subject ASC");
     $stmt->execute([$studentId]);
     $grades = $stmt->fetchAll();
 
@@ -102,7 +102,7 @@ function getGradePoint($marks) {
   <div class="gpa-card">
     <h2 style="color:#666;margin:0">Current GPA</h2>
     <div class="gpa-display"><?=number_format($gpa,1)?></div>
-    <p style="color:#666;font-size:15px">Out of 4.0 <?=($gpa>=3.5?'â€” Excellent Performance!':($gpa>=2.5?'â€” Good Performance!':'â€” Keep it up!'))?></p>
+    <p style="color:#666;font-size:15px">Out of 4.0 <?=($gpa>=3.5?'— Excellent Performance!':($gpa>=2.5?'— Good Performance!':'— Keep it up!'))?></p>
     <?php if (!empty($semester)): ?>
     <p style="color:#999;font-size:13px;margin-top:8px"><?=htmlspecialchars($semester)?></p>
     <?php endif; ?>
@@ -132,17 +132,17 @@ function getGradePoint($marks) {
       <tr>
         <td><?=htmlspecialchars($g['subject'])?></td>
         <td><?=htmlspecialchars($g['exam_type'])?></td>
-        <td><?=htmlspecialchars($g['internal_marks'] ?? 'â€”')?></td>
-        <td><?=htmlspecialchars($g['external_marks'] ?? 'â€”')?></td>
-        <td><?=$total > 0 ? $total.'/100' : 'â€”'?></td>
-        <td><?=$total > 0 ? '<span class="grade-badge '.$cls.'">'.$letter.'</span>' : 'â€”'?></td>
-        <td><?=$total > 0 ? $gp : 'â€”'?></td>
+        <td><?=htmlspecialchars($g['internal_marks'] ?? '—')?></td>
+        <td><?=htmlspecialchars($g['external_marks'] ?? '—')?></td>
+        <td><?=$total > 0 ? $total.'/100' : '—'?></td>
+        <td><?=$total > 0 ? '<span class="grade-badge '.$cls.'">'.$letter.'</span>' : '—'?></td>
+        <td><?=$total > 0 ? $gp : '—'?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
   <?php endif; ?>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
 </body>
 </html>

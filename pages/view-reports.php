@@ -10,10 +10,12 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
   <meta charset="UTF-8">
   <title>Reports | SCTI Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+    .top-header{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:10px 20px;font-size:14px}
+    .footer{background:#2c3e50;color:white;text-align:center;padding:20px;margin-top:30px}
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     .page-header {
       background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
@@ -170,7 +172,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     </table>
   </div>
 </div>
-<footer class="footer" style="margin-top:30px;"><p>© 2025 SCTI - Admin Panel</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Admin Panel</p></footer>
 
 <style>
 @media print {

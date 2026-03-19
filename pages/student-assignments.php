@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
@@ -205,7 +205,7 @@ function isOverdue($due) { return strtotime($due) < time(); }
     <?php endif; ?>
   </div>
 </div>
-<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>� 2025 SCTI - Student Portal</p></footer>
 
 <div class="modal-overlay" id="detailModal">
   <div class="modal-box">

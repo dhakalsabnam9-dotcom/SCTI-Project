@@ -1,13 +1,54 @@
 <?php
 session_start();
-
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    header('Location: ../index.php');
-    exit();
+    header('Location: ../index.php'); exit();
+}
+require_once '../includes/config.php';
+
+$username = $_SESSION['username'] ?? 'Admin';
+
+// Real DB counts
+try {
+    $db = getDBConnection();
+    $totalStudents  = $db->query("SELECT COUNT(*) FROM students")->fetchColumn();
+    $totalTeachers  = $db->query("SELECT COUNT(*) FROM teachers")->fetchColumn();
+    $totalPrograms  = $db->query("SELECT COUNT(*) FROM programs WHERE status='active'")->fetchColumn();
+
+    // Recent activity: last 5 students + last 5 teachers + last 5 notices combined, sorted by date
+    $activities = [];
+
+    $newStudents = $db->query("SELECT full_name, created_at, 'student' as type FROM students ORDER BY created_at DESC LIMIT 3")->fetchAll();
+    foreach ($newStudents as $r) {
+        $activities[] = ['icon'=>'fa-user-plus','color'=>'#004080','label'=>'New student registered','name'=>$r['full_name'],'time'=>$r['created_at'],'link'=>'../pages/manage-students.php'];
+    }
+
+    $newTeachers = $db->query("SELECT full_name, created_at, 'teacher' as type FROM teachers ORDER BY created_at DESC LIMIT 2")->fetchAll();
+    foreach ($newTeachers as $r) {
+        $activities[] = ['icon'=>'fa-chalkboard-teacher','color'=>'#28a745','label'=>'Teacher added','name'=>$r['full_name'],'time'=>$r['created_at'],'link'=>'../pages/manage-teachers.php'];
+    }
+
+    $newNotices = $db->query("SELECT title, created_at FROM notices ORDER BY created_at DESC LIMIT 2")->fetchAll();
+    foreach ($newNotices as $r) {
+        $activities[] = ['icon'=>'fa-bullhorn','color'=>'#fd7e14','label'=>'Notice published','name'=>$r['title'],'time'=>$r['created_at'],'link'=>'../pages/manage-notices.php'];
+    }
+
+    // Sort by time desc
+    usort($activities, function($a,$b){ return strtotime($b['time']) - strtotime($a['time']); });
+    $activities = array_slice($activities, 0, 6);
+
+} catch(Exception $e) {
+    $totalStudents = $totalTeachers = $totalPrograms = 0;
+    $activities = [];
 }
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
+function timeAgo($datetime) {
+    $diff = time() - strtotime($datetime);
+    if ($diff < 60)     return 'Just now';
+    if ($diff < 3600)   return floor($diff/60).' minutes ago';
+    if ($diff < 86400)  return floor($diff/3600).' hours ago';
+    if ($diff < 604800) return floor($diff/86400).' days ago';
+    return date('M d, Y', strtotime($datetime));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -73,15 +114,16 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     .stat-card {
       background: white;
       padding: 25px;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
       gap: 20px;
-      transition: all 0.3s;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      border: 2px solid transparent;
     }
     .stat-card::before {
       content: '';
@@ -97,14 +139,19 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       left: 100%;
     }
     .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,64,128,0.3);
-      border: 2px solid #004080;
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,64,128,0.3);
+      border-color: #004080;
     }
     .stat-card:active {
       transform: translateY(-2px) scale(0.98);
-      box-shadow: 0 4px 15px rgba(0,64,128,0.4);
+      box-shadow: 0 5px 15px rgba(0,64,128,0.4);
     }
+    .stat-card .card-arrow {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: #ccc; font-size: 13px; transition: all .3s; opacity: 0;
+    }
+    .stat-card:hover .card-arrow { opacity: 1; color: #004080; right: 10px; }
     
     .stat-icon {
       width: 60px;
@@ -366,7 +413,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
       <p style="margin: 5px 0 0 0; opacity: 0.9;">Welcome back, <?php echo htmlspecialchars($username); ?>!</p>
     </div>
     <div class="user-info">
-      <span><i class="fa fa-user-shield"></i> Administrator</span>
+      <a href="../pages/admin-profile.php" style="color:white;text-decoration:none;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);padding:8px 16px;border-radius:5px;transition:.2s" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'"><i class="fa fa-user-shield"></i> Administrator</a>
       <a href="../includes/logout.php" class="logout-btn">
         <i class="fa fa-sign-out-alt"></i> Logout
       </a>
@@ -377,34 +424,31 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
   <!-- Updated: Gallery card added - Version 2.0 -->
   <div class="stats-grid">
     <!-- GALLERY CARD SHOULD APPEAR AS 6TH CARD -->
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-students.php'">
-      <div class="stat-icon blue">
-        <i class="fa fa-users"></i>
-      </div>
+    <div class="stat-card" onclick="window.location.href='../pages/manage-students.php'">
+      <div class="stat-icon blue"><i class="fa fa-users"></i></div>
       <div class="stat-info">
-        <h3>245</h3>
+        <h3><?=intval($totalStudents)?></h3>
         <p>Total Students</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-teachers.php'">
-      <div class="stat-icon green">
-        <i class="fa fa-chalkboard-teacher"></i>
-      </div>
+    <div class="stat-card" onclick="window.location.href='../pages/manage-teachers.php'">
+      <div class="stat-icon green"><i class="fa fa-chalkboard-teacher"></i></div>
       <div class="stat-info">
-        <h3>18</h3>
+        <h3><?=intval($totalTeachers)?></h3>
         <p>Total Teachers</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
-    <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-programs.php'">
-      <div class="stat-icon orange">
-        <i class="fa fa-book"></i>
-      </div>
+    <div class="stat-card" onclick="window.location.href='../pages/manage-programs.php'">
+      <div class="stat-icon orange"><i class="fa fa-book"></i></div>
       <div class="stat-info">
-        <h3>4</h3>
+        <h3><?=intval($totalPrograms)?></h3>
         <p>Active Programs</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
     <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-notices.php'">
@@ -415,6 +459,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <h3 id="noticeCount">0</h3>
         <p>Active Notices</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
     
     <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='../pages/view-contacts.php'">
@@ -425,6 +470,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <h3 id="contactCount">0</h3>
         <p>Contact Messages</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
     <div class="stat-card gallery-card" style="cursor: pointer;" onclick="window.location.href='../pages/manage-gallery.php'">
@@ -435,6 +481,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <h3 id="galleryCount">0</h3>
         <p>Gallery Images</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow" style="color:rgba(255,255,255,.5)"></i>
     </div>
   </div>
 
@@ -481,51 +528,25 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
   <div class="recent-activity">
     <h2><i class="fa fa-history"></i> Recent Activity</h2>
     <ul class="activity-list">
+      <?php if (empty($activities)): ?>
       <li class="activity-item">
+        <div class="activity-icon"><i class="fa fa-info-circle"></i></div>
+        <div class="activity-content"><p>No recent activity found.</p></div>
+      </li>
+      <?php else: ?>
+      <?php foreach ($activities as $act): ?>
+      <li class="activity-item" onclick="window.location.href='<?=htmlspecialchars($act['link'])?>'" style="cursor:pointer">
         <div class="activity-icon">
-          <i class="fa fa-user-plus"></i>
+          <i class="fa <?=htmlspecialchars($act['icon'])?>" style="color:<?=htmlspecialchars($act['color'])?>"></i>
         </div>
         <div class="activity-content">
-          <p><strong>New student registered:</strong> Ram Sharma</p>
-          <span class="activity-time">2 hours ago</span>
+          <p><strong><?=htmlspecialchars($act['label'])?>:</strong> <?=htmlspecialchars($act['name'])?></p>
+          <span class="activity-time"><?=timeAgo($act['time'])?></span>
         </div>
+        <i class="fa fa-chevron-right" style="color:#ccc;font-size:12px"></i>
       </li>
-      <li class="activity-item">
-        <div class="activity-icon">
-          <i class="fa fa-bullhorn"></i>
-        </div>
-        <div class="activity-content">
-          <p><strong>Notice published:</strong> Admission Open 2025/26</p>
-          <span class="activity-time">5 hours ago</span>
-        </div>
-      </li>
-      <li class="activity-item">
-        <div class="activity-icon">
-          <i class="fa fa-edit"></i>
-        </div>
-        <div class="activity-content">
-          <p><strong>Program updated:</strong> B.Tech Ed in IT</p>
-          <span class="activity-time">1 day ago</span>
-        </div>
-      </li>
-      <li class="activity-item">
-        <div class="activity-icon">
-          <i class="fa fa-user-check"></i>
-        </div>
-        <div class="activity-content">
-          <p><strong>Teacher approved:</strong> Sita Poudel</p>
-          <span class="activity-time">2 days ago</span>
-        </div>
-      </li>
-      <li class="activity-item">
-        <div class="activity-icon">
-          <i class="fa fa-calendar"></i>
-        </div>
-        <div class="activity-content">
-          <p><strong>Event scheduled:</strong> Sports Week Dec 20-25</p>
-          <span class="activity-time">3 days ago</span>
-        </div>
-      </li>
+      <?php endforeach; ?>
+      <?php endif; ?>
     </ul>
   </div>
 

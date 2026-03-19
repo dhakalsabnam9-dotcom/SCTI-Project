@@ -1,68 +1,54 @@
 <?php
 session_start();
-
-// Database configuration
 require_once('../includes/config.php');
-
-// Get database connection
 $conn = getDBConnection();
 
-// Initialize variables
 $error = '';
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+          (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+          isset($_POST['ajax']);
 
-// Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
-    $userType = trim($_POST['userType']);
-    
-    // Validate inputs
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $userType = trim($_POST['userType'] ?? '');
+
     if (empty($username) || empty($password) || empty($userType)) {
         $error = "All fields are required!";
     } else {
-        
-        // Determine table based on user type
-        $table = '';
-        $redirect = '';
-        switch($userType) {
-            case 'student':
-                $table = 'students';
-                $redirect = '../dashboards/student-dashboard.php';
-                break;
-            case 'teacher':
-                $table = 'teachers';
-                $redirect = '../dashboards/teacher-dashboard.php';
-                break;
-            case 'admin':
-                $table = 'admins';
-                $redirect = '../dashboards/admin-dashboard.php';
-                break;
-            default:
-                $error = "Invalid user type!";
-        }
-        
-        if (empty($error)) {
+        $tableMap = ['student'=>'students','teacher'=>'teachers','admin'=>'admins'];
+        $redirectMap = [
+            'student' => '../dashboards/student-dashboard.php',
+            'teacher' => '../dashboards/teacher-dashboard.php',
+            'admin'   => '../dashboards/admin-dashboard.php'
+        ];
+
+        if (!isset($tableMap[$userType])) {
+            $error = "Invalid user type!";
+        } else {
+            $table    = $tableMap[$userType];
+            $redirect = $redirectMap[$userType];
             try {
-                // Query database for user
                 $stmt = $conn->prepare("SELECT * FROM $table WHERE username = :username LIMIT 1");
                 $stmt->bindParam(':username', $username);
                 $stmt->execute();
-                
+
                 if ($stmt->rowCount() > 0) {
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                    
-                    // Verify password
-                    if (password_verify($password, $user['password'])) {
-                        // Password is correct - set session variables
-                        $_SESSION['user_id'] = $user['id'];
-                        $_SESSION['username'] = $user['username'];
+                    $passwordOk = password_verify($password, $user['password']) || ($password === $user['password']);
+                    if ($passwordOk) {
+                        $_SESSION['user_id']   = $user['id'];
+                        $_SESSION['username']  = $user['username'];
                         $_SESSION['user_type'] = $userType;
                         $_SESSION['full_name'] = $user['full_name'];
-                        $_SESSION['email'] = $user['email'];
+                        $_SESSION['email']     = $user['email'];
                         $_SESSION['logged_in'] = true;
-                        
-                        // Redirect to appropriate dashboard
+
+                        if ($isAjax) {
+                            header('Content-Type: application/json');
+                            echo json_encode(['success'=>true,'redirect'=>$redirect,'userType'=>$userType]);
+                            exit();
+                        }
                         header("Location: " . $redirect);
                         exit();
                     } else {
@@ -71,14 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } else {
                     $error = "Invalid username or password!";
                 }
-                
             } catch(PDOException $e) {
                 $error = "Login error: " . $e->getMessage();
             }
         }
     }
-}
 
+    if ($isAjax && $error) {
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>false,'message'=>$error]);
+        exit();
+    }
+}
 $conn = null;
 ?>
 <!DOCTYPE html>
@@ -267,14 +257,6 @@ $conn = null;
       animation: fadeIn 0.5s ease-out 0.2s both;
     }
     
-    .remember-me {
-      transition: all 0.3s;
-    }
-    
-    .remember-me:hover {
-      color: #004080;
-    }
-    
     .forgot-password {
       position: relative;
       transition: all 0.3s;
@@ -440,9 +422,6 @@ $conn = null;
         </div>
 
         <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" name="remember"> Remember Me
-          </label>
           <a href="#" class="forgot-password">Forgot Password?</a>
         </div>
 

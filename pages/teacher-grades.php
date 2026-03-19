@@ -142,7 +142,6 @@ $subjects = ['Programming Fundamentals','Database Management','Web Development',
 <div class="toast toast-err" id="toastErr"><i class="fa fa-times-circle"></i><span id="toastErrMsg">Error</span></div>
 
 <script>
-var gradesData = <?=json_encode($gradesMap)?>;
 var subjects   = <?=json_encode($subjects)?>;
 
 function getGrade(total) {
@@ -173,14 +172,38 @@ function calcTotal(inp) {
 function loadSubjectGrades() {
   var subj = document.getElementById('subjectSel').value;
   var exam = document.getElementById('examType').value;
-  document.querySelectorAll('#gradesBody tr[data-student-db-id]').forEach(function(row) {
-    var sid = row.dataset.studentDbId;
-    var g = (gradesData[sid] && gradesData[sid][subj] && gradesData[sid][subj][exam])
-              ? gradesData[sid][subj][exam] : null;
-    row.querySelector('.internal-input').value = g ? g.internal_marks : '';
-    row.querySelector('.external-input').value = g ? g.external_marks : '';
-    calcTotal(row.querySelector('.internal-input'));
+
+  // Show loading state on all inputs
+  document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
+    row.querySelector('.internal-input').value = '';
+    row.querySelector('.internal-input').placeholder = '...';
+    row.querySelector('.external-input').value = '';
+    row.querySelector('.external-input').placeholder = '...';
+    row.querySelector('.total-cell').textContent = '—';
+    row.querySelector('.grade-cell').innerHTML = '—';
   });
+
+  fetch('grade-get.php?subject=' + encodeURIComponent(subj) + '&exam_type=' + encodeURIComponent(exam))
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
+        var sid = row.dataset.studentId;
+        var g = res.grades && res.grades[sid] ? res.grades[sid] : null;
+        var iInput = row.querySelector('.internal-input');
+        var eInput = row.querySelector('.external-input');
+        iInput.value = g ? g.internal : '';
+        iInput.placeholder = '0-40';
+        eInput.value = g ? g.external : '';
+        eInput.placeholder = '0-60';
+        calcTotal(iInput);
+      });
+    })
+    .catch(function(){
+      document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
+        row.querySelector('.internal-input').placeholder = '0-40';
+        row.querySelector('.external-input').placeholder = '0-60';
+      });
+    });
 }
 
 document.getElementById('subjectSel').addEventListener('change', loadSubjectGrades);
@@ -212,13 +235,8 @@ function saveGrades() {
   .then(function(res){
     btn.disabled = false; btn.innerHTML = '<i class="fa fa-save"></i> Save Grades';
     if (res.success) {
-      // update local cache with subject+exam_type key
-      records.forEach(function(r){
-        if (!gradesData[r.student_db_id]) gradesData[r.student_db_id] = {};
-        if (!gradesData[r.student_db_id][subject]) gradesData[r.student_db_id][subject] = {};
-        gradesData[r.student_db_id][subject][examType] = {internal_marks:r.internal, external_marks:r.external};
-      });
       showToast('ok', res.message || 'Grades saved!');
+      loadSubjectGrades(); // refresh from server to confirm saved values
     } else { showToast('err', res.message || 'Save failed.'); }
   })
   .catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Grades'; showToast('err','Network error.'); });
@@ -233,10 +251,8 @@ function showToast(type, msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
-// Init totals on load
-document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row){
-  calcTotal(row.querySelector('.internal-input'));
-});
+// Init — load grades for default subject+exam on page load
+loadSubjectGrades();
 </script>
 </body>
 </html>

@@ -11,20 +11,54 @@ const homePage = `
       <div class="update-card notice">
         <h3><i class="fa fa-bullhorn"></i> Notice Board</h3>
         <ul>
-          <li><span class="date">2025/26</span> Admission Open</li>
-          <li><span class="date">Nov 10</span> Orientation Program</li>
-          <li><span class="date">Nov 12</span> Classes Begin</li>
-          <li><span class="date">Dec 20–25</span> Sports Week</li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">2025/26</span>
+            <span class="item-text">Admission Open</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Nov 10</span>
+            <span class="item-text">Orientation Program</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Nov 12</span>
+            <span class="item-text">Classes Begin</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Dec 20–25</span>
+            <span class="item-text">Sports Week</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
         </ul>
+        <div class="card-footer-link" onclick="loadPage('notices')">
+          <span>View All Notices</span> <i class="fa fa-arrow-right"></i>
+        </div>
       </div>
 
       <div class="update-card events">
-        <h3><i class="fa fa-calendar"></i> Recent Events</h3>
+        <h3><i class="fa fa-calendar-alt"></i> Recent Events</h3>
         <ul>
-          <li><span class="date">Sept 14</span> AI Workshop</li>
-          <li><span class="date">Aug 30</span> Sports Week</li>
-          <li><span class="date">June 10</span> Project Exhibition</li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Sept 14</span>
+            <span class="item-text">AI Workshop</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Aug 30</span>
+            <span class="item-text">Sports Week</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">June 10</span>
+            <span class="item-text">Project Exhibition</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
         </ul>
+        <div class="card-footer-link" onclick="loadPage('notices')">
+          <span>View All Events</span> <i class="fa fa-arrow-right"></i>
+        </div>
       </div>
     </section>
   </section>

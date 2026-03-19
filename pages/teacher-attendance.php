@@ -73,10 +73,19 @@ $today = date('Y-m-d');
 <div class="top-header">Attendance Management — Mark and save student attendance</div>
 <div class="container">
   <div class="page-header">
-    <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
-    <div class="breadcrumb"><a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Attendance</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
+        <div class="breadcrumb"><a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Attendance</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="showTab('mark')" id="tabMark" style="background:rgba(255,255,255,.9);color:#28a745;border:none;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px"><i class="fa fa-edit"></i> Mark</button>
+        <button onclick="showTab('history')" id="tabHistory" style="background:rgba(255,255,255,.2);color:white;border:2px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px"><i class="fa fa-history"></i> History</button>
+      </div>
+    </div>
   </div>
 
+  <div id="sectionMark">
   <div class="controls">
     <div class="ctrl-group">
       <label><i class="fa fa-book"></i> Class / Course</label>
@@ -137,6 +146,28 @@ $today = date('Y-m-d');
     </table>
     <div class="save-wrap">
       <button class="save-btn" id="saveBtn" onclick="saveAttendance()"><i class="fa fa-save"></i> Save Attendance</button>
+    </div>
+  </div>
+  </div><!-- end sectionMark -->
+
+  <!-- HISTORY SECTION -->
+  <div id="sectionHistory" style="display:none">
+    <div style="background:white;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Filter by Date</label>
+        <input type="date" id="histDate" class="ctrl-input" style="width:180px">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Filter by Class</label>
+        <input type="text" id="histClass" class="ctrl-input" placeholder="Class name..." style="width:200px">
+      </div>
+      <button onclick="loadHistory()" style="padding:11px 20px;background:linear-gradient(135deg,#28a745,#20c997);color:white;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px"><i class="fa fa-search"></i> Search</button>
+    </div>
+    <div class="table-wrap">
+      <table class="att-table">
+        <thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Period</th><th>Status</th><th>Remarks</th></tr></thead>
+        <tbody id="histBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#aaa">Click Search to load history</td></tr></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -230,6 +261,48 @@ function showToast(type, msg) {
 
 // Init summary on load
 updateSummary();
+
+function showTab(tab) {
+  var isMark = tab === 'mark';
+  document.getElementById('sectionMark').style.display    = isMark ? '' : 'none';
+  document.getElementById('sectionHistory').style.display = isMark ? 'none' : '';
+  document.getElementById('tabMark').style.background    = isMark ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.2)';
+  document.getElementById('tabMark').style.color         = isMark ? '#28a745' : 'white';
+  document.getElementById('tabMark').style.border        = isMark ? 'none' : '2px solid rgba(255,255,255,.5)';
+  document.getElementById('tabHistory').style.background = isMark ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.9)';
+  document.getElementById('tabHistory').style.color      = isMark ? 'white' : '#28a745';
+  document.getElementById('tabHistory').style.border     = isMark ? '2px solid rgba(255,255,255,.5)' : 'none';
+}
+
+function loadHistory() {
+  var date  = document.getElementById('histDate').value;
+  var cls   = document.getElementById('histClass').value.trim();
+  var tbody = document.getElementById('histBody');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
+  var url = 'attendance-history.php?date=' + encodeURIComponent(date) + '&class=' + encodeURIComponent(cls);
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.success || !d.records.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#aaa">No records found.</td></tr>'; return;
+      }
+      tbody.innerHTML = d.records.map(function(r){
+        var st = r.status || 'present';
+        var cls = st==='present'?'#d4edda;color:#155724':st==='absent'?'#f8d7da;color:#721c24':'#fff3cd;color:#856404';
+        return '<tr>'
+          + '<td>'+esc(r.attendance_date)+'</td>'
+          + '<td>'+esc(r.student_name||'—')+'</td>'
+          + '<td>'+esc(r.class_name||'—')+'</td>'
+          + '<td style="font-size:12px;color:#666">'+esc(r.period||'—')+'</td>'
+          + '<td><span style="background:'+cls+';padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">'+cap(st)+'</span></td>'
+          + '<td style="font-size:12px;color:#666">'+esc(r.remarks||'—')+'</td>'
+          + '</tr>';
+      }).join('');
+    })
+    .catch(function(){ tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;padding:30px">Network error</td></tr>'; });
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
 </script>
 </body>
 </html>

@@ -107,9 +107,9 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
   </div>
 
   <div class="export-btns">
-    <button class="btn-export btn-pdf" onclick="alert('PDF export coming soon!');"><i class="fa fa-file-pdf"></i> Export PDF</button>
-    <button class="btn-export btn-excel" onclick="alert('Excel export coming soon!');"><i class="fa fa-file-excel"></i> Export Excel</button>
-    <button class="btn-export btn-print" onclick="window.print();"><i class="fa fa-print"></i> Print</button>
+    <button class="btn-export btn-pdf" onclick="exportPDF()"><i class="fa fa-file-pdf"></i> Export PDF</button>
+    <button class="btn-export btn-excel" onclick="exportExcel()"><i class="fa fa-file-excel"></i> Export Excel</button>
+    <button class="btn-export btn-print" onclick="window.print()"><i class="fa fa-print"></i> Print</button>
   </div>
 
   <div class="reports-grid">
@@ -171,5 +171,41 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
   </div>
 </div>
 <footer class="footer" style="margin-top:30px;"><p>© 2025 SCTI - Admin Panel</p></footer>
+
+<style>
+@media print {
+  .export-btns, .top-header, footer, .breadcrumb { display: none !important; }
+  body { background: white; }
+  .page-header { box-shadow: none; border-radius: 0; }
+  .report-card, .stat-card { box-shadow: none; border: 1px solid #ddd; }
+}
+</style>
+
+<script>
+function exportPDF() {
+  window.print();
+}
+
+function exportExcel() {
+  var rows = [
+    ['Program', 'Students', 'Avg Attendance', 'Pass Rate', 'Avg GPA', 'Status'],
+    ['B.Tech IT', '120', '89%', '82%', '3.2', 'Good'],
+    ['Diploma Civil', '75', '85%', '78%', '3.0', 'Good'],
+    ['Diploma Electrical', '50', '82%', '70%', '2.8', 'Needs Attention']
+  ];
+  var csv = rows.map(function(r) {
+    return r.map(function(c) { return '"' + c + '"'; }).join(',');
+  }).join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'SCTI_Report_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
 </body>
 </html>

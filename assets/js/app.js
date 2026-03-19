@@ -29,15 +29,13 @@ function loadPage(pageName) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
   // Close mobile menu if open
-  document.getElementById("menu").classList.remove("show");
+  const menuEl = document.getElementById("menu");
+  if (menuEl) menuEl.classList.remove("show");
   
   // Update active menu item
   document.querySelectorAll('.menu ul li a').forEach(link => {
     link.classList.remove('active');
   });
-  if (typeof event !== 'undefined' && event && event.target) {
-    event.target.classList.add('active');
-  }
 }
 
 // Contact form handler
@@ -87,48 +85,26 @@ function handleLoginSubmit(e) {
   e.preventDefault();
   
   const formData = new FormData(e.target);
+  formData.append('ajax', '1');
   const messageDiv = document.getElementById('loginMessage');
   
-  // Show loading state
   messageDiv.innerHTML = '<div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Logging in...</div>';
   
-  // Send AJAX request
   fetch('pages/login-simple.php', {
     method: 'POST',
     body: formData
   })
-  .then(response => response.text())
+  .then(response => response.json())
   .then(data => {
-    console.log('Login response:', data); // Debug log
-    
-    // Check if login was successful (redirect happened)
-    if (data.includes('Invalid username') || data.includes('Invalid password') || data.includes('All fields are required') || data.includes('alert-danger')) {
-      // Extract error message
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(data, 'text/html');
-      const errorElement = doc.querySelector('.alert-danger');
-      const errorMessage = errorElement ? errorElement.textContent.trim() : 'Login failed. Please try again.';
-      
-      messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + errorMessage + '</div>';
-    } else {
-      // Success - redirect to appropriate dashboard
+    if (data.success) {
       messageDiv.innerHTML = '<div class="alert alert-success"><i class="fa fa-check-circle"></i> Login successful! Redirecting...</div>';
-      
-      // Redirect based on user type
-      const userType = formData.get('userType');
-      setTimeout(() => {
-        if (userType === 'admin') {
-          window.location.href = 'dashboards/admin-dashboard.php';
-        } else if (userType === 'teacher') {
-          window.location.href = 'dashboards/teacher-dashboard.php';
-        } else if (userType === 'student') {
-          window.location.href = 'dashboards/student-dashboard.php';
-        }
-      }, 1000);
+      setTimeout(() => { window.location.href = data.redirect.replace('../', ''); }, 800);
+    } else {
+      messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + (data.message || 'Login failed.') + '</div>';
     }
   })
   .catch(error => {
-    console.error('Login error:', error); // Debug log
+    console.error('Login error:', error);
     messageDiv.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> An error occurred. Please try again.</div>';
   });
   

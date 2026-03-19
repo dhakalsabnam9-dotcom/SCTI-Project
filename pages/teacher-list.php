@@ -8,7 +8,7 @@ require_once '../includes/config.php';
 header('Content-Type: application/json');
 try {
     $db   = getDBConnection();
-    $stmt = $db->query("SELECT id, full_name, username, email, teacher_id, department, phone, status, created_at FROM teachers ORDER BY id DESC");
+    $stmt = $db->query("SELECT id, full_name as name, username, email, teacher_id, department, phone, qualification, experience, subjects, status, created_at FROM teachers ORDER BY id DESC");
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ob_end_clean();
     echo json_encode(['success'=>true,'teachers'=>$rows]);

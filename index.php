@@ -102,12 +102,12 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <script src="assets/js/pages/home.js"></script>
 <script src="assets/js/pages/programs.js?v=35"></script>
 <script src="assets/js/pages/gallery.js?v=36"></script>
-<script src="assets/js/pages/notices.js?v=39"></script>
+<script src="assets/js/pages/notices.js?v=42"></script>
 <script src="assets/js/pages/contact.js"></script>
 <script src="assets/js/pages/login.js"></script>
 <script src="assets/js/pages/signup.js"></script>
 <script src="assets/js/pages.js"></script>
-<script src="assets/js/app.js?v=35"></script>
+<script src="assets/js/app.js?v=36"></script>
 
 </body>
 </html>

@@ -3,7 +3,7 @@
 // =============================================
 const noticesPage = `
   <style>
-    .nbp-wrap{background:#f0f2f8;min-height:100vh}
+    .nbp-wrap{background:#f0f2f8}
     .nbp-hero{position:relative;background:linear-gradient(135deg,#1e0a4e 0%,#4c1d95 45%,#7c3aed 80%,#a78bfa 100%);padding:70px 20px 0;text-align:center;overflow:hidden}
     .nbp-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
     .nbp-hero-inner{position:relative;z-index:2;color:white;padding-bottom:36px}
@@ -58,9 +58,9 @@ const noticesPage = `
     .nbp-card-title{font-size:20px;font-weight:800;color:#1a202c;margin:0 0 10px;line-height:1.35}
     .nbp-card-desc{font-size:14px;color:#4a5568;line-height:1.8;margin:0 0 18px;white-space:pre-line}
     .nbp-card-divider{border:none;border-top:1px dashed #e8ecf2;margin:0 0 14px}
-    .nbp-card-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .nbp-card-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;background:#f3f0ff;color:#6d28d9}
-    .nbp-read-btn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:10px;font-size:13px;font-weight:700;color:white;border:none;cursor:pointer;transition:.2s}
+    .nbp-card-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#f8f7ff;margin:0 -32px -22px -0;padding:12px 32px 14px 0;border-top:1px solid #ede9fe;border-radius:0 0 20px 0}
+    .nbp-card-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;background:#ede9fe;color:#6d28d9}
+    .nbp-read-btn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;font-size:12px;font-weight:700;color:white;border:none;cursor:pointer;transition:.2s}
     .nbp-read-btn:hover{opacity:.88;transform:translateY(-1px)}
     .nbp-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
     .nbp-section-title{font-size:22px;font-weight:800;color:#1a202c;display:flex;align-items:center;gap:10px}
@@ -73,6 +73,11 @@ const noticesPage = `
     .nbp-urgent-banner-text p{font-size:13px;opacity:.88;margin:0}
     @media(max-width:768px){.nbp-main{padding:24px 16px 60px}.nbp-hero-inner h1{font-size:30px}.nbp-card-icon-col{width:60px}.nbp-cat-icon{width:40px;height:40px;font-size:18px}.nbp-card-content{padding:16px 16px 16px 0}.nbp-card-title{font-size:16px}}
     @media(max-width:480px){.nbp-card-inner{flex-direction:column}.nbp-card-icon-col{width:100%;padding:18px 20px 0;flex-direction:row;justify-content:flex-start;gap:12px;align-items:center}.nbp-card-content{padding:12px 18px 18px}.nbp-card-date{margin-left:0}}
+    .nbp-admin-bar{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px dashed #e0e6ef;flex-wrap:wrap}
+    .nbp-abtn{padding:7px 16px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:.2s}
+    .nbp-abtn-edit{background:#fef3c7;color:#92400e}.nbp-abtn-edit:hover{background:#f59e0b;color:#fff}
+    .nbp-abtn-tog{background:#d1fae5;color:#065f46}.nbp-abtn-tog:hover{background:#10b981;color:#fff}
+    .nbp-abtn-del{background:#fee2e2;color:#991b1b}.nbp-abtn-del:hover{background:#dc2626;color:#fff}
   </style>
   <div class="nbp-wrap">
     <div class="nbp-hero">
@@ -123,11 +128,15 @@ const noticesPage = `
         <p>No notices in this category right now.</p>
       </div>
     </div>
+    <footer style="background:#1e0a4e;color:rgba(255,255,255,.7);text-align:center;padding:20px;font-size:13px;margin-top:40px;border-top:1px solid rgba(255,255,255,.1)">
+      <p>© 2025 Sindhuli Community Technical Institute (SCTI) &nbsp;|&nbsp; <a href="#" onclick="loadPage('home');return false;" style="color:#a78bfa;text-decoration:none;">Home</a> &nbsp;|&nbsp; <a href="#" onclick="loadPage('contact');return false;" style="color:#a78bfa;text-decoration:none;">Contact Us</a></p>
+    </footer>
   </div>
 `;
 
 var nbpAllNotices = [];
 var nbpActiveFilter = '';
+var nbpIsAdmin = false;
 
 var NBP_CAT = {
   urgent:    { from:'#991b1b', to:'#dc2626', icon:'fa-circle-exclamation', cls:'nbp-urgent-card',    label:'Urgent' },
@@ -155,7 +164,14 @@ function initNotices() {
   loading.style.display = 'flex';
   board.style.display   = 'none';
   empty.style.display   = 'none';
-  fetch('pages/notice-list.php?status=active')
+
+  // Check if admin is logged in, then load notices
+  fetch('pages/session-info.php')
+    .then(function(r){ return r.json(); })
+    .then(function(s){
+      nbpIsAdmin = s.logged_in && s.user_type === 'admin';
+      return fetch('pages/notice-list.php?status=active');
+    })
     .then(function(r){ return r.json(); })
     .then(function(result){
       loading.style.display = 'none';
@@ -210,7 +226,17 @@ function nbpBuildCard(n) {
   var dt  = nbpFmtDate(n.notice_date);
   var pl  = n.priority.charAt(0).toUpperCase() + n.priority.slice(1);
   var pc  = n.priority==='urgent' ? 'nbp-badge-urgent' : n.priority==='high' ? 'nbp-badge-high' : 'nbp-badge-normal';
-  return '<div class="nbp-card ' + cfg.cls + '">'
+  var adminBar = nbpIsAdmin ? (
+    '<div class="nbp-admin-bar">'
+    + '<button class="nbp-abtn nbp-abtn-edit" onclick="nbpEditNotice(' + n.id + ')"><i class="fa fa-edit"></i> Edit</button>'
+    + '<button class="nbp-abtn nbp-abtn-tog" onclick="nbpToggleNotice(' + n.id + ',\'' + n.status + '\')">'
+    +   '<i class="fa ' + (n.status==='active'?'fa-eye-slash':'fa-eye') + '"></i> '
+    +   (n.status==='active' ? 'Deactivate' : 'Activate')
+    + '</button>'
+    + '<button class="nbp-abtn nbp-abtn-del" onclick="nbpDeleteNotice(' + n.id + ')"><i class="fa fa-trash"></i> Delete</button>'
+    + '</div>'
+  ) : '';
+  return '<div class="nbp-card ' + cfg.cls + '" id="nbp-card-' + n.id + '">'
     + '<div class="nbp-card-accent" style="background:linear-gradient(90deg,' + cfg.from + ',' + cfg.to + ')"></div>'
     + '<div class="nbp-card-inner">'
     +   '<div class="nbp-card-icon-col"><div class="nbp-cat-icon" style="background:linear-gradient(135deg,' + cfg.from + ',' + cfg.to + ')"><i class="fa ' + cfg.icon + '"></i></div></div>'
@@ -222,15 +248,95 @@ function nbpBuildCard(n) {
     +     '</div>'
     +     '<h3 class="nbp-card-title">' + nbpEsc(n.title) + '</h3>'
     +     '<p class="nbp-card-desc">' + nbpEsc(n.description) + '</p>'
-    +     '<hr class="nbp-card-divider">'
     +     '<div class="nbp-card-footer">'
     +       '<span class="nbp-card-tag"><i class="fa fa-tag"></i> ' + cfg.label + '</span>'
     +       '<span class="nbp-card-tag"><i class="fa fa-calendar-days"></i> ' + dt + '</span>'
     +       '<button class="nbp-read-btn" style="background:linear-gradient(135deg,' + cfg.from + ',' + cfg.to + ')" onclick="nbpScrollTop()"><i class="fa fa-arrow-up"></i> Back to Top</button>'
     +     '</div>'
+    +     adminBar
     +   '</div>'
     + '</div>'
     + '</div>';
+}
+
+/* ── ADMIN CRUD ── */
+function nbpEditNotice(id) {
+  var n = nbpAllNotices.find(function(x){ return x.id == id; });
+  if (!n) return;
+  var title = prompt('Edit Title:', n.title);
+  if (title === null) return;
+  var desc = prompt('Edit Description:', n.description);
+  if (desc === null) return;
+  fetch('pages/notice-save.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      id: n.id, title: title.trim(), description: desc.trim(),
+      category: n.category, priority: n.priority,
+      notice_date: (n.notice_date||'').split('T')[0].split(' ')[0],
+      status: n.status
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) { nbpShowToast('Notice updated!', 'ok'); initNotices(); }
+    else nbpShowToast(d.message || 'Update failed', 'err');
+  });
+}
+
+function nbpToggleNotice(id, curStatus) {
+  var newStatus = curStatus === 'active' ? 'inactive' : 'active';
+  var n = nbpAllNotices.find(function(x){ return x.id == id; });
+  if (!n) return;
+  fetch('pages/notice-save.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      id: n.id, title: n.title, description: n.description,
+      category: n.category, priority: n.priority,
+      notice_date: (n.notice_date||'').split('T')[0].split(' ')[0],
+      status: newStatus
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) { nbpShowToast('Status changed to ' + newStatus, 'ok'); initNotices(); }
+    else nbpShowToast(d.message || 'Failed', 'err');
+  });
+}
+
+function nbpDeleteNotice(id) {
+  if (!confirm('Delete this notice? This cannot be undone.')) return;
+  fetch('pages/notice-delete.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({id: parseInt(id)})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) {
+      nbpShowToast('Notice deleted', 'ok');
+      var card = document.getElementById('nbp-card-' + id);
+      if (card) card.remove();
+      nbpAllNotices = nbpAllNotices.filter(function(x){ return x.id != id; });
+      var label = document.getElementById('nbpCountLabel');
+      if (label) label.textContent = nbpAllNotices.length + ' notice' + (nbpAllNotices.length!==1?'s':'');
+    } else nbpShowToast(d.message || 'Delete failed', 'err');
+  });
+}
+
+function nbpShowToast(msg, type) {
+  var t = document.getElementById('nbpToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'nbpToast';
+    t.style.cssText = 'position:fixed;bottom:22px;right:22px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;color:#fff;display:none;box-shadow:0 4px 18px rgba(0,0,0,.2)';
+    document.body.appendChild(t);
+  }
+  t.style.background = type === 'ok' ? '#10b981' : '#dc2626';
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, 3000);
 }
 
 function nbpScrollTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }

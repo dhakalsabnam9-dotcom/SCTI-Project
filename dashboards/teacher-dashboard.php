@@ -14,13 +14,24 @@ $teacherId = $_SESSION['user_id'] ?? 0;
 require_once '../includes/config.php';
 try {
     $db = getDBConnection();
-    $totalStudents    = $db->query("SELECT COUNT(*) FROM students WHERE status='active'")->fetchColumn();
+    $totalStudents = $db->query("SELECT COUNT(*) FROM students WHERE status='active'")->fetchColumn();
     $stmt2 = $db->prepare("SELECT COUNT(*) FROM assignments WHERE created_by=?");
     $stmt2->execute([$teacherId]);
     $pendingAssign = $stmt2->fetchColumn();
+    $totalMaterials = $db->prepare("SELECT COUNT(*) FROM materials WHERE teacher_id=?");
+    $totalMaterials->execute([$teacherId]);
+    $materialsCount = $totalMaterials->fetchColumn();
+    // Recent notices
+    $notices = $db->query("SELECT title, created_at FROM notices ORDER BY created_at DESC LIMIT 4")->fetchAll();
 } catch(Exception $e) {
-    $totalStudents = 0;
-    $pendingAssign = 0;
+    $totalStudents = 0; $pendingAssign = 0; $materialsCount = 0; $notices = [];
+}
+function timeAgo($dt) {
+    $diff = time() - strtotime($dt);
+    if ($diff < 60) return 'Just now';
+    if ($diff < 3600) return floor($diff/60).' min ago';
+    if ($diff < 86400) return floor($diff/3600).' hrs ago';
+    return floor($diff/86400).' days ago';
 }
 ?>
 <!DOCTYPE html>
@@ -59,13 +70,14 @@ try {
     }
     
     .stat-card {
-      background: white; padding: 25px; border-radius: 10px;
+      background: white; padding: 25px; border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       display: flex; align-items: center; gap: 20px;
-      transition: all 0.3s;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      border: 2px solid transparent;
     }
     .stat-card::before {
       content: '';
@@ -81,14 +93,19 @@ try {
       left: 100%;
     }
     .stat-card:hover { 
-      transform: translateY(-5px); 
-      box-shadow: 0 8px 25px rgba(40,167,69,0.3);
-      border: 2px solid #28a745;
+      transform: translateY(-6px); 
+      box-shadow: 0 12px 30px rgba(40,167,69,0.3);
+      border-color: #28a745;
     }
     .stat-card:active {
       transform: translateY(-2px) scale(0.98);
-      box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+      box-shadow: 0 5px 15px rgba(40,167,69,0.4);
     }
+    .stat-card .card-arrow {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: #ccc; font-size: 13px; transition: all .3s; opacity: 0;
+    }
+    .stat-card:hover .card-arrow { opacity: 1; color: #28a745; right: 10px; }
     
     .stat-icon {
       width: 60px; height: 60px; border-radius: 10px;
@@ -195,7 +212,7 @@ try {
       <p style="margin: 5px 0 0 0; opacity: 0.9;">Welcome back, <?php echo htmlspecialchars($fullName); ?>!</p>
     </div>
     <div class="user-info">
-      <span><i class="fa fa-chalkboard-teacher"></i> Teacher</span>
+      <a href="../pages/teacher-profile.php" style="color:white;text-decoration:none;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);padding:8px 16px;border-radius:5px;transition:.2s" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'"><i class="fa fa-chalkboard-teacher"></i> Teacher</a>
       <a href="../includes/logout.php" class="logout-btn">
         <i class="fa fa-sign-out-alt"></i> Logout
       </a>
@@ -209,14 +226,16 @@ try {
         <h3><?php echo $totalStudents; ?></h3>
         <p>Total Students</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
-    <div class="stat-card" onclick="window.location.href='../pages/teacher-classes.php'">
+    <div class="stat-card" onclick="window.location.href='../pages/teacher-materials.php'">
       <div class="stat-icon blue"><i class="fa fa-book"></i></div>
       <div class="stat-info">
-        <h3>5</h3>
-        <p>Classes Teaching</p>
+        <h3><?php echo $materialsCount; ?></h3>
+        <p>Course Materials</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
     <div class="stat-card" onclick="window.location.href='../pages/teacher-assignments.php'">
@@ -225,72 +244,67 @@ try {
         <h3><?php echo $pendingAssign; ?></h3>
         <p>Assignments</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
 
     <div class="stat-card" onclick="window.location.href='../pages/teacher-schedule.php'">
       <div class="stat-icon purple"><i class="fa fa-calendar"></i></div>
       <div class="stat-info">
-        <h3>4</h3>
-        <p>Classes Today</p>
+        <h3><?php echo $totalStudents; ?></h3>
+        <p>Active Students</p>
       </div>
+      <i class="fa fa-chevron-right card-arrow"></i>
     </div>
   </div>
 
   <div class="content-grid">
     <div class="card">
-      <h2><i class="fa fa-book-open"></i> My Classes</h2>
+      <h2><i class="fa fa-book-open"></i> My Assignments</h2>
+      <?php
+      try {
+          $db2 = getDBConnection();
+          $aStmt = $db2->prepare("SELECT * FROM assignments WHERE created_by=? ORDER BY due_date ASC LIMIT 5");
+          $aStmt->execute([$teacherId]);
+          $myAssignments = $aStmt->fetchAll();
+      } catch(Exception $e) { $myAssignments = []; }
+      ?>
       <ul class="class-list">
-        <li class="class-item">
+        <?php if (empty($myAssignments)): ?>
+        <li class="class-item"><span style="color:#999">No assignments created yet.</span></li>
+        <?php else: ?>
+        <?php foreach ($myAssignments as $a): ?>
+        <li class="class-item" onclick="window.location.href='../pages/teacher-assignments.php'" style="cursor:pointer;transition:.2s" onmouseover="this.style.background='#f0fff4'" onmouseout="this.style.background=''">
           <div>
-            <div class="class-name">Programming Fundamentals</div>
-            <small style="color: #666;">B.Tech IT - Semester 1</small>
+            <div class="class-name"><?=htmlspecialchars($a['title'])?></div>
+            <small style="color:#666">Due: <?=date('M d, Y', strtotime($a['due_date']))?> &nbsp;|&nbsp; <?=htmlspecialchars($a['subject'] ?? 'General')?></small>
           </div>
-          <span class="class-badge">35 Students</span>
+          <span class="class-badge"><?=strtotime($a['due_date']) > time() ? 'Active' : 'Overdue'?></span>
         </li>
-        <li class="class-item">
-          <div>
-            <div class="class-name">Database Management</div>
-            <small style="color: #666;">B.Tech IT - Semester 3</small>
-          </div>
-          <span class="class-badge">28 Students</span>
-        </li>
-        <li class="class-item">
-          <div>
-            <div class="class-name">Web Development</div>
-            <small style="color: #666;">Diploma Civil - Semester 2</small>
-          </div>
-          <span class="class-badge">32 Students</span>
-        </li>
-        <li class="class-item">
-          <div>
-            <div class="class-name">Data Structures</div>
-            <small style="color: #666;">B.Tech IT - Semester 2</small>
-          </div>
-          <span class="class-badge">25 Students</span>
-        </li>
+        <?php endforeach; ?>
+        <?php endif; ?>
       </ul>
+      <div style="margin-top:12px;text-align:right">
+        <a href="../pages/teacher-assignments.php" style="color:#28a745;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All Assignments</a>
+      </div>
     </div>
 
     <div class="card">
-      <h2><i class="fa fa-clock"></i> Today's Schedule</h2>
+      <h2><i class="fa fa-bullhorn"></i> Recent Notices</h2>
       <ul class="schedule-list">
-        <li class="schedule-item">
-          <div class="schedule-time">9:00 AM - 10:30 AM</div>
-          <div class="schedule-class">Programming Fundamentals</div>
+        <?php if (empty($notices)): ?>
+        <li class="schedule-item"><div class="schedule-class" style="color:#999">No notices yet.</div></li>
+        <?php else: ?>
+        <?php foreach ($notices as $n): ?>
+        <li class="schedule-item" onclick="window.location.href='../index.php?page=notices'" style="cursor:pointer;transition:.2s" onmouseover="this.style.background='#e8f5e9'" onmouseout="this.style.background='#f8f9fa'">
+          <div class="schedule-time"><?=timeAgo($n['created_at'])?></div>
+          <div class="schedule-class"><?=htmlspecialchars($n['title'])?></div>
         </li>
-        <li class="schedule-item">
-          <div class="schedule-time">11:00 AM - 12:30 PM</div>
-          <div class="schedule-class">Database Management</div>
-        </li>
-        <li class="schedule-item">
-          <div class="schedule-time">1:30 PM - 3:00 PM</div>
-          <div class="schedule-class">Web Development</div>
-        </li>
-        <li class="schedule-item">
-          <div class="schedule-time">3:30 PM - 5:00 PM</div>
-          <div class="schedule-class">Data Structures</div>
-        </li>
+        <?php endforeach; ?>
+        <?php endif; ?>
       </ul>
+      <div style="margin-top:12px;text-align:right">
+        <a href="../index.php?page=notices" style="color:#28a745;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All Notices</a>
+      </div>
     </div>
   </div>
 

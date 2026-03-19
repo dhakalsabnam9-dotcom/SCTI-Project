@@ -19,7 +19,7 @@ $username    = $s['username']    ?? ($_SESSION['username']  ?? 'student');
 $email       = $s['email']       ?? '—';
 $phone       = $s['phone']       ?? '—';
 $address     = $s['address']     ?? '—';
-$program     = $s['program']     ?? '—';
+$program     = $s['course']      ?? '—';
 $semester    = $s['semester']    ?? '—';
 $studentDbId = $s['student_id']  ?? '—';
 $status      = ucfirst($s['status'] ?? 'active');
@@ -48,10 +48,15 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
     .profile-name{font-size:22px;font-weight:700;color:#333;margin-bottom:5px}
     .profile-role{display:inline-block;background:#cce5ff;color:#004080;padding:5px 15px;border-radius:20px;font-size:13px;margin-bottom:20px}
     .profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-    .pstat{background:#f8f9fa;border-radius:8px;padding:12px}
+    .pstat{background:#f8f9fa;border-radius:8px;padding:12px;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);border:2px solid transparent;position:relative;overflow:hidden;text-decoration:none;display:block}
+    .pstat:hover{background:#e8f0fe;border-color:#004080;transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,64,128,.15)}
+    .pstat:active{transform:translateY(0)}
+    .pstat::after{content:'\f054';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#004080;opacity:0;transition:.2s}
+    .pstat:hover::after{opacity:1}
     .pstat .num{font-size:16px;font-weight:700;color:#004080}
     .pstat .lbl{font-size:11px;color:#666}
-    .info-card{background:white;border-radius:10px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:20px}
+    .info-card{background:white;border-radius:10px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:20px;transition:box-shadow .25s,transform .25s}
+    .info-card:hover{box-shadow:0 8px 28px rgba(0,64,128,.13);transform:translateY(-2px)}
     .info-card h3{color:#004080;margin-bottom:20px;font-size:18px;border-bottom:2px solid #f0f0f0;padding-bottom:10px;display:flex;justify-content:space-between;align-items:center}
     .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
     .info-item label{display:block;font-size:12px;color:#999;margin-bottom:4px;text-transform:uppercase}
@@ -97,10 +102,10 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
         <div class="profile-name"><?=htmlspecialchars($fullName)?></div>
         <div class="profile-role">Student</div>
         <div class="profile-stats">
-          <div class="pstat"><div class="num"><?=htmlspecialchars($studentDbId)?></div><div class="lbl">Student ID</div></div>
-          <div class="pstat"><div class="num"><?=htmlspecialchars($semester !== '—' ? $semester : '—')?></div><div class="lbl">Semester</div></div>
-          <div class="pstat"><div class="num"><?=$status?></div><div class="lbl">Status</div></div>
-          <div class="pstat"><div class="num"><?=htmlspecialchars($program !== '—' ? substr($program,0,6) : '—')?></div><div class="lbl">Program</div></div>
+          <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($studentDbId)?></div><div class="lbl">Student ID</div></a>
+          <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($semester !== '—' ? $semester : '—')?></div><div class="lbl">Semester</div></a>
+          <a class="pstat" href="student-attendance.php" title="View Attendance"><div class="num"><?=$status?></div><div class="lbl">Status</div></a>
+          <a class="pstat" href="student-courses.php" title="View Program"><div class="num"><?=htmlspecialchars($program !== '—' ? substr($program,0,6) : '—')?></div><div class="lbl">Program</div></a>
         </div>
       </div>
     </div>

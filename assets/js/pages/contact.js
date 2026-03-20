@@ -119,9 +119,9 @@ const contactPage = `
         <div class="cp-panel">
           <div class="cp-panel-title"><i class="fa fa-share-nodes"></i> Follow Us</div>
           <div class="cp-social-row">
-            <a href="#" class="cp-social-btn cp-social-fb"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <a href="https://www.facebook.com/SCTISINDHULI/" target="_blank" class="cp-social-btn cp-social-fb"><i class="fab fa-facebook-f"></i> Facebook</a>
             <a href="#" class="cp-social-btn cp-social-tw"><i class="fab fa-twitter"></i> Twitter</a>
-            <a href="#" class="cp-social-btn cp-social-yt"><i class="fab fa-youtube"></i> YouTube</a>
+            <a href="https://www.tiktok.com/@scti_sindhuli/video/7528023104916966663" target="_blank" class="cp-social-btn cp-social-yt" style="background:#010101"><i class="fab fa-tiktok"></i> TikTok</a>
           </div>
         </div>
         <div class="cp-panel">

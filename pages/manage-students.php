@@ -163,8 +163,11 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     <hr class="divider">
 
     <div class="fg">
-      <label>Email</label>
-      <input type="email" id="fEmail" class="fc" placeholder="student@scti.edu.np">
+      <label>Email <span class="auto-badge"><i class="fa fa-magic"></i> Auto</span></label>
+      <div class="input-group">
+        <input type="email" id="fEmail" class="fc" placeholder="student@scti.edu.np">
+        <button class="ig-btn" onclick="genEmail()" title="Regenerate Email"><i class="fa fa-sync"></i></button>
+      </div>
     </div>
     <div class="frow">
       <div class="fg">
@@ -245,6 +248,7 @@ var allStudents = [];
 function autoGenerate() {
   genStudentId();
   genUsername();
+  genEmail();
   if (!document.getElementById('fPassword').value) genPassword();
   updateCredBox();
 }
@@ -288,6 +292,13 @@ function genUsername() {
   base = base.replace(/[^a-z0-9.]/g, '');
   document.getElementById('fUsername').value = base || 'student' + Math.floor(Math.random()*999);
   updateCredBox();
+}
+
+function genEmail() {
+  var username = document.getElementById('fUsername').value.trim();
+  if (username) {
+    document.getElementById('fEmail').value = username + '@student.scti.edu.np';
+  }
 }
 
 function genPassword() {

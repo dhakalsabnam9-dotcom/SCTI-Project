@@ -7,6 +7,29 @@ require_once '../includes/config.php';
 
 $studentId = intval($_SESSION['user_id'] ?? 0);
 
+function renderUploadForm($aid) {
+    ob_start(); ?>
+    <form id="form-<?=$aid?>" onsubmit="event.preventDefault(); submitWork(<?=$aid?>)">
+      <input type="hidden" name="assignment_id" value="<?=$aid?>">
+      <div class="upload-area" onclick="document.getElementById('file-<?=$aid?>').click()">
+        <i class="fa fa-cloud-upload-alt"></i>
+        <p>Click to upload file (PDF, DOC, DOCX, TXT, ZIP, Image)</p>
+        <p style="font-size:11px;margin-top:4px">Max 10MB</p>
+        <input type="file" id="file-<?=$aid?>" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip,.rar" onchange="previewFile(this, <?=$aid?>)">
+      </div>
+      <div class="file-preview" id="fp-<?=$aid?>">
+        <i class="fa fa-paperclip"></i>
+        <span class="fp-name"></span>
+        <span style="margin-left:auto;cursor:pointer;color:#dc3545" onclick="document.getElementById('file-<?=$aid?>').value='';document.getElementById('fp-<?=$aid?>').style.display='none'"><i class="fa fa-times"></i></span>
+      </div>
+      <textarea class="notes-input" name="notes" placeholder="Add a note to your teacher (optional)..."></textarea>
+      <button type="submit" class="btn-submit-work">
+        <i class="fa fa-paper-plane"></i> Submit Assignment
+      </button>
+    </form>
+    <?php return ob_get_clean();
+}
+
 try {
     $db = getDBConnection();
     $assignments = $db->prepare(
@@ -275,7 +298,6 @@ function isOverdue($due) { return strtotime($due) < time(); }
             </button>
           </div>
           <div id="upload-<?=$aid?>" style="display:none;margin-top:10px">
-            <?php include_once 'upload-form-partial.php'; // inline below ?>
             <?= renderUploadForm($aid) ?>
           </div>
 
@@ -366,27 +388,3 @@ function showToast(msg, err) {
 </script>
 </body>
 </html>
-<?php
-function renderUploadForm($aid) {
-    ob_start(); ?>
-    <form id="form-<?=$aid?>" onsubmit="event.preventDefault(); submitWork(<?=$aid?>)">
-      <input type="hidden" name="assignment_id" value="<?=$aid?>">
-      <div class="upload-area" onclick="document.getElementById('file-<?=$aid?>').click()">
-        <i class="fa fa-cloud-upload-alt"></i>
-        <p>Click to upload file (PDF, DOC, DOCX, TXT, ZIP, Image)</p>
-        <p style="font-size:11px;margin-top:4px">Max 10MB</p>
-        <input type="file" id="file-<?=$aid?>" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip,.rar" onchange="previewFile(this, <?=$aid?>)">
-      </div>
-      <div class="file-preview" id="fp-<?=$aid?>">
-        <i class="fa fa-paperclip"></i>
-        <span class="fp-name"></span>
-        <span style="margin-left:auto;cursor:pointer;color:#dc3545" onclick="document.getElementById('file-<?=$aid?>').value='';document.getElementById('fp-<?=$aid?>').style.display='none'"><i class="fa fa-times"></i></span>
-      </div>
-      <textarea class="notes-input" name="notes" placeholder="Add a note to your teacher (optional)..."></textarea>
-      <button type="submit" class="btn-submit-work">
-        <i class="fa fa-paper-plane"></i> Submit Assignment
-      </button>
-    </form>
-    <?php return ob_get_clean();
-}
-?>

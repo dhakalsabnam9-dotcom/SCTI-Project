@@ -77,11 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $updateError = $ex->getMessage();
                         }
 
+                        // First-login check: if last_login is NULL, force password change (students & teachers only)
+                        $isFirstLogin = in_array($userType, ['student','teacher']) && empty($user['last_login']);
+                        $finalRedirect = $isFirstLogin ? '../pages/first-login-password.php' : $redirect;
+
                         if ($isAjax) {
                             header('Content-Type: application/json');
                             echo json_encode([
                                 'success'       => true,
-                                'redirect'      => $redirect,
+                                'redirect'      => $finalRedirect,
                                 'userType'      => $userType,
                                 'update_result' => $updateResult,
                                 'update_error'  => $updateError,
@@ -90,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             ]);
                             exit();
                         }
-                        header("Location: " . $redirect);
+                        header("Location: " . $finalRedirect);
                         exit();
                     } else {
                         $error = "Invalid username or password!";

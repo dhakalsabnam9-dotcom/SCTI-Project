@@ -307,6 +307,10 @@ function timeAgo($dt) {
         <i class="fa fa-calendar-check"></i>
         <span>Mark Attendance</span>
       </a>
+      <a href="../pages/teacher-attendance-chart.php" class="quick-link">
+        <i class="fa fa-chart-bar"></i>
+        <span>Attendance Charts</span>
+      </a>
       <a href="../pages/teacher-grades.php" class="quick-link">
         <i class="fa fa-chart-line"></i>
         <span>Enter Grades</span>

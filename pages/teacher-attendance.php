@@ -3,306 +3,366 @@ session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
 }
+$teacherName = $_SESSION['full_name'] ?? 'Teacher';
+$teacherId   = $_SESSION['user_id']   ?? 0;
 require_once '../includes/config.php';
 try {
     $db = getDBConnection();
     $students = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
 } catch(Exception $e) { $students = []; }
-$today = date('Y-m-d');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Mark Attendance | SCTI Teacher Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',sans-serif;background:#f5f7fa}
-    .top-header{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:10px 0;text-align:center;font-size:14px}
-    .container{max-width:1400px;margin:0 auto;padding:20px}
-    .page-header{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:30px;border-radius:10px;margin-bottom:30px;box-shadow:0 4px 15px rgba(40,167,69,.2)}
-    .page-header h1{margin:0 0 8px;font-size:28px}
-    .breadcrumb{font-size:14px}
-    .breadcrumb a{color:white;text-decoration:none}
-    .controls{background:white;padding:22px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
-    .ctrl-group label{display:block;margin-bottom:7px;color:#555;font-weight:600;font-size:13px}
-    .ctrl-input{width:100%;padding:11px 14px;border:2px solid #dee2e6;border-radius:7px;font-size:14px;font-family:inherit}
-    .ctrl-input:focus{outline:none;border-color:#28a745}
-    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:24px}
-    .sum-box{background:white;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);text-align:center}
-    .sum-box h3{font-size:32px;margin:8px 0;font-weight:800}
-    .sum-box p{font-size:13px;color:#888}
-    .sum-present h3{color:#28a745}
-    .sum-absent h3{color:#dc3545}
-    .sum-late h3{color:#ffc107}
-    .sum-rate h3{color:#004080}
-    .table-wrap{background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
-    .att-table{width:100%;border-collapse:collapse}
-    .att-table th{background:#f8f9fa;padding:14px 16px;text-align:left;color:#333;font-weight:700;font-size:13px;border-bottom:2px solid #dee2e6}
-    .att-table td{padding:13px 16px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-    .att-table tr:last-child td{border-bottom:none}
-    .att-table tbody tr:hover{background:#f8fffe}
-    .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#28a745,#20c997);display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;flex-shrink:0}
-    .stu-info{display:flex;align-items:center;gap:10px}
-    .att-btns{display:flex;gap:7px}
-    .att-btn{padding:8px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s;display:inline-flex;align-items:center;gap:5px}
-    .btn-present{background:#d4edda;color:#155724}
-    .btn-present.active,.btn-present:hover{background:#28a745;color:white}
-    .btn-absent{background:#f8d7da;color:#721c24}
-    .btn-absent.active,.btn-absent:hover{background:#dc3545;color:white}
-    .btn-late{background:#fff3cd;color:#856404}
-    .btn-late.active,.btn-late:hover{background:#ffc107;color:#333}
-    .remark-input{padding:8px 10px;border:1px solid #dee2e6;border-radius:5px;width:100%;font-size:13px;font-family:inherit}
-    .remark-input:focus{outline:none;border-color:#28a745}
-    .save-wrap{text-align:center;padding:28px}
-    .save-btn{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:14px 44px;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:700;transition:.2s;display:inline-flex;align-items:center;gap:10px}
-    .save-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(40,167,69,.35)}
-    .save-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .toast{display:none;position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
-    .toast.show{display:flex;animation:tIn .3s ease}
-    .toast-ok{background:#28a745;color:white}
-    .toast-err{background:#dc3545;color:white}
-    @keyframes tIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .footer{background:#2c3e50;color:white;text-align:center;padding:20px;border-radius:10px;margin-top:30px}
-    @media(max-width:600px){.summary{grid-template-columns:1fr 1fr}.att-btns{flex-direction:column}}
-  </style>
+<meta charset="UTF-8">
+<title>Mark Attendance | SCTI Teacher</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
+.top-bar{background:#00264d;color:white;padding:7px 20px;font-size:13px}
+.pg-header{background:linear-gradient(135deg,#28a745,#20c997);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 18px rgba(40,167,69,.25)}
+.pg-header h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 3px}
+.pg-header .bc{font-size:12px;color:rgba(255,255,255,.75)}
+.pg-header .bc a{color:#fff;text-decoration:none}
+.hdr-btns{display:flex;gap:8px}
+.btn-hdr{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;transition:.2s;text-decoration:none}
+.btn-hdr.ghost{background:rgba(255,255,255,.18);color:#fff}
+.btn-hdr.ghost:hover{background:rgba(255,255,255,.32)}
+.btn-hdr.chart{background:rgba(255,255,255,.9);color:#28a745}
+.btn-hdr.chart:hover{background:#fff}
+.wrap{max-width:1100px;margin:28px auto;padding:0 20px 60px}
+/* Controls */
+.ctrl-bar{background:white;border-radius:14px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:22px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.ctrl-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px}
+.ctrl-group label{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px}
+.ctrl-group input,.ctrl-group select{padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s}
+.ctrl-group input:focus,.ctrl-group select:focus{outline:none;border-color:#28a745;box-shadow:0 0 0 3px rgba(40,167,69,.1)}
+.btn-load{padding:10px 22px;background:linear-gradient(135deg,#28a745,#20c997);color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;white-space:nowrap;align-self:flex-end}
+.btn-load:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(40,167,69,.35)}
+/* Stats bar */
+.stats-row{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.stat-pill{flex:1;min-width:100px;background:white;border-radius:12px;padding:14px 18px;box-shadow:0 2px 10px rgba(0,0,0,.07);text-align:center}
+.stat-pill .sv{font-size:26px;font-weight:800;line-height:1}
+.stat-pill .sl{font-size:11px;color:#888;margin-top:3px;font-weight:600}
+.sp-total{border-top:4px solid #6c757d}.sp-total .sv{color:#495057}
+.sp-present{border-top:4px solid #28a745}.sp-present .sv{color:#28a745}
+.sp-absent{border-top:4px solid #dc3545}.sp-absent .sv{color:#dc3545}
+.sp-late{border-top:4px solid #fd7e14}.sp-late .sv{color:#fd7e14}
+/* Table */
+.att-table-wrap{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden}
+.att-table-head{background:linear-gradient(135deg,#28a745,#20c997);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;color:white}
+.att-table-head h3{margin:0;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.bulk-btns{display:flex;gap:8px}
+.bulk-btn{padding:7px 14px;border:2px solid rgba(255,255,255,.5);background:transparent;color:white;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s}
+.bulk-btn:hover{background:rgba(255,255,255,.2)}
+.bulk-btn.all-present{border-color:#a7f3d0;color:#a7f3d0}
+.bulk-btn.all-absent{border-color:#fca5a5;color:#fca5a5}
+table{width:100%;border-collapse:collapse}
+thead th{background:#f8fffe;padding:12px 16px;text-align:left;font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e8f5e9}
+tbody tr{border-bottom:1px solid #f0f0f0;transition:.15s}
+tbody tr:hover{background:#f8fffe}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 16px;font-size:13px;color:#333;vertical-align:middle}
+.student-name{font-weight:700;color:#1a202c}
+.student-meta{font-size:11px;color:#888;margin-top:2px}
+/* Status radio buttons */
+.status-group{display:flex;gap:6px;flex-wrap:wrap}
+.status-radio{display:none}
+.status-label{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid #e0e6ef;color:#666;transition:.2s;white-space:nowrap}
+.status-radio:checked + .status-label{border-color:transparent;color:white}
+.status-radio.r-present:checked + .status-label{background:#28a745}
+.status-radio.r-absent:checked  + .status-label{background:#dc3545}
+.status-radio.r-late:checked   + .status-label{background:#fd7e14}
+.status-label:hover{transform:translateY(-1px)}
+/* Late reason input */
+.late-reason-wrap{display:none;margin-top:6px}
+.late-reason-wrap input{width:100%;padding:7px 11px;border:2px solid #fed7aa;border-radius:8px;font-size:12px;font-family:inherit;outline:none;transition:.2s}
+.late-reason-wrap input:focus{border-color:#fd7e14;box-shadow:0 0 0 3px rgba(253,126,20,.1)}
+/* Remarks */
+.remarks-input{width:100%;padding:7px 11px;border:2px solid #e0e6ef;border-radius:8px;font-size:12px;font-family:inherit;outline:none;transition:.2s}
+.remarks-input:focus{border-color:#28a745;box-shadow:0 0 0 3px rgba(40,167,69,.1)}
+/* Save bar */
+.save-bar{position:sticky;bottom:0;background:white;border-top:2px solid #e8f5e9;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -4px 18px rgba(0,0,0,.08)}
+.save-info{font-size:13px;color:#666}
+.btn-save{padding:12px 32px;background:linear-gradient(135deg,#28a745,#20c997);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.2s}
+.btn-save:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(40,167,69,.4)}
+.btn-save:disabled{opacity:.6;cursor:not-allowed;transform:none}
+/* Alert */
+.alert{padding:12px 18px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;align-items:center;gap:10px}
+.alert.ok{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
+.alert.err{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:#aaa}
+.empty-state i{font-size:56px;display:block;margin-bottom:14px;color:#d1fae5}
+/* Search */
+.search-bar{padding:12px 24px;border-bottom:1px solid #f0f0f0;background:#fafffe}
+.search-bar input{width:100%;padding:9px 14px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;outline:none;transition:.2s}
+.search-bar input:focus{border-color:#28a745}
+/* Already marked badge */
+.marked-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:#d1fae5;color:#065f46}
+footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:13px;margin-top:40px}
+@media(max-width:700px){.ctrl-bar{flex-direction:column}.status-group{gap:4px}.status-label{padding:5px 10px;font-size:11px}td{padding:10px 10px}thead th{padding:10px 10px}}
+</style>
 </head>
 <body>
-<div class="top-header">Attendance Management — Mark and save student attendance</div>
-<div class="container">
-  <div class="page-header">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
-      <div>
-        <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
-        <div class="breadcrumb"><a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Attendance</div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button onclick="showTab('mark')" id="tabMark" style="background:rgba(255,255,255,.9);color:#28a745;border:none;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px"><i class="fa fa-edit"></i> Mark</button>
-        <button onclick="showTab('history')" id="tabHistory" style="background:rgba(255,255,255,.2);color:white;border:2px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px"><i class="fa fa-history"></i> History</button>
-      </div>
-    </div>
+<div class="top-bar"><marquee>SCTI Teacher Portal â€” Mark Attendance</marquee></div>
+<div class="pg-header">
+  <div>
+    <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
+    <div class="bc"><a href="../dashboards/teacher-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Attendance</div>
   </div>
+  <div class="hdr-btns">
+    <a href="teacher-attendance-chart.php" class="btn-hdr chart"><i class="fa fa-chart-bar"></i> View Charts</a>
+    <a href="../dashboards/teacher-dashboard.php" class="btn-hdr ghost"><i class="fa fa-arrow-left"></i> Back</a>
+  </div>
+</div>
 
-  <div id="sectionMark">
-  <div class="controls">
+<div class="wrap">
+  <div id="alertBox" class="alert"></div>
+
+  <!-- Controls -->
+  <div class="ctrl-bar">
     <div class="ctrl-group">
-      <label><i class="fa fa-book"></i> Class / Course</label>
-      <input type="text" class="ctrl-input" id="className" placeholder="e.g. Database Management" list="courseList">
-      <datalist id="courseList">
-        <?php $courses = array_unique(array_column($students,'course')); foreach($courses as $c) if($c) echo '<option value="'.htmlspecialchars($c).'">'; ?>
+      <label><i class="fa fa-calendar"></i> Date</label>
+      <input type="date" id="attDate" value="<?= date('Y-m-d') ?>">
+    </div>
+    <div class="ctrl-group">
+      <label><i class="fa fa-chalkboard"></i> Class / Subject</label>
+      <input type="text" id="attClass" placeholder="e.g. BIT Semester 1 â€” Math" list="classSuggestions">
+      <datalist id="classSuggestions">
+        <option value="BIT Semester 1">
+        <option value="BIT Semester 2">
+        <option value="BIT Semester 3">
+        <option value="BIT Semester 4">
+        <option value="BIT Semester 5">
+        <option value="BIT Semester 6">
+        <option value="CTEVT IT">
+        <option value="General Class">
       </datalist>
     </div>
     <div class="ctrl-group">
-      <label><i class="fa fa-calendar"></i> Date</label>
-      <input type="date" class="ctrl-input" id="attDate" value="<?=$today?>">
-    </div>
-    <div class="ctrl-group">
-      <label><i class="fa fa-clock"></i> Period</label>
-      <select class="ctrl-input" id="attPeriod">
-        <option>9:00 AM - 10:30 AM</option>
-        <option>11:00 AM - 12:30 PM</option>
-        <option>1:30 PM - 3:00 PM</option>
-        <option>3:30 PM - 5:00 PM</option>
+      <label><i class="fa fa-clock"></i> Period (optional)</label>
+      <select id="attPeriod">
+        <option value="">â€” Select Period â€”</option>
+        <option value="1st Period">1st Period</option>
+        <option value="2nd Period">2nd Period</option>
+        <option value="3rd Period">3rd Period</option>
+        <option value="4th Period">4th Period</option>
+        <option value="5th Period">5th Period</option>
+        <option value="6th Period">6th Period</option>
+        <option value="Full Day">Full Day</option>
       </select>
     </div>
+    <button class="btn-load" onclick="loadStudents()"><i class="fa fa-users"></i> Load Students</button>
   </div>
 
-  <div class="summary">
-    <div class="sum-box sum-present"><i class="fa fa-check-circle" style="font-size:22px;color:#28a745"></i><h3 id="cntPresent">0</h3><p>Present</p></div>
-    <div class="sum-box sum-absent"><i class="fa fa-times-circle" style="font-size:22px;color:#dc3545"></i><h3 id="cntAbsent">0</h3><p>Absent</p></div>
-    <div class="sum-box sum-late"><i class="fa fa-clock" style="font-size:22px;color:#ffc107"></i><h3 id="cntLate">0</h3><p>Late</p></div>
-    <div class="sum-box sum-rate"><i class="fa fa-percent" style="font-size:22px;color:#004080"></i><h3 id="cntRate">0%</h3><p>Attendance Rate</p></div>
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-pill sp-total"><div class="sv" id="stTotal">0</div><div class="sl">Total</div></div>
+    <div class="stat-pill sp-present"><div class="sv" id="stPresent">0</div><div class="sl">Present</div></div>
+    <div class="stat-pill sp-absent"><div class="sv" id="stAbsent">0</div><div class="sl">Absent</div></div>
+    <div class="stat-pill sp-late"><div class="sv" id="stLate">0</div><div class="sl">Late</div></div>
   </div>
 
-  <div class="table-wrap">
-    <table class="att-table">
-      <thead>
-        <tr><th>Roll No.</th><th>Student Name</th><th>Student ID</th><th>Mark Attendance</th><th>Remarks</th></tr>
-      </thead>
-      <tbody>
-        <?php if(empty($students)): ?>
-        <tr><td colspan="5" style="text-align:center;padding:50px;color:#aaa">No students found in database.</td></tr>
-        <?php else: foreach($students as $i=>$s):
-          $parts = explode(' ', $s['full_name']);
-          $initials = strtoupper(substr($parts[0],0,1).(count($parts)>1?substr($parts[count($parts)-1],0,1):''));
-        ?>
-        <tr>
-          <td><?=$i+1?></td>
-          <td><div class="stu-info"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
-          <td><?=htmlspecialchars($s['student_id'])?></td>
-          <td>
-            <div class="att-btns" data-student-id="<?=$s['id']?>" data-student-db-id="<?=htmlspecialchars($s['student_id'])?>">
-              <button class="att-btn btn-present active" onclick="setAtt(this,'present')"><i class="fa fa-check"></i> Present</button>
-              <button class="att-btn btn-absent" onclick="setAtt(this,'absent')"><i class="fa fa-times"></i> Absent</button>
-              <button class="att-btn btn-late" onclick="setAtt(this,'late')"><i class="fa fa-clock"></i> Late</button>
-            </div>
-          </td>
-          <td><input type="text" class="remark-input" placeholder="Add remarks..."></td>
-        </tr>
-        <?php endforeach; endif; ?>
-      </tbody>
-    </table>
-    <div class="save-wrap">
-      <button class="save-btn" id="saveBtn" onclick="saveAttendance()"><i class="fa fa-save"></i> Save Attendance</button>
-    </div>
-  </div>
-  </div><!-- end sectionMark -->
-
-  <!-- HISTORY SECTION -->
-  <div id="sectionHistory" style="display:none">
-    <div style="background:white;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-      <div>
-        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Filter by Date</label>
-        <input type="date" id="histDate" class="ctrl-input" style="width:180px">
+  <!-- Table -->
+  <div class="att-table-wrap">
+    <div class="att-table-head">
+      <h3><i class="fa fa-list-check"></i> Student Attendance List</h3>
+      <div class="bulk-btns">
+        <button class="bulk-btn all-present" onclick="markAll('present')"><i class="fa fa-check"></i> All Present</button>
+        <button class="bulk-btn all-absent"  onclick="markAll('absent')"><i class="fa fa-times"></i> All Absent</button>
       </div>
-      <div>
-        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Filter by Class</label>
-        <input type="text" id="histClass" class="ctrl-input" placeholder="Class name..." style="width:200px">
-      </div>
-      <button onclick="loadHistory()" style="padding:11px 20px;background:linear-gradient(135deg,#28a745,#20c997);color:white;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px"><i class="fa fa-search"></i> Search</button>
     </div>
-    <div class="table-wrap">
-      <table class="att-table">
-        <thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Period</th><th>Status</th><th>Remarks</th></tr></thead>
-        <tbody id="histBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#aaa">Click Search to load history</td></tr></tbody>
-      </table>
+    <div class="search-bar">
+      <input type="text" id="searchStudent" placeholder="Search student by name or ID..." oninput="filterStudents(this.value)">
+    </div>
+    <div id="tableWrap">
+      <div class="empty-state">
+        <i class="fa fa-calendar-check"></i>
+        <p>Select a date and class, then click <strong>Load Students</strong></p>
+      </div>
+    </div>
+    <div class="save-bar">
+      <div class="save-info" id="saveInfo">No attendance loaded</div>
+      <button class="btn-save" id="btnSave" onclick="saveAttendance()" disabled>
+        <i class="fa fa-save"></i> Save Attendance
+      </button>
     </div>
   </div>
 </div>
-<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
 
-<div class="toast toast-ok" id="toastOk"><i class="fa fa-check-circle"></i><span id="toastOkMsg">Saved!</span></div>
-<div class="toast toast-err" id="toastErr"><i class="fa fa-times-circle"></i><span id="toastErrMsg">Error</span></div>
+<footer>Â© 2025 SCTI â€” Teacher Portal</footer>
 
 <script>
-function setAtt(btn, status) {
-  var group = btn.parentElement;
-  group.querySelectorAll('.att-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  updateSummary();
+var allStudents = [];
+var existingMap = {};
+
+function loadStudents() {
+  var date  = document.getElementById('attDate').value;
+  var cls   = document.getElementById('attClass').value.trim();
+  if (!date || !cls) { showAlert('Please enter both date and class name.','err'); return; }
+
+  document.getElementById('tableWrap').innerHTML = '<div class="empty-state"><i class="fa fa-spinner fa-spin" style="color:#28a745"></i><p>Loading students...</p></div>';
+  document.getElementById('btnSave').disabled = true;
+
+  // Load students + existing attendance in parallel
+  Promise.all([
+    fetch('attendance-data.php?action=students').then(r=>r.json()),
+    fetch('attendance-data.php?action=existing&date='+encodeURIComponent(date)+'&class='+encodeURIComponent(cls)).then(r=>r.json())
+  ]).then(function(results) {
+    var sRes = results[0], eRes = results[1];
+    if (!sRes.success) { showAlert(sRes.message||'Failed to load students','err'); return; }
+    allStudents = sRes.students || [];
+    existingMap = (eRes.success && eRes.records) ? eRes.records : {};
+    renderTable(allStudents);
+    updateStats();
+    document.getElementById('btnSave').disabled = allStudents.length === 0;
+    document.getElementById('saveInfo').textContent = allStudents.length + ' students loaded for ' + date;
+  }).catch(function(e){ showAlert('Network error: '+e.message,'err'); });
 }
 
-function updateSummary() {
-  var p=0,a=0,l=0;
-  document.querySelectorAll('.att-btns').forEach(function(g){
-    var active = g.querySelector('.att-btn.active');
-    if (!active) return;
-    if (active.classList.contains('btn-present')) p++;
-    else if (active.classList.contains('btn-absent')) a++;
-    else if (active.classList.contains('btn-late')) l++;
+function renderTable(list) {
+  if (!list.length) {
+    document.getElementById('tableWrap').innerHTML = '<div class="empty-state"><i class="fa fa-user-slash"></i><p>No active students found.</p></div>';
+    return;
+  }
+  var html = '<table><thead><tr>'
+    + '<th>#</th><th>Student</th><th>Status</th><th>Late Reason</th><th>Remarks</th>'
+    + '</tr></thead><tbody>';
+
+  list.forEach(function(s, i) {
+    var ex      = existingMap[s.id] || {};
+    var status  = ex.status || 'present';
+    var lr      = ex.late_reason || '';
+    var remarks = ex.remarks || '';
+    var lrStyle = status === 'late' ? 'display:block' : 'display:none';
+
+    html += '<tr id="row_'+s.id+'">'
+      + '<td style="color:#aaa;font-size:12px">'+(i+1)+'</td>'
+      + '<td><div class="student-name">'+esc(s.full_name)+'</div>'
+      +   '<div class="student-meta">'+esc(s.student_id)+' &nbsp;|&nbsp; '+esc(s.course||'')+(s.semester?' &nbsp;Sem '+esc(s.semester):'')+'</div>'
+      + '</td>'
+      + '<td>'
+      +   '<div class="status-group">'
+      +     radioBtn(s.id,'present',status)+' '
+      +     radioBtn(s.id,'absent', status)+' '
+      +     radioBtn(s.id,'late',   status)
+      +   '</div>'
+      + '</td>'
+      + '<td><div class="late-reason-wrap" id="lr_'+s.id+'" style="'+lrStyle+'">'
+      +   '<input type="text" id="lrInput_'+s.id+'" placeholder="Reason for being late..." value="'+esc(lr)+'" oninput="updateStats()">'
+      + '</div></td>'
+      + '<td><input type="text" class="remarks-input" id="rem_'+s.id+'" placeholder="Optional remark..." value="'+esc(remarks)+'"></td>'
+      + '</tr>';
   });
-  var total = p+a+l;
-  document.getElementById('cntPresent').textContent = p;
-  document.getElementById('cntAbsent').textContent  = a;
-  document.getElementById('cntLate').textContent    = l;
-  document.getElementById('cntRate').textContent    = total>0 ? Math.round((p/total)*100)+'%' : '0%';
+  html += '</tbody></table>';
+  document.getElementById('tableWrap').innerHTML = html;
+  updateStats();
+}
+
+function radioBtn(sid, val, checked) {
+  var id  = 'r_'+sid+'_'+val;
+  var cls = 'r-'+val;
+  var lbl = val.charAt(0).toUpperCase()+val.slice(1);
+  var chk = checked===val ? 'checked' : '';
+  return '<input type="radio" class="status-radio '+cls+'" name="status_'+sid+'" id="'+id+'" value="'+val+'" '+chk
+    + ' onchange="onStatusChange('+sid+',\''+val+'\')">'
+    + '<label class="status-label" for="'+id+'">'+lbl+'</label>';
+}
+
+function onStatusChange(sid, val) {
+  var lrWrap = document.getElementById('lr_'+sid);
+  if (lrWrap) lrWrap.style.display = val==='late' ? 'block' : 'none';
+  updateStats();
+}
+
+function markAll(status) {
+  allStudents.forEach(function(s) {
+    var radio = document.getElementById('r_'+s.id+'_'+status);
+    if (radio) { radio.checked = true; onStatusChange(s.id, status); }
+  });
+}
+
+function filterStudents(q) {
+  q = q.toLowerCase();
+  var rows = document.querySelectorAll('tbody tr');
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    row.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+
+function updateStats() {
+  var p=0,a=0,l=0;
+  allStudents.forEach(function(s) {
+    var checked = document.querySelector('input[name="status_'+s.id+'"]:checked');
+    var val = checked ? checked.value : 'present';
+    if (val==='present') p++;
+    else if (val==='absent') a++;
+    else if (val==='late') l++;
+  });
+  document.getElementById('stTotal').textContent   = allStudents.length;
+  document.getElementById('stPresent').textContent = p;
+  document.getElementById('stAbsent').textContent  = a;
+  document.getElementById('stLate').textContent    = l;
 }
 
 function saveAttendance() {
-  var className = document.getElementById('className').value.trim();
-  var date      = document.getElementById('attDate').value;
-  var period    = document.getElementById('attPeriod').value;
-  if (!className) { showToast('err','Please enter a class name.'); return; }
-  if (!date)      { showToast('err','Please select a date.'); return; }
+  var date  = document.getElementById('attDate').value;
+  var cls   = document.getElementById('attClass').value.trim();
+  var period= document.getElementById('attPeriod').value;
+  if (!date || !cls) { showAlert('Date and class are required.','err'); return; }
+  if (!allStudents.length) { showAlert('No students loaded.','err'); return; }
 
-  var records = [];
-  document.querySelectorAll('.att-btns').forEach(function(g){
-    var active = g.querySelector('.att-btn.active');
-    var row    = g.closest('tr');
-    var remark = row.querySelector('.remark-input').value.trim();
-    records.push({
-      student_id:    parseInt(g.dataset.studentId),
-      student_db_id: g.dataset.studentDbId,
-      status:        active ? (active.classList.contains('btn-present')?'present':active.classList.contains('btn-absent')?'absent':'late') : 'present',
-      remarks:       remark
-    });
+  var records = allStudents.map(function(s) {
+    var checked = document.querySelector('input[name="status_'+s.id+'"]:checked');
+    var status  = checked ? checked.value : 'present';
+    var lrInput = document.getElementById('lrInput_'+s.id);
+    var remInput= document.getElementById('rem_'+s.id);
+    return {
+      student_id:  s.id,
+      status:      status,
+      late_reason: lrInput ? lrInput.value.trim() : '',
+      remarks:     remInput ? remInput.value.trim() : ''
+    };
   });
 
-  if (!records.length) { showToast('err','No students to save.'); return; }
-
-  var btn = document.getElementById('saveBtn');
+  var btn = document.getElementById('btnSave');
   btn.disabled = true;
   btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
 
   fetch('attendance-save.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ class_name:className, date:date, period:period, records:records })
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({class_name:cls, date:date, period:period, records:records})
   })
   .then(function(r){ return r.json(); })
-  .then(function(res){
+  .then(function(d) {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa fa-save"></i> Save Attendance';
-    if (res.success) { showToast('ok', res.message || 'Attendance saved!'); }
-    else { showToast('err', res.message || 'Save failed.'); }
+    if (d.success) {
+      showAlert('<i class="fa fa-check-circle"></i> '+d.message, 'ok');
+      // Reload existing map
+      fetch('attendance-data.php?action=existing&date='+encodeURIComponent(date)+'&class='+encodeURIComponent(cls))
+        .then(r=>r.json()).then(function(e){ if(e.success) existingMap=e.records; });
+    } else {
+      showAlert(d.message||'Save failed','err');
+    }
   })
-  .catch(function(){
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa fa-save"></i> Save Attendance';
-    showToast('err','Network error.');
-  });
+  .catch(function(e){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Attendance'; showAlert('Network error: '+e.message,'err'); });
 }
 
-function showToast(type, msg) {
-  if (type==='ok') {
-    document.getElementById('toastOkMsg').textContent = msg;
-    var t = document.getElementById('toastOk');
-    t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 3000);
-  } else {
-    document.getElementById('toastErrMsg').textContent = msg;
-    var t = document.getElementById('toastErr');
-    t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 3500);
-  }
+function showAlert(msg, type) {
+  var el = document.getElementById('alertBox');
+  el.innerHTML = msg;
+  el.className = 'alert '+type;
+  el.style.display = 'flex';
+  setTimeout(function(){ el.style.display='none'; }, 5000);
 }
 
-// Init summary on load
-updateSummary();
-
-function showTab(tab) {
-  var isMark = tab === 'mark';
-  document.getElementById('sectionMark').style.display    = isMark ? '' : 'none';
-  document.getElementById('sectionHistory').style.display = isMark ? 'none' : '';
-  document.getElementById('tabMark').style.background    = isMark ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.2)';
-  document.getElementById('tabMark').style.color         = isMark ? '#28a745' : 'white';
-  document.getElementById('tabMark').style.border        = isMark ? 'none' : '2px solid rgba(255,255,255,.5)';
-  document.getElementById('tabHistory').style.background = isMark ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.9)';
-  document.getElementById('tabHistory').style.color      = isMark ? 'white' : '#28a745';
-  document.getElementById('tabHistory').style.border     = isMark ? '2px solid rgba(255,255,255,.5)' : 'none';
-}
-
-function loadHistory() {
-  var date  = document.getElementById('histDate').value;
-  var cls   = document.getElementById('histClass').value.trim();
-  var tbody = document.getElementById('histBody');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
-  var url = 'attendance-history.php?date=' + encodeURIComponent(date) + '&class=' + encodeURIComponent(cls);
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (!d.success || !d.records.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#aaa">No records found.</td></tr>'; return;
-      }
-      tbody.innerHTML = d.records.map(function(r){
-        var st = r.status || 'present';
-        var cls = st==='present'?'#d4edda;color:#155724':st==='absent'?'#f8d7da;color:#721c24':'#fff3cd;color:#856404';
-        return '<tr>'
-          + '<td>'+esc(r.attendance_date)+'</td>'
-          + '<td>'+esc(r.student_name||'—')+'</td>'
-          + '<td>'+esc(r.class_name||'—')+'</td>'
-          + '<td style="font-size:12px;color:#666">'+esc(r.period||'—')+'</td>'
-          + '<td><span style="background:'+cls+';padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">'+cap(st)+'</span></td>'
-          + '<td style="font-size:12px;color:#666">'+esc(r.remarks||'—')+'</td>'
-          + '</tr>';
-      }).join('');
-    })
-    .catch(function(){ tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;padding:30px">Network error</td></tr>'; });
-}
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 </script>
 </body>
 </html>

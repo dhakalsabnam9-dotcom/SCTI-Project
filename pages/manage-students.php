@@ -136,17 +136,28 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
       <div class="fg">
         <label>Username <span class="auto-badge"><i class="fa fa-magic"></i> Auto</span></label>
         <div class="input-group">
-          <input type="text" id="fUsername" class="fc" placeholder="student.ram" readonly>
+          <input type="text" id="fUsername" class="fc" placeholder="student.ram">
           <button class="ig-btn" onclick="genUsername()" title="Regenerate"><i class="fa fa-sync"></i></button>
         </div>
       </div>
       <div class="fg">
         <label>Password <span class="auto-badge"><i class="fa fa-magic"></i> Auto</span></label>
         <div class="input-group">
-          <input type="text" id="fPassword" class="fc" placeholder="Auto123!" readonly>
+          <input type="text" id="fPassword" class="fc" placeholder="Auto123!">
           <button class="ig-btn" onclick="genPassword()" title="Regenerate"><i class="fa fa-sync"></i></button>
+          <button class="ig-btn" onclick="copyPwd()" title="Copy password" style="border-radius:0;border-left:1px solid rgba(255,255,255,.3)"><i class="fa fa-copy" id="copyIcon"></i></button>
         </div>
       </div>
+    </div>
+
+    <!-- Credentials preview box -->
+    <div id="credBox" style="display:none;background:linear-gradient(135deg,#e8f0fe,#f0f4ff);border:2px solid #004080;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px">
+      <div style="font-weight:700;color:#004080;margin-bottom:6px"><i class="fa fa-key"></i> Generated Credentials</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <span><i class="fa fa-user" style="color:#004080"></i> <strong>User:</strong> <code id="credUser" style="background:#fff;padding:2px 8px;border-radius:5px;color:#004080"></code></span>
+        <span><i class="fa fa-lock" style="color:#004080"></i> <strong>Pass:</strong> <code id="credPass" style="background:#fff;padding:2px 8px;border-radius:5px;color:#dc3545"></code></span>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:6px"><i class="fa fa-info-circle"></i> Share these credentials with the student after saving.</div>
     </div>
 
     <hr class="divider">
@@ -160,6 +171,12 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
         <label>Phone</label>
         <input type="text" id="fPhone" class="fc" placeholder="98XXXXXXXX">
       </div>
+      <div class="fg">
+        <label>Qualification</label>
+        <input type="text" id="fQual" class="fc" placeholder="e.g. +2 Science">
+      </div>
+    </div>
+    <div class="frow">
       <div class="fg">
         <label>Semester</label>
         <select id="fSemester" class="fc">
@@ -229,6 +246,31 @@ function autoGenerate() {
   genStudentId();
   genUsername();
   if (!document.getElementById('fPassword').value) genPassword();
+  updateCredBox();
+}
+
+function updateCredBox() {
+  var u = document.getElementById('fUsername').value.trim();
+  var p = document.getElementById('fPassword').value.trim();
+  var box = document.getElementById('credBox');
+  if (u || p) {
+    document.getElementById('credUser').textContent = u || '—';
+    document.getElementById('credPass').textContent = p || '—';
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function copyPwd() {
+  var pwd = document.getElementById('fPassword').value;
+  if (!pwd) { toast('No password to copy', 'err'); return; }
+  navigator.clipboard.writeText(pwd).then(function(){
+    var icon = document.getElementById('copyIcon');
+    icon.className = 'fa fa-check';
+    toast('Password copied!', 'ok');
+    setTimeout(function(){ icon.className = 'fa fa-copy'; }, 2000);
+  }).catch(function(){ toast('Copy failed', 'err'); });
 }
 
 function genStudentId() {
@@ -245,6 +287,7 @@ function genUsername() {
     : (parts[0] || 'student') + Math.floor(Math.random() * 99 + 1);
   base = base.replace(/[^a-z0-9.]/g, '');
   document.getElementById('fUsername').value = base || 'student' + Math.floor(Math.random()*999);
+  updateCredBox();
 }
 
 function genPassword() {
@@ -259,6 +302,7 @@ function genPassword() {
           + upper[Math.floor(Math.random()*upper.length)];
   pwd = pwd.split('').sort(function(){return Math.random()-.5;}).join('');
   document.getElementById('fPassword').value = pwd;
+  updateCredBox();
 }
 
 function saveStudent() {
@@ -274,17 +318,18 @@ function saveStudent() {
   if (id === 0 && !password) { showAlert('Please generate a Password', 'err'); return; }
 
   var payload = {
-    id:         id,
-    name:       name,
-    student_id: sid,
-    username:   username,
-    password:   password,
-    program:    program,
-    email:      document.getElementById('fEmail').value.trim(),
-    phone:      document.getElementById('fPhone').value.trim(),
-    semester:   document.getElementById('fSemester').value ? parseInt(document.getElementById('fSemester').value) : null,
-    address:    document.getElementById('fAddress').value.trim(),
-    status:     document.getElementById('fStatus').value
+    id:            id,
+    name:          name,
+    student_id:    sid,
+    username:      username,
+    password:      password,
+    program:       program,
+    email:         document.getElementById('fEmail').value.trim(),
+    phone:         document.getElementById('fPhone').value.trim(),
+    qualification: document.getElementById('fQual').value.trim(),
+    semester:      document.getElementById('fSemester').value || '',
+    address:       document.getElementById('fAddress').value.trim(),
+    status:        document.getElementById('fStatus').value
   };
 
   fetch('student-save.php', {
@@ -321,9 +366,11 @@ function editStudent(id) {
   document.getElementById('fProgram').value     = s.program || '';
   document.getElementById('fEmail').value       = s.email || '';
   document.getElementById('fPhone').value       = s.phone || '';
+  document.getElementById('fQual').value        = s.qualification || '';
   document.getElementById('fSemester').value    = s.semester || '';
   document.getElementById('fAddress').value     = s.address || '';
   document.getElementById('fStatus').value      = s.status || 'active';
+  document.getElementById('credBox').style.display = 'none';
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-edit"></i> Edit Student';
   document.getElementById('btnTxt').textContent  = 'Update Student';
   document.getElementById('formAlert').style.display = 'none';
@@ -348,14 +395,15 @@ function deleteStudent(id) {
 
 function resetForm() {
   document.getElementById('fId').value = '0';
-  ['fName','fStudentId','fUsername','fPassword','fEmail','fPhone','fAddress'].forEach(function(id){
+  ['fName','fStudentId','fUsername','fPassword','fEmail','fPhone','fQual','fAddress'].forEach(function(id){
     document.getElementById(id).value = '';
   });
   document.getElementById('fProgram').value  = '';
   document.getElementById('fSemester').value = '';
   document.getElementById('fStatus').value   = 'active';
-  document.getElementById('fPassword').readOnly    = true;
+  document.getElementById('fPassword').readOnly    = false;
   document.getElementById('fPassword').placeholder = 'Auto123!';
+  document.getElementById('credBox').style.display = 'none';
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Add Student';
   document.getElementById('btnTxt').textContent  = 'Save Student';
   document.getElementById('formAlert').style.display = 'none';

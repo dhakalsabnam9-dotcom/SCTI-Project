@@ -23,6 +23,7 @@ try {
     $semRaw     = $data['semester'] ?? '';
     $semester   = ($semRaw !== '' && $semRaw !== null) ? trim($semRaw) : null;
     $address    = trim($data['address']      ?? '');
+    $qualification = trim($data['qualification'] ?? '');
     $status     = in_array($data['status'] ?? '', ['active','inactive']) ? $data['status'] : 'active';
 
     if (!$name || !$username || !$program) {
@@ -37,18 +38,18 @@ try {
         if ($chk->fetch()) { ob_end_clean(); echo json_encode(['success'=>false,'message'=>'Username already exists']); exit(); }
         if (!$password) { ob_end_clean(); echo json_encode(['success'=>false,'message'=>'Password required for new student']); exit(); }
         $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $db->prepare("INSERT INTO students (username, email, password, full_name, student_id, course, phone, semester, address, status, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())");
-        $stmt->execute([$username, $email, $hashed, $name, $student_id, $program, $phone, $semester, $address, $status]);
+        $stmt = $db->prepare("INSERT INTO students (username, email, password, full_name, student_id, course, phone, semester, address, qualification, status, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())");
+        $stmt->execute([$username, $email, $hashed, $name, $student_id, $program, $phone, $semester, $address, $qualification, $status]);
         ob_end_clean();
         echo json_encode(['success'=>true,'message'=>'Student added successfully','id'=>$db->lastInsertId()]);
     } else {
         if ($password) {
             $hashed = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $db->prepare("UPDATE students SET full_name=?, username=?, email=?, password=?, student_id=?, course=?, phone=?, semester=?, address=?, status=? WHERE id=?");
-            $stmt->execute([$name, $username, $email, $hashed, $student_id, $program, $phone, $semester, $address, $status, $id]);
+            $stmt = $db->prepare("UPDATE students SET full_name=?, username=?, email=?, password=?, student_id=?, course=?, phone=?, semester=?, address=?, qualification=?, status=? WHERE id=?");
+            $stmt->execute([$name, $username, $email, $hashed, $student_id, $program, $phone, $semester, $address, $qualification, $status, $id]);
         } else {
-            $stmt = $db->prepare("UPDATE students SET full_name=?, username=?, email=?, student_id=?, course=?, phone=?, semester=?, address=?, status=? WHERE id=?");
-            $stmt->execute([$name, $username, $email, $student_id, $program, $phone, $semester, $address, $status, $id]);
+            $stmt = $db->prepare("UPDATE students SET full_name=?, username=?, email=?, student_id=?, course=?, phone=?, semester=?, address=?, qualification=?, status=? WHERE id=?");
+            $stmt->execute([$name, $username, $email, $student_id, $program, $phone, $semester, $address, $qualification, $status, $id]);
         }
         ob_end_clean();
         echo json_encode(['success'=>true,'message'=>'Student updated successfully']);

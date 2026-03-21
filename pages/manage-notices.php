@@ -90,6 +90,20 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .nbtn-del:hover{background:#dc3545;color:#fff;}
     .empty{text-align:center;padding:60px 20px;color:#ccc;grid-column:1/-1;}
     .empty i{font-size:56px;display:block;margin-bottom:12px;}
+    /* ── AUDIENCE TAGS ── */
+    .aud-tag{cursor:pointer;display:inline-flex;align-items:center;}
+    .aud-tag span{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:2px solid #dee2e6;background:#f8f9fa;color:#555;transition:.2s;display:flex;align-items:center;gap:5px;}
+    .aud-tag:hover span{border-color:#004080;color:#004080;}
+    .aud-tag.selected span{background:linear-gradient(135deg,#004080,#0059b3);color:white;border-color:transparent;}
+    .aud-tag[data-val="student"].selected span{background:linear-gradient(135deg,#004080,#0059b3);}
+    .aud-tag[data-val="teacher"].selected span{background:linear-gradient(135deg,#28a745,#20c997);}
+    .aud-tag[data-val="emergency"].selected span{background:linear-gradient(135deg,#dc3545,#c82333);}
+    .aud-tag[data-val="all"].selected span{background:linear-gradient(135deg,#6f42c1,#e83e8c);}
+    /* audience badge on cards */
+    .nbdg-aud-all{background:#ede9fe;color:#5b21b6;}
+    .nbdg-aud-student{background:#cce5ff;color:#004085;}
+    .nbdg-aud-teacher{background:#d4edda;color:#155724;}
+    .nbdg-aud-emergency{background:#f8d7da;color:#721c24;}
     /* ── TOAST ── */
     .toast{position:fixed;bottom:22px;right:22px;color:white;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:99999;display:none;}
     .toast.ok{background:#28a745;}
@@ -149,6 +163,27 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
           <option value="high">High</option>
           <option value="urgent">Urgent</option>
         </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Audience / Tag</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="audienceTags">
+        <label class="aud-tag" data-val="all">
+          <input type="radio" name="audience" value="all" checked style="display:none">
+          <span><i class="fa fa-globe"></i> For All</span>
+        </label>
+        <label class="aud-tag" data-val="student">
+          <input type="radio" name="audience" value="student" style="display:none">
+          <span><i class="fa fa-user-graduate"></i> Students</span>
+        </label>
+        <label class="aud-tag" data-val="teacher">
+          <input type="radio" name="audience" value="teacher" style="display:none">
+          <span><i class="fa fa-chalkboard-teacher"></i> Teachers</span>
+        </label>
+        <label class="aud-tag" data-val="emergency">
+          <input type="radio" name="audience" value="emergency" style="display:none">
+          <span><i class="fa fa-triangle-exclamation"></i> Emergency</span>
+        </label>
       </div>
     </div>
     <div class="frow">
@@ -252,6 +287,9 @@ function buildCard(n) {
   var ti  = n.status==='active' ? 'fa-eye-slash' : 'fa-eye';
   var id  = n.id;
   var st  = n.status;
+  var aud = n.audience || 'all';
+  var audLabels = {all:'For All',student:'Students',teacher:'Teachers',emergency:'Emergency'};
+  var audIcons  = {all:'fa-globe',student:'fa-user-graduate',teacher:'fa-chalkboard-teacher',emergency:'fa-triangle-exclamation'};
 
   return '<div class="ncard ' + pc + ' ' + dim + '">'
     + '<div class="ncard-body">'
@@ -259,6 +297,7 @@ function buildCard(n) {
     +     '<span class="nbdg nbdg-' + n.priority + '">' + pl + '</span>'
     +     '<span class="nbdg nbdg-' + n.status + '">' + sl + '</span>'
     +     '<span class="nbdg nbdg-cat">' + cl + '</span>'
+    +     '<span class="nbdg nbdg-aud-' + aud + '"><i class="fa ' + (audIcons[aud]||'fa-globe') + '"></i> ' + (audLabels[aud]||aud) + '</span>'
     +   '</div>'
     +   '<div class="ncard-title">' + esc(n.title) + '</div>'
     +   '<div class="ncard-desc">' + esc(n.description) + '</div>'
@@ -281,6 +320,8 @@ function resetForm() {
   document.getElementById('fPri').value   = 'normal';
   document.getElementById('fDate').value  = today();
   document.getElementById('fStat').value  = 'active';
+  document.querySelectorAll('input[name="audience"]').forEach(function(r){ r.checked = r.value === 'all'; });
+  document.querySelectorAll('.aud-tag').forEach(function(t){ t.classList.toggle('selected', t.dataset.val === 'all'); });
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Notice';
   document.getElementById('btnTxt').textContent  = 'Save Notice';
   document.getElementById('formAlert').style.display = 'none';
@@ -296,6 +337,10 @@ function editNotice(id) {
   document.getElementById('fPri').value   = n.priority;
   document.getElementById('fDate').value  = (n.notice_date||'').split(' ')[0].split('T')[0] || today();
   document.getElementById('fStat').value  = n.status;
+  // Set audience tag
+  var aud = n.audience || 'all';
+  document.querySelectorAll('input[name="audience"]').forEach(function(r){ r.checked = r.value === aud; });
+  document.querySelectorAll('.aud-tag').forEach(function(t){ t.classList.toggle('selected', t.dataset.val === aud); });
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-edit"></i> Edit Notice';
   document.getElementById('btnTxt').textContent  = 'Update Notice';
   document.querySelector('.panel').scrollTop = 0;
@@ -309,7 +354,8 @@ function saveNotice() {
     category:    document.getElementById('fCat').value,
     priority:    document.getElementById('fPri').value,
     notice_date: document.getElementById('fDate').value,
-    status:      document.getElementById('fStat').value
+    status:      document.getElementById('fStat').value,
+    audience:    document.querySelector('input[name="audience"]:checked')?.value || 'all'
   };
   if (!payload.title || !payload.description) { showAlert('Title and description required','err'); return; }
 
@@ -384,6 +430,19 @@ function fmtDate(d){ try{ return new Date(d).toLocaleDateString('en-US',{year:'n
 
 document.getElementById('filterPri').addEventListener('change', filterLocal);
 document.getElementById('fDate').value = today();
+
+// Audience tag click handler
+document.querySelectorAll('.aud-tag').forEach(function(tag) {
+  tag.addEventListener('click', function() {
+    var val = this.dataset.val;
+    document.querySelectorAll('.aud-tag').forEach(function(t){ t.classList.remove('selected'); });
+    this.classList.add('selected');
+    this.querySelector('input[type="radio"]').checked = true;
+  });
+});
+// Set default selected
+document.querySelector('.aud-tag[data-val="all"]').classList.add('selected');
+
 loadNotices();
 </script>
 </body>

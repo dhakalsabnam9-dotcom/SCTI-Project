@@ -200,23 +200,12 @@ function timeAgo($dt) {
 
     <div class="card">
       <h2><i class="fa fa-bullhorn"></i> Recent Notices</h2>
-      <ul class="notice-list">
-        <?php if (empty($notices)): ?>
-        <li class="notice-item"><div class="notice-title" style="color:#999">No notices yet.</div></li>
-        <?php else: ?>
-        <?php foreach ($notices as $n): ?>
-        <li class="notice-item" onclick="window.location.href='../index.php?page=notices'">
-          <div>
-            <div class="notice-title"><?=htmlspecialchars($n['title'])?></div>
-            <div class="notice-date"><i class="fa fa-clock" style="margin-right:4px"></i><?=timeAgo($n['created_at'])?></div>
-          </div>
-          <i class="fa fa-chevron-right ni-arrow"></i>
-        </li>
-        <?php endforeach; ?>
-        <?php endif; ?>
-      </ul>
+      <?php
+      require_once '../pages/notice-widget.php';
+      renderNoticeWidget('student');
+      ?>
       <div style="margin-top:12px;text-align:right">
-        <a href="../index.php?page=notices" style="color:#004080;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All Notices</a>
+        <a href="../pages/notice-board.php" style="color:#004080;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All Notices</a>
       </div>
     </div>
   </div>

@@ -281,6 +281,9 @@ function nbpSearch(val) {
 
 function nbpApply() {
   _nbpFiltered = _nbpAll.filter(n => {
+    // Public board: only show notices meant for everyone or emergency
+    const aud = (n.audience || 'all').toLowerCase();
+    if (aud === 'student' || aud === 'teacher') return false;
     const catMatch = !_nbpCat || n.category === _nbpCat || (_nbpCat === 'urgent' && n.priority === 'urgent');
     const q = _nbpSearch;
     const textMatch = !q || (n.title||'').toLowerCase().includes(q) || (n.description||'').toLowerCase().includes(q);

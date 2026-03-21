@@ -20,6 +20,9 @@ $category    = $data['category'] ?? 'general';
 $priority    = $data['priority'] ?? 'normal';
 $status      = $data['status'] ?? 'active';
 $notice_date = $data['notice_date'] ?? date('Y-m-d');
+$audience    = $data['audience'] ?? 'all';
+$allowed_audiences = ['all','student','teacher','emergency'];
+if (!in_array($audience, $allowed_audiences)) $audience = 'all';
 
 if (!$title || !$description) {
     ob_end_clean();
@@ -30,15 +33,13 @@ if (!$title || !$description) {
 try {
     $db = getDBConnection();
     if ($id > 0) {
-        // Update
-        $stmt = $db->prepare("UPDATE notices SET title=?, description=?, category=?, priority=?, status=?, notice_date=?, updated_at=NOW() WHERE id=?");
-        $stmt->execute([$title, $description, $category, $priority, $status, $notice_date, $id]);
+        $stmt = $db->prepare("UPDATE notices SET title=?, description=?, category=?, audience=?, priority=?, status=?, notice_date=?, updated_at=NOW() WHERE id=?");
+        $stmt->execute([$title, $description, $category, $audience, $priority, $status, $notice_date, $id]);
         $msg = 'Notice updated';
     } else {
-        // Insert
         $admin_id = $_SESSION['user_id'] ?? null;
-        $stmt = $db->prepare("INSERT INTO notices (title, description, category, priority, status, notice_date, created_by) VALUES (?,?,?,?,?,?,?)");
-        $stmt->execute([$title, $description, $category, $priority, $status, $notice_date, $admin_id]);
+        $stmt = $db->prepare("INSERT INTO notices (title, description, category, audience, priority, status, notice_date, created_by) VALUES (?,?,?,?,?,?,?,?)");
+        $stmt->execute([$title, $description, $category, $audience, $priority, $status, $notice_date, $admin_id]);
         $id = $db->lastInsertId();
         $msg = 'Notice created';
     }

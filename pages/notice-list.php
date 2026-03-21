@@ -5,14 +5,22 @@ require_once '../includes/config.php';
 header('Content-Type: application/json');
 
 try {
-    $db = getDBConnection();
-    $status = isset($_GET['status']) ? $_GET['status'] : 'active';
-    $all    = ($status === 'all');
+    $db       = getDBConnection();
+    $status   = isset($_GET['status'])   ? $_GET['status']   : 'active';
+    $audience = isset($_GET['audience']) ? $_GET['audience'] : '';
+    $all      = ($status === 'all');
 
-    if ($all) {
+    if ($all && !$audience) {
         $stmt = $db->query("SELECT * FROM notices ORDER BY created_at DESC");
+    } elseif ($audience && !$all) {
+        // audience filter: show notices for this audience OR 'all'
+        $stmt = $db->prepare("SELECT * FROM notices WHERE status=? AND (audience=? OR audience='all') ORDER BY priority='urgent' DESC, created_at DESC");
+        $stmt->execute([$status, $audience]);
+    } elseif ($audience && $all) {
+        $stmt = $db->prepare("SELECT * FROM notices WHERE audience=? OR audience='all' ORDER BY created_at DESC");
+        $stmt->execute([$audience]);
     } else {
-        $stmt = $db->prepare("SELECT * FROM notices WHERE status = ? ORDER BY created_at DESC");
+        $stmt = $db->prepare("SELECT * FROM notices WHERE status=? ORDER BY created_at DESC");
         $stmt->execute([$status]);
     }
     $notices = $stmt->fetchAll();

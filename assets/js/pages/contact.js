@@ -30,6 +30,8 @@ const contactPage = `
     .cp-info-card p{font-size:13px;color:#64748b;margin:0;line-height:1.7}
     .cp-info-card a{color:#1d4ed8;text-decoration:none;font-weight:600}
     .cp-info-card a:hover{text-decoration:underline}
+    a.cp-info-card{display:block;color:inherit;text-decoration:none;cursor:pointer}
+    a.cp-info-card p{color:#64748b}
     /* MAIN SECTION */
     .cp-main{display:grid;grid-template-columns:1fr 1.6fr;gap:32px;padding:40px 40px 80px;max-width:1200px;margin:0 auto}
     /* LEFT PANEL */
@@ -92,11 +94,11 @@ const contactPage = `
 
     <!-- INFO CARDS -->
     <div class="cp-info-grid">
-      <div class="cp-info-card">
+      <a class="cp-info-card" href="https://maps.google.com/?q=6WGC%2B83H+Kamalamai+Sindhuli+Nepal" target="_blank" rel="noopener noreferrer">
         <div class="cp-info-icon"><i class="fa fa-map-location-dot"></i></div>
         <h4>Address</h4>
         <p>Kamalamai Municipality<br>Sindhuli, Province 3<br>Nepal</p>
-      </div>
+      </a>
       <div class="cp-info-card">
         <div class="cp-info-icon"><i class="fa fa-phone-volume"></i></div>
         <h4>Phone</h4>

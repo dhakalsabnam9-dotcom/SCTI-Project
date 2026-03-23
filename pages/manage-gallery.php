@@ -365,7 +365,7 @@ async function loadGallery() {
       const dt = new Date(img.created_at);
       if (dt.toDateString() === today) todayCnt++;
       const date  = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-      const ftype = img.file_type || 'image';
+      const ftype = (img.file_type && img.file_type !== 'null') ? img.file_type : 'image';
       const thumb = img.thumbnail_path || img.file_path;
 
       // Thumbnail area based on file type

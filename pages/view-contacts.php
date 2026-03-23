@@ -15,8 +15,8 @@ try {
     $error = 'Could not load messages: ' . $e->getMessage();
 }
 
-$total   = count($messages);
-$today   = date('Y-m-d');
+$total    = count($messages);
+$today    = date('Y-m-d');
 $todayCnt = 0;
 foreach ($messages as $m) {
     if (isset($m['created_at']) && substr($m['created_at'], 0, 10) === $today) $todayCnt++;
@@ -33,13 +33,14 @@ foreach ($messages as $m) {
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;}
     .top-bar{background:#00264d;color:white;padding:7px 20px;font-size:13px;}
-    /* HEADER */
     .pg-header{background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 18px rgba(220,53,69,.3);}
     .pg-header h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 3px;}
     .pg-header .bc{font-size:12px;color:rgba(255,255,255,.75);}
     .pg-header .bc a{color:#fff;text-decoration:none;}
     .hdr-btns{display:flex;gap:8px;}
     .btn-hdr{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;transition:.2s;text-decoration:none;}
+    .btn-hdr.red{background:#fff;color:#dc3545;}
+    .btn-hdr.red:hover{background:#fde8ea;}
     .btn-hdr.ghost{background:rgba(255,255,255,.18);color:#fff;}
     .btn-hdr.ghost:hover{background:rgba(255,255,255,.32);}
     /* STATS */
@@ -54,12 +55,19 @@ foreach ($messages as $m) {
     .stat-lbl{font-size:11px;color:#999;margin-top:2px;}
     /* LAYOUT */
     .layout{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 170px);}
-    .panel{background:#fff;border-right:1px solid #e9ecef;padding:22px;overflow-y:auto;}
-    .panel h3{font-size:15px;color:#dc3545;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #fde8ea;display:flex;align-items:center;gap:8px;}
+    .panel{background:#fff;border-right:1px solid #e9ecef;padding:0;overflow-y:auto;display:flex;flex-direction:column;}
     .content{padding:22px;overflow-y:auto;}
-    /* DETAIL PANEL */
-    .detail-empty{text-align:center;padding:60px 20px;color:#ccc;}
-    .detail-empty i{font-size:56px;display:block;margin-bottom:12px;}
+    /* PANEL TABS */
+    .panel-tabs{display:flex;border-bottom:2px solid #f0f0f0;}
+    .ptab{flex:1;padding:13px 10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;color:#999;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .ptab.active{color:#dc3545;border-bottom-color:#dc3545;}
+    .ptab:hover:not(.active){color:#555;}
+    .panel-body{padding:22px;flex:1;overflow-y:auto;}
+    .tab-pane{display:none;}
+    .tab-pane.active{display:block;}
+    /* DETAIL */
+    .detail-empty{text-align:center;padding:50px 20px;color:#ccc;}
+    .detail-empty i{font-size:52px;display:block;margin-bottom:12px;}
     .detail-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#dc3545,#c82333);display:flex;align-items:center;justify-content:center;color:white;font-size:26px;font-weight:700;margin:0 auto 14px;}
     .detail-name{font-size:18px;font-weight:700;color:#222;text-align:center;margin-bottom:4px;}
     .detail-email{font-size:13px;color:#888;text-align:center;margin-bottom:16px;}
@@ -69,11 +77,23 @@ foreach ($messages as $m) {
     .detail-subject{font-weight:700;color:#333;font-size:14px;margin-bottom:8px;}
     .detail-body{color:#555;font-size:13px;line-height:1.7;background:#f8f9fa;border-radius:8px;padding:14px;margin-bottom:16px;white-space:pre-wrap;}
     .detail-actions{display:flex;flex-direction:column;gap:8px;}
-    .dbtn{width:100%;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;transition:.2s;}
+    .dbtn{width:100%;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;transition:.2s;text-decoration:none;}
     .dbtn-reply{background:linear-gradient(135deg,#004080,#0059b3);color:#fff;}
     .dbtn-reply:hover{opacity:.88;}
     .dbtn-del{background:#f8d7da;color:#dc3545;}
     .dbtn-del:hover{background:#dc3545;color:#fff;}
+    /* COMPOSE FORM */
+    .fg{margin-bottom:14px;}
+    .fg label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;}
+    .fc{width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;transition:.2s;}
+    .fc:focus{outline:none;border-color:#dc3545;box-shadow:0 0 0 3px rgba(220,53,69,.1);}
+    textarea.fc{resize:vertical;min-height:90px;}
+    .btn-send{width:100%;padding:12px;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s;margin-top:4px;}
+    .btn-send:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(220,53,69,.4);}
+    .btn-send:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+    .alert{padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;}
+    .alert-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+    .alert-err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
     /* TOOLBAR */
     .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
     .toolbar input{flex:1;min-width:160px;padding:9px 13px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;}
@@ -101,7 +121,6 @@ foreach ($messages as $m) {
     .cbtn-del:hover{background:#dc3545;color:#fff;}
     .empty{text-align:center;padding:60px 20px;color:#ccc;grid-column:1/-1;}
     .empty i{font-size:56px;display:block;margin-bottom:12px;}
-    /* TOAST */
     .toast{position:fixed;bottom:22px;right:22px;color:white;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:99999;display:none;}
     .toast.ok{background:#28a745;}
     .toast.err{background:#dc3545;}
@@ -112,18 +131,17 @@ foreach ($messages as $m) {
 <body>
 <div class="top-bar"><marquee>Contact Messages — View and manage messages from visitors and students</marquee></div>
 
-<!-- HEADER -->
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-envelope-open-text"></i> Contact Messages</h1>
     <div class="bc"><a href="../dashboards/admin-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Contact Messages</div>
   </div>
   <div class="hdr-btns">
+    <button class="btn-hdr red" onclick="switchTab('compose')"><i class="fa fa-pen"></i> Compose</button>
     <a href="../dashboards/admin-dashboard.php" class="btn-hdr ghost"><i class="fa fa-arrow-left"></i> Back</a>
   </div>
 </div>
 
-<!-- STATS -->
 <div class="stats">
   <div class="stat"><div class="stat-ico ico-red"><i class="fa fa-envelope"></i></div><div><div class="stat-val"><?php echo $total; ?></div><div class="stat-lbl">Total Messages</div></div></div>
   <div class="stat"><div class="stat-ico ico-orange"><i class="fa fa-calendar-day"></i></div><div><div class="stat-val"><?php echo $todayCnt; ?></div><div class="stat-lbl">Today</div></div></div>
@@ -131,17 +149,56 @@ foreach ($messages as $m) {
   <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sSelected">—</div><div class="stat-lbl">Selected</div></div></div>
 </div>
 
-<!-- LAYOUT -->
 <div class="layout">
 
-  <!-- LEFT PANEL: MESSAGE DETAIL -->
+  <!-- LEFT PANEL -->
   <div class="panel">
-    <h3><i class="fa fa-envelope-open"></i> Message Detail</h3>
-    <div id="detailPane">
-      <div class="detail-empty">
-        <i class="fa fa-envelope"></i>
-        <p>Click a message card to view details</p>
+    <div class="panel-tabs">
+      <div class="ptab active" id="tab-detail" onclick="switchTab('detail')"><i class="fa fa-envelope-open"></i> Message Detail</div>
+      <div class="ptab" id="tab-compose" onclick="switchTab('compose')"><i class="fa fa-pen-to-square"></i> Compose</div>
+    </div>
+    <div class="panel-body">
+
+      <!-- DETAIL TAB -->
+      <div class="tab-pane active" id="pane-detail">
+        <div id="detailPane">
+          <div class="detail-empty">
+            <i class="fa fa-envelope"></i>
+            <p>Click a message card to view details</p>
+          </div>
+        </div>
       </div>
+
+      <!-- COMPOSE TAB -->
+      <div class="tab-pane" id="pane-compose">
+        <div id="composeAlert" class="alert"></div>
+        <form id="composeForm">
+          <div class="fg">
+            <label><i class="fa fa-user" style="color:#dc3545"></i> Full Name *</label>
+            <input type="text" name="name" class="fc" placeholder="Enter sender name" required>
+          </div>
+          <div class="fg">
+            <label><i class="fa fa-envelope" style="color:#dc3545"></i> Email *</label>
+            <input type="email" name="email" class="fc" placeholder="Enter email address" required>
+          </div>
+          <div class="fg">
+            <label><i class="fa fa-phone" style="color:#dc3545"></i> Phone *</label>
+            <input type="text" name="phone" class="fc" placeholder="Enter phone number" required>
+          </div>
+          <div class="fg">
+            <label><i class="fa fa-tag" style="color:#dc3545"></i> Subject *</label>
+            <input type="text" name="subject" class="fc" placeholder="Message subject" required>
+          </div>
+          <div class="fg">
+            <label><i class="fa fa-comment" style="color:#dc3545"></i> Message *</label>
+            <textarea name="message" class="fc" placeholder="Write your message here..." required></textarea>
+          </div>
+          <button type="submit" class="btn-send" id="sendBtn">
+            <i class="fa fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+
     </div>
   </div>
 
@@ -162,7 +219,6 @@ foreach ($messages as $m) {
           $email   = htmlspecialchars($m['email'] ?? '');
           $subject = htmlspecialchars($m['subject'] ?? 'No Subject');
           $body    = htmlspecialchars($m['message'] ?? '');
-          $phone   = htmlspecialchars($m['phone'] ?? '');
           $dt      = isset($m['created_at']) ? date('M d, Y H:i', strtotime($m['created_at'])) : '';
           $initial = strtoupper(substr($m['name'] ?? 'U', 0, 1));
           $id      = (int)($m['id'] ?? 0);
@@ -186,23 +242,29 @@ foreach ($messages as $m) {
     </div>
   </div>
 
-</div><!-- /layout -->
+</div>
 
 <div class="toast" id="toast"></div>
 <footer>© 2025 SCTI — Admin Panel</footer>
 
 <script>
 var msgs = <?php echo json_encode(array_values($messages)); ?>;
-
 document.getElementById('sShowing').textContent = msgs.length;
 document.getElementById('sSelected').textContent = '—';
+
+/* ── TABS ── */
+function switchTab(tab) {
+  document.querySelectorAll('.ptab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('pane-' + tab).classList.add('active');
+}
 
 /* ── VIEW ── */
 function viewMsg(i) {
   var m = msgs[i];
   if (!m) return;
-
-  // highlight selected card
+  switchTab('detail');
   document.querySelectorAll('.ccard').forEach(function(c){ c.classList.remove('selected'); });
   var card = document.getElementById('card-' + i);
   if (card) card.classList.add('selected');
@@ -238,24 +300,52 @@ function delMsg(id, idx) {
   if (!confirm('Delete this message? This cannot be undone.')) return;
   fetch('contact-delete.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:id})})
     .then(function(r){ return r.json(); })
-    .then(function(d){ if (!d.success) { toast(d.message||'Delete failed','err'); return; } })
     .catch(function(){});
 
-  // Remove from DOM and array
   var card = document.getElementById('card-' + idx);
   if (card) card.remove();
   msgs[idx] = null;
-
-  // Reset detail pane
   document.getElementById('detailPane').innerHTML =
     '<div class="detail-empty"><i class="fa fa-envelope"></i><p>Message deleted</p></div>';
   document.getElementById('sSelected').textContent = '—';
-
-  // Recount showing
-  var visible = document.querySelectorAll('.ccard').length;
-  document.getElementById('sShowing').textContent = visible;
+  document.getElementById('sShowing').textContent = document.querySelectorAll('.ccard').length;
   toast('Message deleted', 'ok');
 }
+
+/* ── COMPOSE ── */
+document.getElementById('composeForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var al  = document.getElementById('composeAlert');
+  var btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...';
+  al.style.display = 'none';
+
+  try {
+    var fd = new FormData(e.target);
+    var r  = await fetch('contact-submit.php', {method:'POST', body: fd});
+    var d  = await r.json();
+    if (d.success) {
+      al.className = 'alert alert-ok';
+      al.textContent = 'Message saved successfully!';
+      al.style.display = 'block';
+      e.target.reset();
+      toast('Message created!', 'ok');
+      // Reload after 1.5s to show new card
+      setTimeout(function(){ location.reload(); }, 1500);
+    } else {
+      al.className = 'alert alert-err';
+      al.textContent = d.message || 'Failed to send';
+      al.style.display = 'block';
+    }
+  } catch(err) {
+    al.className = 'alert alert-err';
+    al.textContent = 'Network error: ' + err.message;
+    al.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa fa-paper-plane"></i> Send Message';
+});
 
 /* ── SEARCH ── */
 function filterCards() {

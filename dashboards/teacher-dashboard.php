@@ -277,6 +277,141 @@ function timeAgo($dt) {
     </div>
   </div>
 
+  <!-- Add Student Form + Student List -->
+  <div style="display:grid;grid-template-columns:400px 1fr;gap:20px;margin-bottom:30px">
+
+    <!-- ADD STUDENT FORM -->
+    <div class="card" style="padding:24px">
+      <h2 style="margin-top:0;color:#004080;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid #e8f0fe;font-size:16px"><i class="fa fa-plus-circle"></i> Add Student</h2>
+      <div id="tAddAlert" style="display:none;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Full Name *</label>
+        <input type="text" id="tFName" placeholder="e.g. Ram Bahadur Thapa" oninput="tAutoGen()" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;transition:.2s" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Student ID <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#004080;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px"><i class="fa fa-magic"></i> Auto</span></label>
+          <div style="display:flex">
+            <input type="text" id="tFSid" readonly placeholder="STU-2025-001" style="flex:1;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px 0 0 8px;font-size:13px;background:#f8f9fa;color:#666">
+            <button onclick="tGenSid()" style="padding:0 12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:0 8px 8px 0;cursor:pointer;font-size:13px" title="Regenerate"><i class="fa fa-sync"></i></button>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Program *</label>
+          <select id="tFProgram" onchange="tAutoGen()" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+            <option value="">Select...</option>
+            <?php
+            try {
+                $db2 = getDBConnection();
+                $progs = $db2->query("SELECT title FROM programs WHERE status='active' ORDER BY title")->fetchAll();
+                foreach ($progs as $p) echo '<option>'.htmlspecialchars($p['title']).'</option>';
+            } catch(Exception $e) {}
+            ?>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Username <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#004080;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px"><i class="fa fa-magic"></i> Auto</span></label>
+          <div style="display:flex">
+            <input type="text" id="tFUser" placeholder="student.ram" style="flex:1;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px 0 0 8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+            <button onclick="tGenUser()" style="padding:0 12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:0 8px 8px 0;cursor:pointer;font-size:13px" title="Regenerate"><i class="fa fa-sync"></i></button>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Password <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#004080;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px"><i class="fa fa-magic"></i> Auto</span></label>
+          <div style="display:flex">
+            <input type="text" id="tFPass" placeholder="Auto123!" style="flex:1;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px 0 0 8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+            <button onclick="tGenPass()" style="padding:0 12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:0 8px 8px 0;cursor:pointer;font-size:13px" title="Regenerate"><i class="fa fa-sync"></i></button>
+            <button onclick="tCopyPass()" style="padding:0 12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:0 8px 8px 0;cursor:pointer;font-size:13px;border-left:1px solid rgba(255,255,255,.3);margin-left:1px" title="Copy"><i class="fa fa-copy" id="tCopyIcon"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credentials box -->
+      <div id="tCredBox" style="display:none;background:linear-gradient(135deg,#e8f0fe,#f0f4ff);border:2px solid #004080;border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px">
+        <div style="font-weight:700;color:#004080;margin-bottom:5px"><i class="fa fa-key"></i> Generated Credentials</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          <span><i class="fa fa-user" style="color:#004080"></i> <strong>User:</strong> <code id="tCredUser" style="background:#fff;padding:2px 7px;border-radius:5px;color:#004080"></code></span>
+          <span><i class="fa fa-lock" style="color:#004080"></i> <strong>Pass:</strong> <code id="tCredPass" style="background:#fff;padding:2px 7px;border-radius:5px;color:#dc3545"></code></span>
+        </div>
+        <div style="font-size:11px;color:#888;margin-top:5px"><i class="fa fa-info-circle"></i> Share these with the student after saving.</div>
+      </div>
+
+      <hr style="border:none;border-top:1px dashed #e0e6ef;margin:12px 0">
+
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Email <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#004080;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px"><i class="fa fa-magic"></i> Auto</span></label>
+        <div style="display:flex">
+          <input type="email" id="tFEmail" placeholder="student@scti.edu.np" style="flex:1;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px 0 0 8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+          <button onclick="tGenEmail()" style="padding:0 12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:0 8px 8px 0;cursor:pointer;font-size:13px" title="Regenerate Email"><i class="fa fa-sync"></i></button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Phone</label>
+          <input type="text" id="tFPhone" placeholder="98XXXXXXXX" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Qualification</label>
+          <input type="text" id="tFQual" placeholder="e.g. +2 Science" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Semester</label>
+        <select id="tFSem" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+          <option value="">Select...</option>
+          <option value="Semester 1">Semester 1</option>
+          <option value="Semester 2">Semester 2</option>
+          <option value="Semester 3">Semester 3</option>
+          <option value="Semester 4">Semester 4</option>
+          <option value="Semester 5">Semester 5</option>
+          <option value="Semester 6">Semester 6</option>
+        </select>
+      </div>
+
+      <button onclick="tSaveStudent()" id="tSaveBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(0,64,128,.35)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <i class="fa fa-save"></i> Save Student
+      </button>
+      <button onclick="tResetForm()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">
+        <i class="fa fa-times"></i> Cancel / Reset
+      </button>
+    </div>
+
+    <!-- STUDENT LIST TABLE -->
+    <div class="card" style="padding:24px;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h2 style="margin:0;color:#004080;font-size:16px"><i class="fa fa-users"></i> Student List</h2>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="tSSearch" placeholder="Search..." oninput="tFilterStudents()" style="padding:7px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;width:160px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+          <button onclick="tLoadStudents()" style="padding:7px 14px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600"><i class="fa fa-sync"></i></button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)">
+          <thead>
+            <tr>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">#</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Student</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">ID</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Program</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Semester</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tStudentTbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#999"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- Recent Activity -->
   <div class="recent-activity">
     <h2><i class="fa fa-history"></i> Recent Activity</h2>
@@ -303,6 +438,115 @@ function timeAgo($dt) {
 
 </div>
 <footer class="footer" style="margin-top:40px"><p>&copy; 2025 Sindhuli Community Technical Institute (SCTI) - Teacher Portal</p></footer>
+
+<script>
+var tAllStudents = [];
+
+function tAutoGen() {
+  tGenSid(); tGenUser(); tGenEmail();
+  if (!document.getElementById('tFPass').value) tGenPass();
+  tUpdateCred();
+}
+function tUpdateCred() {
+  var u = document.getElementById('tFUser').value.trim();
+  var p = document.getElementById('tFPass').value.trim();
+  var box = document.getElementById('tCredBox');
+  if (u || p) {
+    document.getElementById('tCredUser').textContent = u || '—';
+    document.getElementById('tCredPass').textContent = p || '—';
+    box.style.display = 'block';
+  } else { box.style.display = 'none'; }
+}
+function tGenSid() {
+  var yr = new Date().getFullYear();
+  document.getElementById('tFSid').value = 'STU-' + yr + '-' + (Math.floor(Math.random()*900)+100);
+}
+function tGenUser() {
+  var name = document.getElementById('tFName').value.trim().toLowerCase().split(/\s+/);
+  var base = name.length >= 2 ? name[0]+'.'+name[name.length-1] : (name[0]||'student')+Math.floor(Math.random()*99+1);
+  document.getElementById('tFUser').value = base.replace(/[^a-z0-9.]/g,'') || 'student'+Math.floor(Math.random()*999);
+  tUpdateCred();
+}
+function tGenEmail() {
+  var u = document.getElementById('tFUser').value.trim();
+  if (u) document.getElementById('tFEmail').value = u + '@student.scti.edu.np';
+}
+function tGenPass() {
+  var u='ABCDEFGHJKLMNPQRSTUVWXYZ',l='abcdefghjkmnpqrstuvwxyz',d='23456789',s='@#$!';
+  var p = u[~~(Math.random()*u.length)]+l[~~(Math.random()*l.length)]+l[~~(Math.random()*l.length)]+d[~~(Math.random()*d.length)]+d[~~(Math.random()*d.length)]+s[~~(Math.random()*s.length)]+l[~~(Math.random()*l.length)]+u[~~(Math.random()*u.length)];
+  document.getElementById('tFPass').value = p.split('').sort(function(){return Math.random()-.5;}).join('');
+  tUpdateCred();
+}
+function tCopyPass() {
+  var pwd = document.getElementById('tFPass').value;
+  if (!pwd) return;
+  navigator.clipboard.writeText(pwd).then(function(){
+    document.getElementById('tCopyIcon').className = 'fa fa-check';
+    setTimeout(function(){ document.getElementById('tCopyIcon').className = 'fa fa-copy'; }, 2000);
+  });
+}
+function tSaveStudent() {
+  var name = document.getElementById('tFName').value.trim();
+  var sid  = document.getElementById('tFSid').value.trim();
+  var user = document.getElementById('tFUser').value.trim();
+  var pass = document.getElementById('tFPass').value.trim();
+  var prog = document.getElementById('tFProgram').value;
+  var alert = document.getElementById('tAddAlert');
+  if (!name || !prog) { alert.className=''; alert.style.cssText='display:block;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb'; alert.textContent='Name and Program are required'; return; }
+  if (!sid || !user || !pass) { alert.className=''; alert.style.cssText='display:block;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb'; alert.textContent='Please generate Student ID, Username and Password'; return; }
+  var btn = document.getElementById('tSaveBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
+  fetch('../pages/student-save.php', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({id:0, name:name, student_id:sid, username:user, password:pass, program:prog,
+      email:document.getElementById('tFEmail').value.trim(), phone:document.getElementById('tFPhone').value.trim(),
+      qualification:document.getElementById('tFQual').value.trim(), semester:document.getElementById('tFSem').value, status:'active'})
+  }).then(function(r){return r.json();}).then(function(d){
+    btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Student';
+    if (d.success) {
+      alert.style.cssText='display:block;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#d4edda;color:#155724;border:1px solid #c3e6cb';
+      alert.textContent = 'Student saved! Login: '+user+' / '+pass;
+      tResetForm(); tLoadStudents();
+    } else { alert.style.cssText='display:block;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb'; alert.textContent=d.message||'Failed'; }
+  }).catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Student'; });
+}
+function tResetForm() {
+  ['tFName','tFSid','tFUser','tFPass','tFEmail','tFPhone','tFQual'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('tFProgram').value=''; document.getElementById('tFSem').value='';
+  document.getElementById('tCredBox').style.display='none';
+}
+function tLoadStudents() {
+  document.getElementById('tStudentTbody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
+  fetch('../pages/student-list.php').then(function(r){return r.json();}).then(function(d){
+    tAllStudents = d.students || [];
+    tRenderStudents(tAllStudents);
+  }).catch(function(){
+    document.getElementById('tStudentTbody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999">Failed to load</td></tr>';
+  });
+}
+function tFilterStudents() {
+  var q = document.getElementById('tSSearch').value.toLowerCase();
+  tRenderStudents(tAllStudents.filter(function(s){ return !q || (s.full_name||'').toLowerCase().includes(q) || (s.student_id||'').toLowerCase().includes(q) || (s.program||'').toLowerCase().includes(q); }));
+}
+function tRenderStudents(list) {
+  if (!list.length) { document.getElementById('tStudentTbody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999">No students found</td></tr>'; return; }
+  document.getElementById('tStudentTbody').innerHTML = list.map(function(s,i){
+    var bdg = s.status==='active' ? 'background:#d4edda;color:#155724' : 'background:#f8d7da;color:#721c24';
+    var init = (s.full_name||'?').charAt(0).toUpperCase();
+    return '<tr style="transition:.2s" onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'
+      +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+(i+1)+'</td>'
+      +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px"><div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#004080,#0059b3);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;flex-shrink:0">'+init+'</span>'+esc2(s.full_name)+'</div></td>'
+      +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc2(s.student_id||'-')+'</td>'
+      +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc2(s.program||'-')+'</td>'
+      +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+(s.semester||'-')+'</td>'
+      +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px"><span style="padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;'+bdg+'">'+cap2(s.status)+'</span></td>'
+      +'</tr>';
+  }).join('');
+}
+function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cap2(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+tLoadStudents();
+</script>
 
 <?php if (!empty($_SESSION['first_login'])): ?>
 <div id="firstLoginOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">

@@ -318,6 +318,101 @@ function timeAgo($dt) {
     </div>
   </div>
 
+  <!-- Profile Edit Form -->
+  <div style="display:grid;grid-template-columns:400px 1fr;gap:20px;margin-bottom:30px">
+
+    <!-- PROFILE FORM -->
+    <div class="card" style="padding:24px">
+      <h2 style="margin-top:0;color:#004080;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid #e8f0fe;font-size:16px"><i class="fa fa-user-edit"></i> My Profile</h2>
+      <div id="spAlert" style="display:none;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Full Name</label>
+        <input type="text" id="spName" value="<?=htmlspecialchars($stuData['full_name'] ?? $fullName)?>" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;transition:.2s" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Student ID <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#004080;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px"><i class="fa fa-lock"></i> Fixed</span></label>
+          <input type="text" value="<?=htmlspecialchars($stuData['student_id'] ?? '-')?>" readonly style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;background:#f8f9fa;color:#666">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Program</label>
+          <input type="text" value="<?=htmlspecialchars($stuData['course'] ?? '-')?>" readonly style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;background:#f8f9fa;color:#666">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Username <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#004080;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px"><i class="fa fa-lock"></i> Fixed</span></label>
+          <input type="text" value="<?=htmlspecialchars($stuData['username'] ?? $username)?>" readonly style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;background:#f8f9fa;color:#666">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Semester</label>
+          <input type="text" value="<?=htmlspecialchars($stuData['semester'] ?? '-')?>" readonly style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;background:#f8f9fa;color:#666">
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px dashed #e0e6ef;margin:12px 0">
+
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Email</label>
+        <input type="email" id="spEmail" value="<?=htmlspecialchars($stuData['email'] ?? '')?>" placeholder="your@email.com" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Phone</label>
+          <input type="text" id="spPhone" value="<?=htmlspecialchars($stuData['phone'] ?? '')?>" placeholder="98XXXXXXXX" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Qualification</label>
+          <input type="text" id="spQual" value="<?=htmlspecialchars($stuData['qualification'] ?? '')?>" placeholder="e.g. +2 Science" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">Address</label>
+        <input type="text" id="spAddress" value="<?=htmlspecialchars($stuData['address'] ?? '')?>" placeholder="e.g. Sindhuli" style="width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px" onfocus="this.style.borderColor='#004080'" onblur="this.style.borderColor='#dee2e6'">
+      </div>
+
+      <button onclick="spSave()" id="spSaveBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(0,64,128,.35)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <i class="fa fa-save"></i> Update Profile
+      </button>
+      <a href="../pages/change-password.php" style="display:block;text-align:center;margin-top:10px;padding:10px;background:#f0f0f0;color:#555;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">
+        <i class="fa fa-key"></i> Change Password
+      </a>
+    </div>
+
+    <!-- GRADES / ATTENDANCE SUMMARY TABLE -->
+    <div class="card" style="padding:24px;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h2 style="margin:0;color:#004080;font-size:16px"><i class="fa fa-chart-bar"></i> My Academic Summary</h2>
+        <div style="display:flex;gap:8px">
+          <button onclick="spLoadTab('grades')" id="spTabGrades" style="padding:6px 14px;border:2px solid #004080;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#004080;color:#fff;transition:.2s">Grades</button>
+          <button onclick="spLoadTab('attendance')" id="spTabAtt" style="padding:6px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:#555;transition:.2s">Attendance</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)">
+          <thead id="spTableHead">
+            <tr>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">#</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Subject</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Internal</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">External</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Total</th>
+              <th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Grade</th>
+            </tr>
+          </thead>
+          <tbody id="spTableBody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#999"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- Recent Activity -->
   <div class="recent-activity">
     <h2><i class="fa fa-history"></i> Recent Activity</h2>
@@ -344,6 +439,104 @@ function timeAgo($dt) {
 
 </div>
 <footer class="footer" style="margin-top:40px"><p>&copy; 2025 Sindhuli Community Technical Institute (SCTI) - Student Portal</p></footer>
+
+<script>
+var spCurrentTab = 'grades';
+
+function spSave() {
+  var btn = document.getElementById('spSaveBtn');
+  var alert = document.getElementById('spAlert');
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
+  var fd = new FormData();
+  fd.append('full_name', document.getElementById('spName').value.trim());
+  fd.append('email', document.getElementById('spEmail').value.trim());
+  fd.append('phone', document.getElementById('spPhone').value.trim());
+  fd.append('qualification', document.getElementById('spQual').value.trim());
+  fd.append('address', document.getElementById('spAddress').value.trim());
+  fetch('../pages/update-profile.php', {method:'POST', body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Update Profile';
+      if (d.success) {
+        alert.style.cssText='display:block;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#d4edda;color:#155724;border:1px solid #c3e6cb';
+        alert.textContent = 'Profile updated successfully!';
+      } else {
+        alert.style.cssText='display:block;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb';
+        alert.textContent = d.message || 'Update failed';
+      }
+      setTimeout(function(){ alert.style.display='none'; }, 5000);
+    }).catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Update Profile'; });
+}
+
+function spLoadTab(tab) {
+  spCurrentTab = tab;
+  var gBtn = document.getElementById('spTabGrades');
+  var aBtn = document.getElementById('spTabAtt');
+  if (tab === 'grades') {
+    gBtn.style.cssText='padding:6px 14px;border:2px solid #004080;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#004080;color:#fff;transition:.2s';
+    aBtn.style.cssText='padding:6px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:#555;transition:.2s';
+    document.getElementById('spTableHead').innerHTML = '<tr>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">#</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Subject</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Internal</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">External</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Total</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Grade</th>'
+      +'</tr>';
+    document.getElementById('spTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
+    fetch('../pages/grade-get.php')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var rows = (d.grades||[]);
+        if (!rows.length) { document.getElementById('spTableBody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:#999">No grades recorded yet</td></tr>'; return; }
+        document.getElementById('spTableBody').innerHTML = rows.map(function(g,i){
+          var total = (parseFloat(g.internal_marks)||0)+(parseFloat(g.external_marks)||0);
+          var grade = total>=90?'A+':total>=80?'A':total>=70?'B+':total>=60?'B':total>=50?'C':'F';
+          var gc = total>=50?'background:#d4edda;color:#155724':'background:#f8d7da;color:#721c24';
+          return '<tr onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+(i+1)+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(g.subject)+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+g.internal_marks+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+g.external_marks+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px;font-weight:700">'+total+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px"><span style="padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;'+gc+'">'+grade+'</span></td>'
+            +'</tr>';
+        }).join('');
+      }).catch(function(){ document.getElementById('spTableBody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:#999">Failed to load</td></tr>'; });
+  } else {
+    gBtn.style.cssText='padding:6px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:#555;transition:.2s';
+    aBtn.style.cssText='padding:6px 14px;border:2px solid #004080;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#004080;color:#fff;transition:.2s';
+    document.getElementById('spTableHead').innerHTML = '<tr>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">#</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Date</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Subject</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Status</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Remarks</th>'
+      +'</tr>';
+    document.getElementById('spTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
+    fetch('../pages/student-attendance-data.php')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var rows = (d.attendance||[]);
+        if (!rows.length) { document.getElementById('spTableBody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:#999">No attendance records yet</td></tr>'; return; }
+        document.getElementById('spTableBody').innerHTML = rows.slice(0,20).map(function(a,i){
+          var isP = a.status==='present';
+          var sc = isP?'background:#d4edda;color:#155724':'background:#f8d7da;color:#721c24';
+          return '<tr onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+(i+1)+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.date)+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.subject||'—')+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px"><span style="padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;'+sc+'">'+cap3(a.status)+'</span></td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.remarks||'—')+'</td>'
+            +'</tr>';
+        }).join('');
+      }).catch(function(){ document.getElementById('spTableBody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:#999">Failed to load</td></tr>'; });
+  }
+}
+function esc3(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cap3(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+spLoadTab('grades');
+</script>
 
 <?php if (!empty($_SESSION['first_login'])): ?>
 <div id="firstLoginOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">

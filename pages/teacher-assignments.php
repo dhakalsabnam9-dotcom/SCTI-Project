@@ -418,7 +418,11 @@ function renderSubmissions(res, a) {
         + '<td style="color:#aaa;font-size:12px">'+(i+1)+'</td>'
         + '<td><div style="font-weight:700;font-size:13px">'+esc(st.full_name)+'</div><div style="font-size:11px;color:#888">'+esc(st.student_id)+'</div></td>'
         + '<td><span class="badge" style="background:#f0f0f0;color:#aaa">Not Submitted</span></td>'
-        + '<td colspan="5" style="color:#bbb;font-size:12px">—</td>'
+        + '<td style="color:#bbb;font-size:12px">—</td>'
+        + '<td style="color:#bbb;font-size:12px">—</td>'
+        + '<td style="color:#bbb;font-size:12px">—</td>'
+        + '<td style="color:#bbb;font-size:12px">—</td>'
+        + '<td style="color:#bbb;font-size:12px">—</td>'
         + '</tr>';
     }
   });

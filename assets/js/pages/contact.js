@@ -130,15 +130,15 @@ const contactPage = `
           <div class="cp-panel-title"><i class="fa fa-map-pin"></i> Find Us</div>
           <div class="cp-map-wrap">
             <iframe
-              src="https://scti.edu.np/map/"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3537.2!2d85.9693!3d27.2590!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb5b3b3b3b3b3b%3A0xabcdef1234567890!2sKamalamai%20Municipality%2C%20Sindhuli%2C%20Nepal!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp"
               allowfullscreen=""
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
-              title="SCTI Location">
+              title="SCTI Location - Kamalamai, Sindhuli">
             </iframe>
           </div>
-          <a class="cp-map-link" href="https://scti.edu.np/map/" target="_blank" rel="noopener noreferrer">
-            <i class="fa fa-external-link-alt"></i> Open Full Map
+          <a class="cp-map-link" href="https://maps.google.com/?q=Kamalamai+Municipality+Sindhuli+Nepal" target="_blank" rel="noopener noreferrer">
+            <i class="fa fa-external-link-alt"></i> Open in Google Maps
           </a>
         </div>
         <div class="cp-panel">

@@ -33,7 +33,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    $sql    = "SELECT id, title, description, file_path, thumbnail_path, category, created_at
+    $sql    = "SELECT id, title, description, file_path, thumbnail_path, file_type, category, created_at
                FROM gallery_images WHERE is_active = 1";
     $params = [];
 

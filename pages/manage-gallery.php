@@ -365,12 +365,32 @@ async function loadGallery() {
       const dt = new Date(img.created_at);
       if (dt.toDateString() === today) todayCnt++;
       const date  = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const ftype = img.file_type || 'image';
       const thumb = img.thumbnail_path || img.file_path;
+
+      // Thumbnail area based on file type
+      let thumbHtml;
+      if (ftype === 'image') {
+        thumbHtml = `<img src="../${thumb}" alt="${img.title}" loading="lazy" onerror="this.src='../assets/images/img1.jpg'">`;
+      } else if (ftype === 'video') {
+        thumbHtml = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1a1a2e;color:#fff;gap:8px">
+          <i class="fa fa-play-circle" style="font-size:48px;color:#17a2b8"></i>
+          <span style="font-size:11px;opacity:.7">VIDEO</span></div>`;
+      } else if (ftype === 'audio') {
+        thumbHtml = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0d1b2a;color:#fff;gap:8px">
+          <i class="fa fa-music" style="font-size:48px;color:#a78bfa"></i>
+          <span style="font-size:11px;opacity:.7">AUDIO</span></div>`;
+      } else {
+        thumbHtml = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1e293b;color:#fff;gap:8px">
+          <i class="fa fa-file-alt" style="font-size:48px;color:#f97316"></i>
+          <span style="font-size:11px;opacity:.7">DOCUMENT</span></div>`;
+      }
+
       return `<div class="gcard">
         <div class="gimg">
-          <img src="../${thumb}" alt="${img.title}" loading="lazy" onerror="this.src='../assets/images/img1.jpg'">
+          ${thumbHtml}
           ${img.category ? `<span class="gcat">${img.category}</span>` : ''}
-          <button class="gview" onclick="quickView('../${img.file_path}','${img.title.replace(/'/g,"\\'")}')"><i class="fa fa-eye"></i> View</button>
+          <button class="gview" onclick="quickView('../${img.file_path}','${img.title.replace(/'/g,"\\'")}','${ftype}')"><i class="fa fa-eye"></i> View</button>
           <div class="govl"><span>${img.title}</span></div>
         </div>
         <div class="gbody">
@@ -391,13 +411,24 @@ async function loadGallery() {
 }
 
 // -- Quick view ----------------------------------------------
-function quickView(path, title) {
+function quickView(path, title, ftype) {
+    ftype = ftype || 'image';
+  let mediaHtml;
+  if (ftype === 'video') {
+    mediaHtml = `<video controls autoplay style="width:100%;max-height:75vh;background:#000;display:block"><source src="${path}">Your browser does not support video.</video>`;
+  } else if (ftype === 'audio') {
+    mediaHtml = `<div style="padding:40px 20px;background:#0d1b2a;text-align:center"><i class="fa fa-music" style="font-size:64px;color:#a78bfa;margin-bottom:20px;display:block"></i><audio controls autoplay style="width:100%;margin-top:10px"><source src="${path}">Your browser does not support audio.</audio></div>`;
+  } else if (ftype === 'document') {
+    mediaHtml = `<div style="padding:40px 20px;background:#1e293b;text-align:center"><i class="fa fa-file-alt" style="font-size:64px;color:#f97316;margin-bottom:20px;display:block"></i><a href="${path}" target="_blank" download style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#f97316;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px"><i class="fa fa-download"></i> Download File</a></div>`;
+  } else {
+    mediaHtml = `<img src="${path}" alt="${title}" style="width:100%;max-height:80vh;object-fit:contain;display:block">`;
+  }
   const m = document.createElement('div');
   m.className = 'modal on'; m.style.zIndex = '2000';
   m.innerHTML = `<div class="mbox" style="max-width:90%;padding:0;overflow:hidden;">
     <div style="position:relative;">
       <button onclick="this.closest('.modal').remove()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;z-index:10">�</button>
-      <img src="${path}" alt="${title}" style="width:100%;max-height:80vh;object-fit:contain;display:block">
+      ${mediaHtml}
       <div style="padding:12px;background:#fff"><strong style="color:#17a2b8">${title}</strong></div>
     </div>
   </div>`;

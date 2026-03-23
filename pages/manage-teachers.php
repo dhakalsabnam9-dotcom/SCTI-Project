@@ -66,22 +66,36 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .toolbar input:focus,.toolbar select:focus{outline:none;border-color:#004080}
     .btn-refresh{padding:9px 16px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.2s}
     .btn-refresh:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,64,128,.3)}
-    /* Cards → replaced with table */
-    table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
-    th{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:12px 14px;text-align:left;font-size:13px}
-    td{padding:11px 14px;border-bottom:1px solid #f0f0f0;font-size:13px}
-    tr:hover td{background:#f0f4ff}
-    .badge{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700}
-    .badge-active{background:#d4edda;color:#155724}
-    .badge-inactive{background:#f8d7da;color:#721c24}
-    .action-btns{display:flex;gap:5px}
-    .btn-icon{width:30px;height:30px;border:none;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:.2s}
-    .btn-edit-i{background:#d4edda;color:#155724}
-    .btn-del-i{background:#f8d7da;color:#721c24}
-    .btn-icon:hover{transform:scale(1.1)}
-    .avatar-sm{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#004080,#0059b3);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0}
-    .teacher-cell{display:flex;align-items:center}
-    .empty-row td{text-align:center;padding:40px;color:#999}
+    /* Cards */
+    .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .tcard{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:.25s;border:2px solid transparent}
+    .tcard:hover{transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,64,128,.18);border-color:#004080}
+    .tcard-head{background:linear-gradient(135deg,#004080,#0059b3);padding:22px 16px;text-align:center;color:white;position:relative}
+    .tcard-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 10px;transition:.3s}
+    .tcard:hover .tcard-avatar{background:rgba(255,255,255,.35);transform:scale(1.08)}
+    .tcard-name{font-size:14px;font-weight:700;margin-bottom:2px}
+    .tcard-dept{font-size:11px;opacity:.85;background:rgba(255,255,255,.15);display:inline-block;padding:2px 10px;border-radius:10px;margin-top:4px}
+    .tcard-body{padding:14px}
+    .tcard-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#555;padding:5px 0;border-bottom:1px solid #f5f5f5}
+    .tcard-row:last-of-type{border-bottom:none}
+    .tcard-row i{color:#004080;width:14px;font-size:11px;flex-shrink:0}
+    .tcard-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .tbdg{padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;display:inline-block;margin:8px 0 4px}
+    .tbdg-active{background:#d4edda;color:#155724}
+    .tbdg-inactive{background:#e2e3e5;color:#383d41}
+    .tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+    .tag{background:#e8f0fe;color:#004080;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+    /* Card action buttons */
+    .tcard-actions{display:flex;gap:6px;margin-top:10px}
+    .tbtn{flex:1;padding:7px 4px;border:none;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;transition:.2s;display:flex;align-items:center;justify-content:center;gap:4px}
+    .tbtn-edit{background:#fff3cd;color:#856404}
+    .tbtn-edit:hover{background:#ffc107;color:#fff;transform:translateY(-1px)}
+    .tbtn-act{background:#d4edda;color:#155724}
+    .tbtn-act:hover{background:#28a745;color:#fff;transform:translateY(-1px)}
+    .tbtn-deact{background:#fff3cd;color:#856404}
+    .tbtn-deact:hover{background:#fd7e14;color:#fff;transform:translateY(-1px)}
+    .tbtn-del{background:#f8d7da;color:#721c24}
+    .tbtn-del:hover{background:#dc3545;color:#fff;transform:translateY(-1px)}
     /* Empty / loading */
     .empty{text-align:center;padding:60px 20px;color:#ccc;grid-column:1/-1}
     .empty i{font-size:56px;display:block;margin-bottom:12px}
@@ -262,14 +276,9 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
       </select>
       <button class="btn-refresh" onclick="loadTeachers()"><i class="fa fa-sync"></i> Refresh</button>
     </div>
-    <table>
-      <thead>
-        <tr><th>#</th><th>Teacher</th><th>Teacher ID</th><th>Department</th><th>Contact</th><th>Qualification</th><th>Status</th><th>Actions</th></tr>
-      </thead>
-      <tbody id="tbody">
-        <tr class="empty-row"><td colspan="8"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>
-      </tbody>
-    </table>
+    <div class="tgrid" id="tgrid">
+      <div class="empty"><i class="fa fa-spinner fa-spin"></i><p>Loading teachers...</p></div>
+    </div>
   </div>
 </div>
 
@@ -502,22 +511,23 @@ function resetForm() {
 
 // ── LOAD & RENDER ─────────────────────────────────────────────
 function loadTeachers() {
-  document.getElementById('tbody').innerHTML = '<tr class="empty-row"><td colspan="8"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
+  var grid = document.getElementById('tgrid');
+  grid.innerHTML = '<div class="empty"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div>';
   fetch('teacher-list.php')
     .then(function(r){ return r.text(); })
     .then(function(txt){
       var d; try { d = JSON.parse(txt); } catch(e){
-        document.getElementById('tbody').innerHTML = '<tr class="empty-row"><td colspan="8">Parse error</td></tr>'; return;
+        grid.innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>Parse error</p></div>'; return;
       }
       if (!d.success) {
-        document.getElementById('tbody').innerHTML = '<tr class="empty-row"><td colspan="8">'+(d.message||'Error loading data')+'</td></tr>'; return;
+        grid.innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>'+(d.message||'Error loading data')+'</p></div>'; return;
       }
       allTeachers = d.teachers || [];
       updateStats();
       filterLocal();
     })
     .catch(function(e){
-      document.getElementById('tbody').innerHTML = '<tr class="empty-row"><td colspan="8">'+e.message+'</td></tr>';
+      grid.innerHTML = '<div class="empty"><i class="fa fa-exclamation-triangle"></i><p>'+e.message+'</p></div>';
     });
 }
 
@@ -539,31 +549,46 @@ function filterLocal() {
     var matchDept = !dept || t.department === dept;
     return matchQ && matchSt && matchDept;
   });
-  renderTable(list);
+  renderGrid(list);
 }
 
-function renderTable(list) {
+function renderGrid(list) {
+  var grid = document.getElementById('tgrid');
   if (!list.length) {
-    document.getElementById('tbody').innerHTML = '<tr class="empty-row"><td colspan="8"><i class="fa fa-chalkboard-teacher"></i> No teachers found</td></tr>';
+    grid.innerHTML = '<div class="empty"><i class="fa fa-chalkboard-teacher"></i><p>No teachers found</p></div>';
     return;
   }
-  document.getElementById('tbody').innerHTML = list.map(function(t, i){
-    var init = (t.name||'?').charAt(0).toUpperCase();
-    var bdg  = t.status==='active' ? 'badge-active' : 'badge-inactive';
-    return '<tr>'
-      + '<td>'+(i+1)+'</td>'
-      + '<td><div class="teacher-cell"><span class="avatar-sm">'+init+'</span>'+esc(t.name)+'</div></td>'
-      + '<td>'+esc(t.teacher_id||'-')+'</td>'
-      + '<td>'+esc(t.department||'-')+'</td>'
-      + '<td>'+esc(t.email||t.phone||'-')+'</td>'
-      + '<td>'+esc(t.qualification||'-')+'</td>'
-      + '<td><span class="badge '+bdg+'">'+cap(t.status)+'</span></td>'
-      + '<td><div class="action-btns">'
-      +   '<button class="btn-icon btn-edit-i" onclick="editTeacher('+t.id+')" title="Edit"><i class="fa fa-edit"></i></button>'
-      +   '<button class="btn-icon btn-del-i"  onclick="askDelete('+t.id+',\''+esc(t.name)+'\')" title="Delete"><i class="fa fa-trash"></i></button>'
-      + '</div></td>'
-      + '</tr>';
-  }).join('');
+  grid.innerHTML = list.map(buildCard).join('');
+}
+
+function buildCard(t) {
+  var isActive = t.status === 'active';
+  var bdgClass = isActive ? 'tbdg-active' : 'tbdg-inactive';
+  var tags = (t.subjects||'').split(',').filter(function(s){ return s.trim(); }).slice(0,3)
+    .map(function(s){ return '<span class="tag">'+esc(s.trim())+'</span>'; }).join('');
+  var toggleBtn = isActive
+    ? '<button class="tbtn tbtn-deact" onclick="toggleStatus('+t.id+',\'active\')"><i class="fa fa-ban"></i> Deactivate</button>'
+    : '<button class="tbtn tbtn-act"   onclick="toggleStatus('+t.id+',\'inactive\')"><i class="fa fa-check"></i> Activate</button>';
+  return '<div class="tcard">'
+    + '<div class="tcard-head">'
+    +   '<div class="tcard-avatar"><i class="fa fa-user-tie"></i></div>'
+    +   '<div class="tcard-name">'+esc(t.name)+'</div>'
+    +   '<div class="tcard-dept">'+esc(t.department||'—')+'</div>'
+    + '</div>'
+    + '<div class="tcard-body">'
+    +   '<div class="tcard-row"><i class="fa fa-id-badge"></i><span>'+esc(t.teacher_id||'—')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-user"></i><span>'+esc(t.username||'—')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-envelope"></i><span>'+esc(t.email||'—')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-graduation-cap"></i><span>'+esc(t.qualification||'—')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-clock"></i><span>'+esc(t.experience||'—')+'</span></div>'
+    +   '<span class="tbdg '+bdgClass+'">'+cap(t.status)+'</span>'
+    +   (tags ? '<div class="tags">'+tags+'</div>' : '')
+    +   '<div class="tcard-actions">'
+    +     '<button class="tbtn tbtn-edit" onclick="editTeacher('+t.id+')"><i class="fa fa-edit"></i> Edit</button>'
+    +     toggleBtn
+    +     '<button class="tbtn tbtn-del" onclick="askDelete('+t.id+',\''+esc(t.name)+'\')"><i class="fa fa-trash"></i> Del</button>'
+    +   '</div>'
+    + '</div></div>';
 }
 
 // ── HELPERS ───────────────────────────────────────────────────

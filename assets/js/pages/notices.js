@@ -12,7 +12,9 @@ const noticesPage = `
     .nbp-hero-inner h1{font-size:46px;font-weight:900;margin:0 0 12px;letter-spacing:-2px;text-shadow:0 2px 16px rgba(0,0,0,.3)}
     .nbp-hero-inner p{font-size:16px;opacity:.85;max-width:560px;margin:0 auto 28px;line-height:1.7}
     .nbp-hero-stats{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:28px}
-    .nbp-stat-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);border-radius:30px;padding:10px 24px;font-size:14px;font-weight:700;color:white;backdrop-filter:blur(6px)}
+    .nbp-stat-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);border-radius:30px;padding:10px 24px;font-size:14px;font-weight:700;color:white;backdrop-filter:blur(6px);cursor:pointer;transition:all .22s}
+    .nbp-stat-pill:hover{background:rgba(255,255,255,.28);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+    .nbp-stat-pill.nbp-pill-active{background:white;color:#4c1d95;box-shadow:0 6px 20px rgba(0,0,0,.2)}
     /* SEARCH BAR in hero */
     .nbp-search-wrap{max-width:560px;margin:0 auto 10px;position:relative;z-index:3}
     .nbp-search-row{display:flex;gap:0;background:white;border-radius:50px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.25)}
@@ -89,7 +91,20 @@ const noticesPage = `
     .nbp-abtn-edit{background:#fef3c7;color:#92400e}.nbp-abtn-edit:hover{background:#f59e0b;color:#fff}
     .nbp-abtn-tog{background:#d1fae5;color:#065f46}.nbp-abtn-tog:hover{background:#10b981;color:#fff}
     .nbp-abtn-del{background:#fee2e2;color:#991b1b}.nbp-abtn-del:hover{background:#dc2626;color:#fff}
-    /* CREATE/EDIT MODAL */
+    /* DETAIL MODAL */
+    .nbp-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9998;display:none;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+    .nbp-detail-overlay.open{display:flex}
+    .nbp-detail-modal{background:white;border-radius:24px;width:100%;max-width:640px;overflow:hidden;box-shadow:0 28px 70px rgba(0,0,0,.35);animation:nbpModalIn .25s ease;max-height:90vh;display:flex;flex-direction:column}
+    .nbp-detail-head{padding:28px 32px 22px;color:white;display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+    .nbp-detail-head h2{margin:0 0 8px;font-size:22px;font-weight:900;line-height:1.3}
+    .nbp-detail-head .nbp-detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .nbp-detail-close{background:rgba(255,255,255,.2);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0;transition:.2s}
+    .nbp-detail-close:hover{background:rgba(255,255,255,.38)}
+    .nbp-detail-body{padding:28px 32px;overflow-y:auto;flex:1}
+    .nbp-detail-body p{font-size:15px;color:#374151;line-height:1.9;white-space:pre-line;margin:0}
+    .nbp-detail-foot{padding:18px 32px;border-top:1px solid #f0f0f0;background:#fafafa;display:flex;justify-content:flex-end;flex-shrink:0}
+    .nbp-detail-close-btn{padding:11px 28px;background:linear-gradient(135deg,#4c1d95,#7c3aed);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px}
+    .nbp-detail-close-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(124,58,237,.35)}
     .nbp-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
     .nbp-modal-overlay.open{display:flex}
     .nbp-modal{background:white;border-radius:20px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.3);animation:nbpModalIn .25s ease}
@@ -126,9 +141,9 @@ const noticesPage = `
         <h1>Notice Board</h1>
         <p>Stay updated with the latest announcements, exam schedules, events and important dates at SCTI</p>
         <div class="nbp-hero-stats" id="nbpCounters" style="display:none">
-          <div class="nbp-stat-pill"><i class="fa fa-bell"></i><span id="nbpTotal">0</span>&nbsp;Total</div>
-          <div class="nbp-stat-pill"><i class="fa fa-circle-exclamation"></i><span id="nbpUrgent">0</span>&nbsp;Urgent</div>
-          <div class="nbp-stat-pill"><i class="fa fa-calendar-check"></i><span id="nbpRecent">0</span>&nbsp;This Month</div>
+          <div class="nbp-stat-pill" id="nbpPillAll" onclick="nbpPillFilter('','nbpPillAll')"><i class="fa fa-bell"></i><span id="nbpTotal">0</span>&nbsp;Total</div>
+          <div class="nbp-stat-pill" id="nbpPillUrgent" onclick="nbpPillFilter('urgent','nbpPillUrgent')"><i class="fa fa-circle-exclamation"></i><span id="nbpUrgent">0</span>&nbsp;Urgent</div>
+          <div class="nbp-stat-pill" id="nbpPillRecent" onclick="nbpPillFilter('recent','nbpPillRecent')"><i class="fa fa-calendar-check"></i><span id="nbpRecent">0</span>&nbsp;This Month</div>
         </div>
         <div class="nbp-search-wrap">
           <div class="nbp-search-row">
@@ -190,6 +205,25 @@ const noticesPage = `
         <a href="#" onclick="loadPage('contact');return false;" style="color:#a78bfa;text-decoration:none">Contact Us</a>
       </p>
     </footer>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div class="nbp-detail-overlay" id="nbpDetailModal">
+    <div class="nbp-detail-modal">
+      <div class="nbp-detail-head" id="nbpDetailHead">
+        <div style="flex:1;min-width:0">
+          <h2 id="nbpDetailTitle"></h2>
+          <div class="nbp-detail-meta" id="nbpDetailMeta"></div>
+        </div>
+        <button class="nbp-detail-close" onclick="nbpCloseDetail()"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="nbp-detail-body">
+        <p id="nbpDetailDesc"></p>
+      </div>
+      <div class="nbp-detail-foot">
+        <button class="nbp-detail-close-btn" onclick="nbpCloseDetail()"><i class="fa fa-check"></i> Close</button>
+      </div>
+    </div>
   </div>
 
   <!-- CREATE / EDIT MODAL -->
@@ -422,8 +456,8 @@ function nbpBuildCard(n) {
         <div class="nbp-card-footer">
           <span class="nbp-card-tag"><i class="fa fa-tag"></i> ${cfg.label}</span>
           ${!isActive ? '<span class="nbp-card-tag" style="background:#fee2e2;color:#991b1b"><i class="fa fa-eye-slash"></i> Inactive</span>' : ''}
-          <button class="nbp-read-btn" style="background:${cfg.bg}" onclick="nbpScrollTop()">
-            <i class="fa fa-arrow-up"></i> Back to Top
+          <button class="nbp-read-btn" style="background:${cfg.bg}" onclick="nbpOpenDetail(${n.id})">
+            <i class="fa fa-book-open"></i> Read More
           </button>
         </div>
         ${adminBar}
@@ -576,6 +610,68 @@ function nbpShowToast(msg, type) {
 
 function nbpScrollTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nbpOpenDetail(id) {
+  const n = _nbpAll.find(x => x.id == id);
+  if (!n) return;
+  const cat = (n.category || 'general').toLowerCase();
+  const cfg = _nbpCatCfg[cat] || _nbpCatCfg.general;
+  const pri = (n.priority || 'normal').toLowerCase();
+  const date = nbpFmtDate(n.notice_date || n.date || n.created_at);
+
+  document.getElementById('nbpDetailHead').style.background = `linear-gradient(135deg, ${cfg.bg}cc, ${cfg.bg})`;
+  document.getElementById('nbpDetailTitle').textContent = n.title || '';
+  document.getElementById('nbpDetailDesc').textContent = n.description || '';
+  document.getElementById('nbpDetailMeta').innerHTML = `
+    <span class="nbp-badge nbp-badge-cat" style="background:rgba(255,255,255,.25);color:white"><i class="fa ${cfg.icon}"></i> ${cfg.label}</span>
+    <span class="nbp-badge" style="background:rgba(255,255,255,.2);color:white"><i class="fa fa-calendar"></i> ${date}</span>
+    ${pri === 'urgent' ? '<span class="nbp-badge" style="background:rgba(255,255,255,.2);color:white"><i class="fa fa-circle-exclamation"></i> Urgent</span>' : ''}
+  `;
+  document.getElementById('nbpDetailModal').classList.add('open');
+}
+
+function nbpCloseDetail() {
+  document.getElementById('nbpDetailModal').classList.remove('open');
+}
+
+function nbpPillFilter(type, pillId) {
+  // Reset all pills
+  ['nbpPillAll','nbpPillUrgent','nbpPillRecent'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('nbp-pill-active');
+  });
+  const pill = document.getElementById(pillId);
+  if (pill) pill.classList.add('nbp-pill-active');
+
+  if (type === 'urgent') {
+    _nbpCat = 'urgent';
+    // also activate the filter bar button
+    document.querySelectorAll('.nbp-filter').forEach(b => b.classList.remove('nbp-active'));
+    const urgentBtn = [...document.querySelectorAll('.nbp-filter')].find(b => b.textContent.trim().includes('Urgent'));
+    if (urgentBtn) urgentBtn.classList.add('nbp-active');
+  } else if (type === 'recent') {
+    _nbpCat = '';
+    document.querySelectorAll('.nbp-filter').forEach(b => b.classList.remove('nbp-active'));
+    const allBtn = document.querySelector('.nbp-filter');
+    if (allBtn) allBtn.classList.add('nbp-active');
+    // filter to this month only
+    const now = new Date();
+    _nbpFiltered = _nbpAll.filter(n => {
+      const d = new Date(n.notice_date || n.date || n.created_at || 0);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    });
+    nbpRender();
+    document.querySelector('.nbp-main')?.scrollIntoView({ behavior: 'smooth' });
+    return;
+  } else {
+    _nbpCat = '';
+    document.querySelectorAll('.nbp-filter').forEach(b => b.classList.remove('nbp-active'));
+    const allBtn = document.querySelector('.nbp-filter');
+    if (allBtn) allBtn.classList.add('nbp-active');
+  }
+  nbpApply();
+  document.querySelector('.nbp-main')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 function nbpFmtDate(d) {

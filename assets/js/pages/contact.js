@@ -44,8 +44,10 @@ const contactPage = `
     .cp-social-tw{background:#1da1f2}
     .cp-social-yt{background:#ff0000}
     /* MAP */
-    .cp-map-wrap{border-radius:14px;overflow:hidden;height:200px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;font-weight:600;flex-direction:column;gap:8px;border:2px dashed #cbd5e1}
-    .cp-map-wrap i{font-size:36px;color:#94a3b8}
+    .cp-map-wrap{border-radius:14px;overflow:hidden;height:220px;position:relative;border:2px solid #e2e8f0;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+    .cp-map-wrap iframe{width:100%;height:100%;border:none;display:block}
+    .cp-map-link{display:block;margin-top:8px;text-align:center;font-size:12px;color:#004080;text-decoration:none;font-weight:600}
+    .cp-map-link:hover{text-decoration:underline}
     /* FORM */
     .cp-form-panel{background:white;border-radius:20px;padding:36px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
     .cp-form-title{font-size:22px;font-weight:800;color:#1a202c;margin:0 0 6px;display:flex;align-items:center;gap:10px}
@@ -127,9 +129,17 @@ const contactPage = `
         <div class="cp-panel">
           <div class="cp-panel-title"><i class="fa fa-map-pin"></i> Find Us</div>
           <div class="cp-map-wrap">
-            <i class="fa fa-map-location-dot"></i>
-            <span>Kamalamai Municipality, Sindhuli</span>
+            <iframe
+              src="https://scti.edu.np/map/"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="SCTI Location">
+            </iframe>
           </div>
+          <a class="cp-map-link" href="https://scti.edu.np/map/" target="_blank" rel="noopener noreferrer">
+            <i class="fa fa-external-link-alt"></i> Open Full Map
+          </a>
         </div>
         <div class="cp-panel">
           <div class="cp-panel-title"><i class="fa fa-circle-info"></i> Quick Info</div>

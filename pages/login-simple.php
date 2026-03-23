@@ -3,6 +3,37 @@ session_start();
 require_once('../includes/config.php');
 $conn = getDBConnection();
 
+// ── Remember Me auto-login ────────────────────────────────────────────────
+if (!isset($_SESSION['logged_in']) && !empty($_COOKIE['scti_remember'])) {
+    $parts = explode(':', $_COOKIE['scti_remember']);
+    if (count($parts) === 3) {
+        list($cookieType, $cookieId, $cookieToken) = $parts;
+        $tableMap2 = ['student'=>'students','teacher'=>'teachers'];
+        if (isset($tableMap2[$cookieType])) {
+            $tbl2 = $tableMap2[$cookieType];
+            try {
+                $chk = $conn->prepare("SELECT * FROM `$tbl2` WHERE id=? AND remember_token=? AND status='active' LIMIT 1");
+                $chk->execute([(int)$cookieId, $cookieToken]);
+                $u = $chk->fetch(PDO::FETCH_ASSOC);
+                if ($u) {
+                    $_SESSION['user_id']   = $u['id'];
+                    $_SESSION['username']  = $u['username'];
+                    $_SESSION['user_type'] = $cookieType;
+                    $_SESSION['full_name'] = $u['full_name'];
+                    $_SESSION['email']     = $u['email'];
+                    $_SESSION['logged_in'] = true;
+                    $upd2 = $conn->prepare("UPDATE `$tbl2` SET last_login=NOW(), updated_at=NOW() WHERE id=?");
+                    $upd2->execute([$u['id']]);
+                    $redir2 = ['student'=>'../dashboards/student-dashboard.php','teacher'=>'../dashboards/teacher-dashboard.php'];
+                    header('Location: ' . $redir2[$cookieType]); exit();
+                }
+            } catch(Exception $e) { /* ignore */ }
+        }
+    }
+    // Invalid cookie — clear it
+    setcookie('scti_remember', '', time() - 3600, '/');
+}
+
 $error = '';
 $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) || 
           (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
@@ -59,22 +90,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $_SESSION['email']     = $user['email'];
                         $_SESSION['logged_in'] = true;
 
-                        // Update last_login and updated_at
-                        $updateResult = false;
-                        $updateError  = '';
+                        // Update last_login using PDO
                         try {
-                            $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-                            if ($mysqli->connect_error) {
-                                $updateError = 'Connect error: ' . $mysqli->connect_error;
-                            } else {
-                                $uid = (int)$user['id'];
-                                $sql = "UPDATE `$table` SET `last_login`=NOW(), `updated_at`=NOW() WHERE `id`=$uid";
-                                $updateResult = $mysqli->query($sql);
-                                $updateError  = $mysqli->error;
-                                $mysqli->close();
-                            }
-                        } catch(Exception $ex) {
-                            $updateError = $ex->getMessage();
+                            $uid = (int)$user['id'];
+                            $upd = $conn->prepare("UPDATE `$table` SET `last_login`=NOW(), `updated_at`=NOW() WHERE `id`=?");
+                            $upd->execute([$uid]);
+                        } catch(Exception $ex) { /* non-fatal */ }
+
+                        // Remember Me — set cookie + save token
+                        $remember = !empty($_POST['remember']);
+                        if ($remember && $userType !== 'admin') {
+                            $token = bin2hex(random_bytes(32));
+                            try {
+                                $rt = $conn->prepare("UPDATE `$table` SET `remember_token`=? WHERE `id`=?");
+                                $rt->execute([$token, $uid]);
+                            } catch(Exception $ex) { /* non-fatal */ }
+                            $cookieVal = $userType . ':' . $uid . ':' . $token;
+                            setcookie('scti_remember', $cookieVal, time() + (30 * 24 * 3600), '/', '', false, true);
                         }
 
                         // First-login check: if last_login was NULL before update, set session flag
@@ -86,14 +118,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         if ($isAjax) {
                             header('Content-Type: application/json');
                             echo json_encode([
-                                'success'       => true,
-                                'redirect'      => $redirect,
-                                'userType'      => $userType,
-                                'first_login'   => $isFirstLogin,
-                                'update_result' => $updateResult,
-                                'update_error'  => $updateError,
-                                'user_id'       => $user['id'],
-                                'table'         => $table
+                                'success'     => true,
+                                'redirect'    => $redirect,
+                                'userType'    => $userType,
+                                'first_login' => $isFirstLogin
                             ]);
                             exit();
                         }

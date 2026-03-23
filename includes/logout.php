@@ -1,39 +1,20 @@
 <?php
 session_start();
+require_once '../includes/config.php';
 
-// Clear remember me cookie if exists
-if (isset($_COOKIE['remember_token'])) {
-    setcookie('remember_token', '', time() - 3600, "/");
-    
-    // Database configuration
-    $host = 'localhost';
-    $dbname = 'scti_school';
-    $username = 'root';
-    $password = '';
-    
-    try {
-        $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        // Clear remember token from database
-        if (isset($_SESSION['user_id']) && isset($_SESSION['user_type'])) {
-            $table = $_SESSION['user_type'] . 's';
-            $stmt = $conn->prepare("UPDATE $table SET remember_token = NULL WHERE id = :id");
-            $stmt->bindParam(':id', $_SESSION['user_id']);
-            $stmt->execute();
-        }
-        
-        $conn = null;
-    } catch(PDOException $e) {
-        // Silent fail
+// Clear remember me cookie and DB token
+if (!empty($_COOKIE['scti_remember'])) {
+    setcookie('scti_remember', '', time() - 3600, '/');
+    if (isset($_SESSION['user_id'], $_SESSION['user_type'])) {
+        try {
+            $db = getDBConnection();
+            $tbl = $_SESSION['user_type'] === 'teacher' ? 'teachers' : 'students';
+            $db->prepare("UPDATE `$tbl` SET remember_token=NULL WHERE id=?")->execute([$_SESSION['user_id']]);
+        } catch(Exception $e) { /* ignore */ }
     }
 }
 
-// Destroy session
 session_unset();
 session_destroy();
-
-// Redirect to home page
 header("Location: ../index.php");
 exit();
-?>

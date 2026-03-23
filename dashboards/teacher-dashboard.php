@@ -278,7 +278,7 @@ function timeAgo($dt) {
   </div>
 
   <!-- Add Student Form + Student List -->
-  <div style="display:grid;grid-template-columns:400px 1fr;gap:20px;margin-bottom:30px">
+  <div style="display:grid;grid-template-columns:400px 1fr;gap:20px;margin-bottom:30px;align-items:start">
 
     <!-- ADD STUDENT FORM -->
     <div class="card" style="padding:24px">
@@ -375,7 +375,7 @@ function timeAgo($dt) {
         </select>
       </div>
 
-      <button onclick="tSaveStudent()" id="tSaveBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(0,64,128,.35)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <button onclick="tSaveStudent()" id="tSaveBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s;position:relative;z-index:1">
         <i class="fa fa-save"></i> Save Student
       </button>
       <button onclick="tResetForm()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">
@@ -384,7 +384,7 @@ function timeAgo($dt) {
     </div>
 
     <!-- STUDENT LIST TABLE -->
-    <div class="card" style="padding:24px;overflow:auto">
+    <div class="card" style="padding:24px;overflow:hidden">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <h2 style="margin:0;color:#004080;font-size:16px"><i class="fa fa-users"></i> Student List</h2>
         <div style="display:flex;gap:8px">

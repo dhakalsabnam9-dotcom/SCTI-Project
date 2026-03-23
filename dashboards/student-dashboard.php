@@ -206,18 +206,34 @@ function timeAgo($dt) {
   <div class="content-grid">
     <div class="card">
       <h2><i class="fa fa-book-open"></i> My Courses</h2>
+      <?php if (!empty($stuData['course'])): ?>
+      <div style="background:linear-gradient(135deg,#004080,#0059b3);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="color:#fff;font-weight:700;font-size:15px"><?=htmlspecialchars($stuData['course'])?></div>
+          <div style="color:rgba(255,255,255,.75);font-size:12px;margin-top:2px"><i class="fa fa-layer-group"></i> <?=htmlspecialchars($stuData['semester'] ?? '')?></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="background:rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700"><i class="fa fa-book"></i> <?=$enrolledCourses?> Subjects</span>
+        </div>
+      </div>
+      <?php endif; ?>
       <ul class="course-list">
         <?php if (empty($courses)): ?>
-        <li class="course-item"><span style="color:#999">No courses found.</span></li>
+        <li class="course-item"><span style="color:#999">No subjects found. Contact admin to set up your program.</span></li>
         <?php else: ?>
-        <?php foreach ($courses as $c): ?>
+        <?php foreach ($courses as $idx => $c): ?>
         <li class="course-item" onclick="window.location.href='../pages/student-courses.php'">
-          <div>
-            <div class="course-name"><?=htmlspecialchars($c['title'])?></div>
-            <small style="color:#666"><?=htmlspecialchars($c['duration'] ?? '')?></small>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#004080,#0059b3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0"><?=$idx+1?></div>
+            <div>
+              <div class="course-name"><?=htmlspecialchars($c['title'])?></div>
+              <?php if (!empty($c['duration'])): ?>
+              <small style="color:#999"><i class="fa fa-clock" style="color:#004080"></i> <?=htmlspecialchars($c['duration'])?></small>
+              <?php endif; ?>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="background:#cce5ff;color:#004080;padding:4px 10px;border-radius:12px;font-size:12px"><?=htmlspecialchars($c['status'] ?? 'Active')?></span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:#e8f0fe;color:#004080;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600"><?=htmlspecialchars(ucfirst($c['status'] ?? 'Active'))?></span>
             <i class="fa fa-chevron-right ci-arrow"></i>
           </div>
         </li>

@@ -130,7 +130,7 @@ function timeAgo($dt) {
     .stat-card:hover .card-arrow{opacity:1;color:rgba(255,255,255,.9);right:10px}
     /* -- QUICK LINKS -- */
     .quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
-    .quick-link{border-radius:14px;color:white;padding:22px 14px;text-decoration:none;text-align:center;transition:all .35s cubic-bezier(.25,.8,.25,1);display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+    .quick-link{border-radius:14px;color:white;padding:22px 14px 18px;text-decoration:none;text-align:center;transition:all .35s cubic-bezier(.25,.8,.25,1);display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.15)}
     .quick-link::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%);transition:width .55s,height .55s}
     .quick-link:hover::before{width:280px;height:280px}
     .quick-link:hover{transform:translateY(-7px) scale(1.04);box-shadow:0 16px 32px rgba(0,0,0,.25)}
@@ -258,14 +258,58 @@ function timeAgo($dt) {
   </div>
 
   <div class="card">
-    <h2><i class="fa fa-bolt"></i> Quick Links</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin:0;color:#004080"><i class="fa fa-bolt"></i> Quick Actions</h2>
+      <span style="font-size:12px;color:#aaa">6 shortcuts</span>
+    </div>
     <div class="quick-links">
-      <a href="../pages/student-attendance.php" class="quick-link ql-blue"><i class="fa fa-calendar-check"></i><span>Attendance</span></a>
-      <a href="../pages/student-grades.php" class="quick-link ql-green"><i class="fa fa-chart-line"></i><span>Grades</span></a>
-      <a href="../pages/student-assignments.php" class="quick-link ql-orange"><i class="fa fa-file-alt"></i><span>Assignments</span></a>
-      <a href="../pages/student-timetable.php" class="quick-link ql-teal"><i class="fa fa-clock"></i><span>Timetable</span></a>
-      <a href="../pages/student-library.php" class="quick-link ql-purple"><i class="fa fa-book"></i><span>Library</span></a>
-      <a href="../pages/student-profile.php" class="quick-link ql-pink"><i class="fa fa-user"></i><span>Profile</span></a>
+
+      <a href="../pages/student-attendance.php" class="quick-link ql-blue">
+        <div style="position:relative">
+          <i class="fa fa-calendar-check"></i>
+          <?php if ($attPct < 75 && $attPct > 0): ?>
+          <span style="position:absolute;top:-8px;right:-10px;background:#ff4757;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700">!</span>
+          <?php endif; ?>
+        </div>
+        <span>Attendance</span>
+        <small style="font-size:10px;opacity:.8;position:relative;z-index:1"><?=$attPct?>% this term</small>
+      </a>
+
+      <a href="../pages/student-grades.php" class="quick-link ql-green">
+        <i class="fa fa-chart-line"></i>
+        <span>My Grades</span>
+        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">GPA <?=number_format($gpa,1)?></small>
+      </a>
+
+      <a href="../pages/student-assignments.php" class="quick-link ql-orange">
+        <div style="position:relative">
+          <i class="fa fa-file-alt"></i>
+          <?php if ($pendingAssign > 0): ?>
+          <span style="position:absolute;top:-8px;right:-10px;background:#fff;color:#e05c00;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800"><?=$pendingAssign?></span>
+          <?php endif; ?>
+        </div>
+        <span>Assignments</span>
+        <small style="font-size:10px;opacity:.8;position:relative;z-index:1"><?=$pendingAssign?> pending</small>
+      </a>
+
+      <a href="../pages/student-timetable.php" class="quick-link ql-teal">
+        <i class="fa fa-clock"></i>
+        <span>Timetable</span>
+        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">View schedule</small>
+      </a>
+
+      <a href="../pages/student-library.php" class="quick-link ql-purple">
+        <i class="fa fa-book"></i>
+        <span>Library</span>
+        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">Course materials</small>
+      </a>
+
+      <a href="../pages/student-profile.php" class="quick-link ql-pink">
+        <i class="fa fa-user-circle"></i>
+        <span>My Profile</span>
+        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">View &amp; edit</small>
+      </a>
+
     </div>
   </div>
 </div>

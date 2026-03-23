@@ -10,77 +10,72 @@ $studentId = $_SESSION['user_id'] ?? 0;
 require_once '../includes/config.php';
 try {
     $db = getDBConnection();
-
-    // Student data
     $stu = $db->prepare("SELECT * FROM students WHERE id=? LIMIT 1");
     $stu->execute([$studentId]);
     $stuData = $stu->fetch() ?: [];
 
-    // Enrolled courses — count subjects in the student's program
     $program = $stuData['course'] ?? '';
     $enrolledCourses = 0;
+    $programRow = null;
     if ($program) {
-        $pStmt = $db->prepare("SELECT content FROM programs WHERE title=? AND status='active' LIMIT 1");
+        $pStmt = $db->prepare("SELECT * FROM programs WHERE title=? AND status='active' LIMIT 1");
         $pStmt->execute([$program]);
-        $pRow = $pStmt->fetch();
-        if (!$pRow) {
-            $pStmt2 = $db->prepare("SELECT content FROM programs WHERE title LIKE ? AND status='active' LIMIT 1");
+        $programRow = $pStmt->fetch();
+        if (!$programRow) {
+            $pStmt2 = $db->prepare("SELECT * FROM programs WHERE title LIKE ? AND status='active' LIMIT 1");
             $pStmt2->execute(['%'.$program.'%']);
-            $pRow = $pStmt2->fetch();
+            $programRow = $pStmt2->fetch();
         }
-        if ($pRow && !empty($pRow['content'])) {
-            $enrolledCourses = count(array_filter(array_map('trim', explode('|', $pRow['content']))));
+        if ($programRow && !empty($programRow['content'])) {
+            $enrolledCourses = count(array_filter(array_map('trim', explode('|', $programRow['content']))));
         } else {
-            $enrolledCourses = 1; // at least enrolled in 1 program
+            $enrolledCourses = 1;
         }
     }
 
-    // Assignments count
-    $totalAssignments = $db->query("SELECT COUNT(*) FROM assignments")->fetchColumn();
     $now = date('Y-m-d H:i:s');
     $pendingAssign = $db->query("SELECT COUNT(*) FROM assignments WHERE due_date > '$now'")->fetchColumn();
 
-    // Attendance
     $attStmt = $db->prepare("SELECT COUNT(*) as total, SUM(CASE WHEN status='present' THEN 1 ELSE 0 END) as present FROM attendance WHERE student_id=?");
     $attStmt->execute([$studentId]);
     $attRow = $attStmt->fetch();
     $attPct = ($attRow['total'] > 0) ? round(($attRow['present'] / $attRow['total']) * 100) : 0;
 
-    // Grades / GPA
     $gradeStmt = $db->prepare("SELECT AVG(internal_marks + external_marks) as avg_marks FROM grades WHERE student_id=?");
     $gradeStmt->execute([$studentId]);
     $gradeRow = $gradeStmt->fetch();
     $avgMarks = floatval($gradeRow['avg_marks'] ?? 0);
     $gpa = $avgMarks > 0 ? round(($avgMarks / 100) * 4, 1) : 0;
 
-    // Recent notices
-    $notices = $db->query("SELECT title, created_at FROM notices ORDER BY created_at DESC LIMIT 4")->fetchAll();
-
-    // Courses list — get subjects from student's enrolled program
-    $courses = [];
-    if (!empty($stuData['course'])) {
-        $cpStmt = $db->prepare("SELECT * FROM programs WHERE title=? AND status='active' LIMIT 1");
-        $cpStmt->execute([$stuData['course']]);
-        $cpRow = $cpStmt->fetch();
-        if (!$cpRow) {
-            $cpStmt2 = $db->prepare("SELECT * FROM programs WHERE title LIKE ? AND status='active' LIMIT 1");
-            $cpStmt2->execute(['%'.$stuData['course'].'%']);
-            $cpRow = $cpStmt2->fetch();
-        }
-        if ($cpRow && !empty($cpRow['content'])) {
-            $subjects = array_filter(array_map('trim', explode('|', $cpRow['content'])));
-            foreach (array_slice(array_values($subjects), 0, 4) as $subj) {
-                $courses[] = ['title' => $subj, 'duration' => $cpRow['duration'] ?? '', 'status' => $cpRow['status'] ?? 'active'];
-            }
-        }
+    // Recent activity
+    $activities = [];
+    $recentGrades = $db->prepare("SELECT subject, internal_marks+external_marks as marks, created_at FROM grades WHERE student_id=? ORDER BY created_at DESC LIMIT 2");
+    $recentGrades->execute([$studentId]);
+    foreach ($recentGrades->fetchAll() as $r) {
+        $activities[] = ['icon'=>'fa-star','color'=>'#fd7e14','label'=>'Grade received','name'=>$r['subject'].' — '.$r['marks'].' marks','time'=>$r['created_at'],'link'=>'../pages/student-grades.php'];
     }
-    if (empty($courses)) {
-        $courses = $db->query("SELECT title, duration, status FROM programs WHERE status='active' ORDER BY id ASC LIMIT 4")->fetchAll();
+    $recentAtt = $db->prepare("SELECT date, status FROM attendance WHERE student_id=? ORDER BY date DESC LIMIT 2");
+    $recentAtt->execute([$studentId]);
+    foreach ($recentAtt->fetchAll() as $r) {
+        $activities[] = ['icon'=>'fa-calendar-check','color'=>'#004080','label'=>'Attendance marked','name'=>date('M d, Y', strtotime($r['date'])).' — '.ucfirst($r['status']),'time'=>$r['date'],'link'=>'../pages/student-attendance.php'];
+    }
+    $recentSub = $db->prepare("SELECT a.title, s.submitted_at FROM assignment_submissions s JOIN assignments a ON a.id=s.assignment_id WHERE s.student_id=? ORDER BY s.submitted_at DESC LIMIT 2");
+    $recentSub->execute([$studentId]);
+    foreach ($recentSub->fetchAll() as $r) {
+        $activities[] = ['icon'=>'fa-file-upload','color'=>'#28a745','label'=>'Assignment submitted','name'=>$r['title'],'time'=>$r['submitted_at'],'link'=>'../pages/student-assignments.php'];
+    }
+    usort($activities, function($a,$b){ return strtotime($b['time']) - strtotime($a['time']); });
+    $activities = array_slice($activities, 0, 6);
+
+    // Subjects list
+    $subjects = [];
+    if ($programRow && !empty($programRow['content'])) {
+        $subjects = array_values(array_filter(array_map('trim', explode('|', $programRow['content']))));
     }
 
 } catch(Exception $e) {
     $enrolledCourses = 0; $pendingAssign = 0; $attPct = 0; $gpa = 0;
-    $notices = []; $courses = [];
+    $activities = []; $subjects = []; $stuData = []; $programRow = null;
 }
 
 function timeAgo($dt) {
@@ -98,77 +93,124 @@ function timeAgo($dt) {
   <title>Student Dashboard | SCTI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    .top-header{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:8px 20px;font-size:13px}
-    footer.footer{background:#00264d;color:white;text-align:center;padding:16px;font-size:13px}
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f5f7fa}
-    .dashboard-container{max-width:1400px;margin:0 auto;padding:20px}
-    .dashboard-header{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:30px;border-radius:10px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 15px rgba(0,64,128,.2)}
-    .dashboard-header h1{margin:0;font-size:28px}
-    .user-info{display:flex;align-items:center;gap:20px}
-    .logout-btn{background:rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:5px;text-decoration:none;transition:.3s}
-    .logout-btn:hover{background:rgba(255,255,255,.3)}
-    /* -- STAT CARDS -- */
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:30px}
-    .stat-card{border-radius:16px;padding:24px 22px;display:flex;align-items:center;gap:18px;cursor:pointer;position:relative;overflow:hidden;transition:all .35s cubic-bezier(.25,.8,.25,1);box-shadow:0 4px 18px rgba(0,0,0,.12);border:none}
-    .stat-card::after{content:'';position:absolute;top:-40%;right:-30%;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);transition:transform .4s}
-    .stat-card:hover::after{transform:scale(1.6)}
-    .stat-card::before{content:'';position:absolute;bottom:-30%;left:-20%;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.08)}
-    .stat-card:hover{transform:translateY(-7px) scale(1.02);box-shadow:0 18px 40px rgba(0,0,0,.2)}
-    .stat-card:active{transform:translateY(-2px) scale(.98)}
-    .stat-card.blue{background:linear-gradient(135deg,#004080 0%,#0077cc 100%)}
-    .stat-card.green{background:linear-gradient(135deg,#1a7a4a 0%,#20c997 100%)}
-    .stat-card.orange{background:linear-gradient(135deg,#e05c00 0%,#ffc107 100%)}
-    .stat-card.purple{background:linear-gradient(135deg,#5a1fa0 0%,#e83e8c 100%)}
-    .stat-icon{width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;background:rgba(255,255,255,.22);flex-shrink:0;transition:transform .3s}
-    .stat-card:hover .stat-icon{transform:scale(1.12) rotate(-5deg)}
-    .stat-info{flex:1;position:relative;z-index:1}
-    .stat-info h3{margin:0;font-size:34px;font-weight:800;color:#fff;line-height:1}
-    .stat-info p{margin:5px 0 0;color:rgba(255,255,255,.85);font-size:13px;font-weight:500}
-    .card-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4);font-size:14px;transition:all .3s;opacity:0}
-    .stat-card:hover .card-arrow{opacity:1;color:rgba(255,255,255,.9);right:10px}
-    /* -- QUICK LINKS -- */
-    .quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
-    .quick-link{border-radius:14px;color:white;padding:22px 14px 18px;text-decoration:none;text-align:center;transition:all .35s cubic-bezier(.25,.8,.25,1);display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.15)}
-    .quick-link::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%);transition:width .55s,height .55s}
-    .quick-link:hover::before{width:280px;height:280px}
-    .quick-link:hover{transform:translateY(-7px) scale(1.04);box-shadow:0 16px 32px rgba(0,0,0,.25)}
-    .quick-link:active{transform:translateY(-2px) scale(.96)}
-    .quick-link i{font-size:26px;position:relative;z-index:1;transition:transform .3s}
-    .quick-link:hover i{transform:scale(1.25) rotate(-8deg)}
-    .quick-link span{position:relative;z-index:1;font-weight:700;font-size:13px}
-    .ql-blue{background:linear-gradient(135deg,#004080,#0077cc)}
-    .ql-green{background:linear-gradient(135deg,#1a7a4a,#20c997)}
-    .ql-orange{background:linear-gradient(135deg,#e05c00,#ffc107)}
-    .ql-teal{background:linear-gradient(135deg,#0d7377,#14a085)}
-    .ql-purple{background:linear-gradient(135deg,#5a1fa0,#9b59b6)}
-    .ql-pink{background:linear-gradient(135deg,#c0392b,#e83e8c)}
-    .content-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:30px}
-    .card{background:white;padding:30px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-    .card h2{margin-top:0;color:#004080;margin-bottom:20px}
-    .course-list{list-style:none;padding:0;margin:0}
-    .course-item{padding:15px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .22s cubic-bezier(.25,.8,.25,1);border-radius:8px;border-left:3px solid transparent;text-decoration:none;color:inherit}
-    .course-item:last-child{border-bottom:none}
-    .course-item:hover{background:#f0f4ff;border-left-color:#004080;transform:translateX(4px);box-shadow:0 2px 10px rgba(0,64,128,.1)}
-    .course-item:active{transform:translateX(2px) scale(0.99)}
-    .course-item .ci-arrow{color:#ccc;font-size:12px;transition:all .22s;opacity:0}
-    .course-item:hover .ci-arrow{opacity:1;color:#004080;transform:translateX(3px)}
-    .course-name{font-weight:600;color:#333}
-    .notice-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-    .notice-item{padding:13px 16px;border-left:4px solid #004080;background:#f8f9fa;border-radius:6px;cursor:pointer;transition:all .22s cubic-bezier(.25,.8,.25,1);display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:inherit}
-    .notice-item:hover{background:#e8f0fe;border-left-color:#0059b3;transform:translateX(4px);box-shadow:0 3px 12px rgba(0,64,128,.12)}
-    .notice-item:active{transform:translateX(2px) scale(0.99)}
-    .notice-item .ni-arrow{color:#ccc;font-size:12px;transition:all .22s;opacity:0;flex-shrink:0}
-    .notice-item:hover .ni-arrow{opacity:1;color:#004080;transform:translateX(3px)}
-    .notice-title{font-weight:600;color:#004080;margin-bottom:4px;font-size:14px}
-    .notice-date{font-size:12px;color:#999}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+    .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .dashboard-header {
+      background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
+      color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 15px rgba(0,64,128,0.2);
+    }
+    .dashboard-header h1 { margin: 0; font-size: 28px; }
+    .user-info { display: flex; align-items: center; gap: 20px; }
+    .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; transition: all 0.3s; }
+    .logout-btn:hover { background: rgba(255,255,255,0.3); }
 
+    /* STAT CARDS — admin style */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card {
+      background: white; padding: 25px; border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex; align-items: center; gap: 20px;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      cursor: pointer; position: relative; overflow: hidden; border: 2px solid transparent;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,64,128,0.1), transparent);
+      transition: left 0.5s;
+    }
+    .stat-card:hover::before { left: 100%; }
+    .stat-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,64,128,0.3); border-color: #004080; }
+    .stat-card:active { transform: translateY(-2px) scale(0.98); }
+    .stat-card .card-arrow { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #ccc; font-size: 13px; transition: all .3s; opacity: 0; }
+    .stat-card:hover .card-arrow { opacity: 1; color: #004080; right: 10px; }
+    .stat-icon { width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
+    .stat-icon.blue   { background: linear-gradient(135deg, #004080, #0059b3); }
+    .stat-icon.green  { background: linear-gradient(135deg, #28a745, #20c997); }
+    .stat-icon.orange { background: linear-gradient(135deg, #fd7e14, #ffc107); }
+    .stat-icon.purple { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
+    .stat-icon.cyan   { background: linear-gradient(135deg, #17a2b8, #138496); }
+    .stat-info h3 { margin: 0; font-size: 32px; color: #004080; }
+    .stat-info p  { margin: 5px 0 0 0; color: #666; font-size: 14px; }
+
+    /* QUICK ACTIONS — admin style */
+    .quick-actions { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+    .quick-actions h2 { margin-top: 0; color: #004080; margin-bottom: 20px; }
+    .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .action-btn {
+      background: linear-gradient(135deg, #004080, #0059b3);
+      color: white; padding: 20px; border-radius: 8px; text-decoration: none;
+      display: flex; align-items: center; gap: 15px; transition: all 0.3s;
+      border: none; cursor: pointer; font-size: 16px; position: relative; overflow: hidden;
+    }
+    .action-btn::before {
+      content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+      border-radius: 50%; background: rgba(255,215,0,0.3);
+      transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s;
+    }
+    .action-btn:hover::before { width: 300px; height: 300px; }
+    .action-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,64,128,0.3); background: linear-gradient(135deg, #0059b3, #004080); }
+    .action-btn:active { transform: translateY(-1px) scale(0.95); }
+    .action-btn i { font-size: 24px; position: relative; z-index: 1; transition: transform 0.3s; }
+    .action-btn:hover i { transform: scale(1.2) rotate(5deg); }
+    .action-btn span { position: relative; z-index: 1; }
+    .action-btn .btn-sub { display: block; font-size: 11px; opacity: 0.8; margin-top: 2px; position: relative; z-index: 1; }
+    .action-btn .badge-pill {
+      position: absolute; top: 10px; right: 10px; background: #ff4757; color: white;
+      border-radius: 10px; padding: 2px 7px; font-size: 11px; font-weight: 700; z-index: 2;
+    }
+    .action-btn .badge-warn {
+      position: absolute; top: 10px; right: 10px; background: #ffc107; color: #333;
+      border-radius: 10px; padding: 2px 7px; font-size: 11px; font-weight: 700; z-index: 2;
+    }
+
+    /* CONTENT GRID */
+    .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .card h2 { margin-top: 0; color: #004080; margin-bottom: 20px; }
+
+    /* RECENT ACTIVITY */
+    .recent-activity { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+    .recent-activity h2 { margin-top: 0; color: #004080; margin-bottom: 20px; }
+    .activity-list { list-style: none; padding: 0; margin: 0; }
+    .activity-item {
+      padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center;
+      gap: 15px; transition: all 0.3s; border-radius: 8px; margin-bottom: 5px; cursor: pointer;
+    }
+    .activity-item:hover { background: #f8f9fa; transform: translateX(5px); border-bottom-color: #004080; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 40px; height: 40px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #004080; transition: all 0.3s; }
+    .activity-item:hover .activity-icon { background: linear-gradient(135deg, #004080, #0059b3); color: white; transform: scale(1.1); }
+    .activity-content { flex: 1; }
+    .activity-content p { margin: 0; color: #333; }
+    .activity-time { color: #999; font-size: 12px; }
+
+    /* SUBJECTS CARD */
+    .subject-list { list-style: none; padding: 0; margin: 0; }
+    .subject-item {
+      padding: 13px 16px; border-bottom: 1px solid #eee; display: flex; align-items: center;
+      gap: 12px; cursor: pointer; transition: all 0.22s; border-radius: 8px; border-left: 3px solid transparent;
+    }
+    .subject-item:last-child { border-bottom: none; }
+    .subject-item:hover { background: #f0f4ff; border-left-color: #004080; transform: translateX(4px); }
+    .subject-num { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,#004080,#0059b3); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+
+    /* NOTICE */
+    .notice-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+    .notice-item { padding: 13px 16px; border-left: 4px solid #004080; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: all 0.22s; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; }
+    .notice-item:hover { background: #e8f0fe; border-left-color: #0059b3; transform: translateX(4px); }
+    .notice-title { font-weight: 600; color: #004080; margin-bottom: 4px; font-size: 14px; }
+    .notice-date { font-size: 12px; color: #999; }
   </style>
 </head>
 <body>
 <div class="top-header"><marquee>Welcome to SCTI Student Portal - Your gateway to academic excellence</marquee></div>
 <div class="dashboard-container">
+
   <div class="dashboard-header">
     <div>
       <h1><i class="fa fa-graduation-cap"></i> Student Dashboard</h1>
@@ -180,29 +222,64 @@ function timeAgo($dt) {
     </div>
   </div>
 
+  <!-- Stat Cards -->
   <div class="stats-grid">
-    <div class="stat-card blue" onclick="window.location.href='../pages/student-courses.php'">
-      <div class="stat-icon"><i class="fa fa-book"></i></div>
-      <div class="stat-info"><h3><?=$enrolledCourses?></h3><p>Enrolled Courses</p></div>
+    <div class="stat-card" onclick="window.location.href='../pages/student-courses.php'">
+      <div class="stat-icon blue"><i class="fa fa-book"></i></div>
+      <div class="stat-info"><h3><?=$enrolledCourses?></h3><p>Enrolled Subjects</p></div>
       <i class="fa fa-chevron-right card-arrow"></i>
     </div>
-    <div class="stat-card green" onclick="window.location.href='../pages/student-attendance.php'">
-      <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
-      <div class="stat-info"><h3><?=$attPct?>%</h3><p>Attendance</p></div>
+    <div class="stat-card" onclick="window.location.href='../pages/student-attendance.php'">
+      <div class="stat-icon green"><i class="fa fa-calendar-check"></i></div>
+      <div class="stat-info"><h3><?=$attPct?>%</h3><p>Attendance Rate</p></div>
       <i class="fa fa-chevron-right card-arrow"></i>
     </div>
-    <div class="stat-card orange" onclick="window.location.href='../pages/student-grades.php'">
-      <div class="stat-icon"><i class="fa fa-star"></i></div>
-      <div class="stat-info"><h3><?=number_format($gpa,1)?></h3><p>GPA</p></div>
+    <div class="stat-card" onclick="window.location.href='../pages/student-grades.php'">
+      <div class="stat-icon orange"><i class="fa fa-star"></i></div>
+      <div class="stat-info"><h3><?=number_format($gpa,1)?></h3><p>Current GPA</p></div>
       <i class="fa fa-chevron-right card-arrow"></i>
     </div>
-    <div class="stat-card purple" onclick="window.location.href='../pages/student-assignments.php'">
-      <div class="stat-icon"><i class="fa fa-tasks"></i></div>
+    <div class="stat-card" onclick="window.location.href='../pages/student-assignments.php'">
+      <div class="stat-icon purple"><i class="fa fa-tasks"></i></div>
       <div class="stat-info"><h3><?=$pendingAssign?></h3><p>Pending Assignments</p></div>
       <i class="fa fa-chevron-right card-arrow"></i>
     </div>
   </div>
 
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2><i class="fa fa-bolt"></i> Quick Actions</h2>
+    <div class="action-grid">
+      <a href="../pages/student-attendance.php" class="action-btn">
+        <?php if ($attPct < 75 && $attPct > 0): ?><span class="badge-warn">!</span><?php endif; ?>
+        <i class="fa fa-calendar-check"></i>
+        <div><span>Attendance</span><span class="btn-sub"><?=$attPct?>% this term</span></div>
+      </a>
+      <a href="../pages/student-grades.php" class="action-btn" style="background:linear-gradient(135deg,#fd7e14,#ffc107)">
+        <i class="fa fa-chart-line"></i>
+        <div><span>My Grades</span><span class="btn-sub">GPA <?=number_format($gpa,1)?></span></div>
+      </a>
+      <a href="../pages/student-assignments.php" class="action-btn" style="background:linear-gradient(135deg,#6f42c1,#e83e8c)">
+        <?php if ($pendingAssign > 0): ?><span class="badge-pill"><?=$pendingAssign?></span><?php endif; ?>
+        <i class="fa fa-file-alt"></i>
+        <div><span>Assignments</span><span class="btn-sub"><?=$pendingAssign?> pending</span></div>
+      </a>
+      <a href="../pages/student-timetable.php" class="action-btn" style="background:linear-gradient(135deg,#17a2b8,#138496)">
+        <i class="fa fa-clock"></i>
+        <div><span>Timetable</span><span class="btn-sub">View schedule</span></div>
+      </a>
+      <a href="../pages/student-library.php" class="action-btn" style="background:linear-gradient(135deg,#28a745,#20c997)">
+        <i class="fa fa-book-open"></i>
+        <div><span>Library</span><span class="btn-sub">Course materials</span></div>
+      </a>
+      <a href="../pages/student-profile.php" class="action-btn" style="background:linear-gradient(135deg,#dc3545,#c82333)">
+        <i class="fa fa-user-circle"></i>
+        <div><span>My Profile</span><span class="btn-sub">View &amp; edit</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- My Courses + Notices -->
   <div class="content-grid">
     <div class="card">
       <h2><i class="fa fa-book-open"></i> My Courses</h2>
@@ -212,108 +289,61 @@ function timeAgo($dt) {
           <div style="color:#fff;font-weight:700;font-size:15px"><?=htmlspecialchars($stuData['course'])?></div>
           <div style="color:rgba(255,255,255,.75);font-size:12px;margin-top:2px"><i class="fa fa-layer-group"></i> <?=htmlspecialchars($stuData['semester'] ?? '')?></div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span style="background:rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700"><i class="fa fa-book"></i> <?=$enrolledCourses?> Subjects</span>
-        </div>
+        <span style="background:rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700"><i class="fa fa-book"></i> <?=$enrolledCourses?> Subjects</span>
       </div>
       <?php endif; ?>
-      <ul class="course-list">
-        <?php if (empty($courses)): ?>
-        <li class="course-item"><span style="color:#999">No subjects found. Contact admin to set up your program.</span></li>
+      <ul class="subject-list">
+        <?php if (empty($subjects)): ?>
+        <li class="subject-item"><span style="color:#999">No subjects found. Contact admin.</span></li>
         <?php else: ?>
-        <?php foreach ($courses as $idx => $c): ?>
-        <li class="course-item" onclick="window.location.href='../pages/student-courses.php'">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#004080,#0059b3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0"><?=$idx+1?></div>
-            <div>
-              <div class="course-name"><?=htmlspecialchars($c['title'])?></div>
-              <?php if (!empty($c['duration'])): ?>
-              <small style="color:#999"><i class="fa fa-clock" style="color:#004080"></i> <?=htmlspecialchars($c['duration'])?></small>
-              <?php endif; ?>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="background:#e8f0fe;color:#004080;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600"><?=htmlspecialchars(ucfirst($c['status'] ?? 'Active'))?></span>
-            <i class="fa fa-chevron-right ci-arrow"></i>
-          </div>
+        <?php foreach (array_slice($subjects, 0, 6) as $idx => $subj): ?>
+        <li class="subject-item" onclick="window.location.href='../pages/student-courses.php'">
+          <div class="subject-num"><?=$idx+1?></div>
+          <span style="font-weight:600;color:#333"><?=htmlspecialchars($subj)?></span>
+          <i class="fa fa-chevron-right" style="margin-left:auto;color:#ccc;font-size:12px"></i>
         </li>
         <?php endforeach; ?>
         <?php endif; ?>
       </ul>
       <div style="margin-top:12px;text-align:right">
-        <a href="../pages/student-courses.php" style="color:#004080;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All Courses</a>
+        <a href="../pages/student-courses.php" style="color:#004080;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All</a>
       </div>
     </div>
-
     <div class="card">
       <h2><i class="fa fa-bullhorn"></i> Recent Notices</h2>
-      <?php
-      require_once '../pages/notice-widget.php';
-      renderNoticeWidget('student');
-      ?>
+      <?php require_once '../pages/notice-widget.php'; renderNoticeWidget('student'); ?>
       <div style="margin-top:12px;text-align:right">
-        <a href="../pages/notice-board.php" style="color:#004080;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All Notices</a>
+        <a href="../pages/notice-board.php" style="color:#004080;font-size:13px;text-decoration:none;font-weight:600"><i class="fa fa-arrow-right"></i> View All</a>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h2 style="margin:0;color:#004080"><i class="fa fa-bolt"></i> Quick Actions</h2>
-      <span style="font-size:12px;color:#aaa">6 shortcuts</span>
-    </div>
-    <div class="quick-links">
-
-      <a href="../pages/student-attendance.php" class="quick-link ql-blue">
-        <div style="position:relative">
-          <i class="fa fa-calendar-check"></i>
-          <?php if ($attPct < 75 && $attPct > 0): ?>
-          <span style="position:absolute;top:-8px;right:-10px;background:#ff4757;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700">!</span>
-          <?php endif; ?>
+  <!-- Recent Activity -->
+  <div class="recent-activity">
+    <h2><i class="fa fa-history"></i> Recent Activity</h2>
+    <ul class="activity-list">
+      <?php if (empty($activities)): ?>
+      <li class="activity-item">
+        <div class="activity-icon"><i class="fa fa-info-circle"></i></div>
+        <div class="activity-content"><p>No recent activity found.</p></div>
+      </li>
+      <?php else: ?>
+      <?php foreach ($activities as $act): ?>
+      <li class="activity-item" onclick="window.location.href='<?=htmlspecialchars($act['link'])?>'">
+        <div class="activity-icon"><i class="fa <?=htmlspecialchars($act['icon'])?>" style="color:<?=htmlspecialchars($act['color'])?>"></i></div>
+        <div class="activity-content">
+          <p><strong><?=htmlspecialchars($act['label'])?>:</strong> <?=htmlspecialchars($act['name'])?></p>
+          <span class="activity-time"><?=timeAgo($act['time'])?></span>
         </div>
-        <span>Attendance</span>
-        <small style="font-size:10px;opacity:.8;position:relative;z-index:1"><?=$attPct?>% this term</small>
-      </a>
-
-      <a href="../pages/student-grades.php" class="quick-link ql-green">
-        <i class="fa fa-chart-line"></i>
-        <span>My Grades</span>
-        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">GPA <?=number_format($gpa,1)?></small>
-      </a>
-
-      <a href="../pages/student-assignments.php" class="quick-link ql-orange">
-        <div style="position:relative">
-          <i class="fa fa-file-alt"></i>
-          <?php if ($pendingAssign > 0): ?>
-          <span style="position:absolute;top:-8px;right:-10px;background:#fff;color:#e05c00;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800"><?=$pendingAssign?></span>
-          <?php endif; ?>
-        </div>
-        <span>Assignments</span>
-        <small style="font-size:10px;opacity:.8;position:relative;z-index:1"><?=$pendingAssign?> pending</small>
-      </a>
-
-      <a href="../pages/student-timetable.php" class="quick-link ql-teal">
-        <i class="fa fa-clock"></i>
-        <span>Timetable</span>
-        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">View schedule</small>
-      </a>
-
-      <a href="../pages/student-library.php" class="quick-link ql-purple">
-        <i class="fa fa-book"></i>
-        <span>Library</span>
-        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">Course materials</small>
-      </a>
-
-      <a href="../pages/student-profile.php" class="quick-link ql-pink">
-        <i class="fa fa-user-circle"></i>
-        <span>My Profile</span>
-        <small style="font-size:10px;opacity:.8;position:relative;z-index:1">View &amp; edit</small>
-      </a>
-
-    </div>
+        <i class="fa fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+      </li>
+      <?php endforeach; ?>
+      <?php endif; ?>
+    </ul>
   </div>
+
 </div>
-<footer class="footer" style="margin-top:40px"><p>� 2025 Sindhuli Community Technical Institute (SCTI) - Student Portal</p></footer>
+<footer class="footer" style="margin-top:40px"><p>&copy; 2025 Sindhuli Community Technical Institute (SCTI) - Student Portal</p></footer>
 
 <?php if (!empty($_SESSION['first_login'])): ?>
 <div id="firstLoginOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">

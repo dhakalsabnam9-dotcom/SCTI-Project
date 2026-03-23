@@ -44,19 +44,52 @@ if (empty($title)) {
     sendJSON(['success' => false, 'message' => 'Title is required']);
 }
 
-if ($file['size'] > 10 * 1024 * 1024) {
-    sendJSON(['success' => false, 'message' => 'File exceeds 10MB limit']);
+if ($file['size'] > 100 * 1024 * 1024) {
+    sendJSON(['success' => false, 'message' => 'File exceeds 100MB limit']);
 }
 
 // Detect MIME type
 $finfo = new finfo(FILEINFO_MIME_TYPE);
 $mime  = $finfo->file($file['tmp_name']);
-$allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+
+$allowed = [
+    // Images
+    'image/jpeg'      => 'jpg',
+    'image/png'       => 'png',
+    'image/gif'       => 'gif',
+    'image/webp'      => 'webp',
+    'image/svg+xml'   => 'svg',
+    // Videos
+    'video/mp4'       => 'mp4',
+    'video/webm'      => 'webm',
+    'video/ogg'       => 'ogv',
+    'video/quicktime' => 'mov',
+    'video/x-msvideo' => 'avi',
+    // Audio
+    'audio/mpeg'      => 'mp3',
+    'audio/ogg'       => 'ogg',
+    'audio/wav'       => 'wav',
+    'audio/mp4'       => 'm4a',
+    'audio/webm'      => 'weba',
+    // Documents
+    'application/pdf'                                                        => 'pdf',
+    'application/msword'                                                     => 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=> 'docx',
+    'application/vnd.ms-powerpoint'                                          => 'ppt',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
+    'application/zip'                                                        => 'zip',
+    'application/x-rar-compressed'                                           => 'rar',
+    'text/plain'                                                             => 'txt',
+];
+
 if (!array_key_exists($mime, $allowed)) {
-    sendJSON(['success' => false, 'message' => "Invalid file type: $mime. Only JPG, PNG, GIF, WEBP allowed"]);
+    sendJSON(['success' => false, 'message' => "File type not allowed: $mime"]);
 }
 
 $ext      = $allowed[$mime];
+$isImage  = str_starts_with($mime, 'image/');
+$isVideo  = str_starts_with($mime, 'video/');
+$isAudio  = str_starts_with($mime, 'audio/');
 $filename = 'gallery_' . uniqid() . '_' . time() . '.' . $ext;
 
 $uploadDir = '../uploads/gallery/';
@@ -82,15 +115,17 @@ if (!move_uploaded_file($file['tmp_name'], $filepath)) {
     sendJSON(['success' => false, 'message' => 'move_uploaded_file() failed — check folder permissions']);
 }
 
-// Create thumbnail (non-fatal if GD missing)
-if (extension_loaded('gd')) {
+// Thumbnail: only for images
+$dbThumb = null;
+if ($isImage && extension_loaded('gd')) {
     createThumb($filepath, $thumbPath, 400, 300, $mime);
-} else {
+    $dbThumb = 'uploads/gallery/thumbnails/' . $filename;
+} elseif ($isImage) {
     copy($filepath, $thumbPath);
+    $dbThumb = 'uploads/gallery/thumbnails/' . $filename;
 }
 
 $dbFile  = 'uploads/gallery/' . $filename;
-$dbThumb = 'uploads/gallery/thumbnails/' . $filename;
 
 try {
     $db = getDBConnection();
@@ -101,18 +136,24 @@ try {
         description TEXT,
         file_path VARCHAR(500) NOT NULL,
         thumbnail_path VARCHAR(500),
+        file_type VARCHAR(20) DEFAULT 'image',
         category VARCHAR(100),
         is_active TINYINT(1) DEFAULT 1,
         created_by INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    $stmt = $db->prepare("INSERT INTO gallery_images
-        (title, description, file_path, thumbnail_path, category, created_by)
-        VALUES (?,?,?,?,?,?)");
-    $stmt->execute([$title, $desc, $dbFile, $dbThumb, $category ?: null, $_SESSION['user_id'] ?? null]);
+    // Add file_type column if missing (for existing installs)
+    try { $db->exec("ALTER TABLE gallery_images ADD COLUMN file_type VARCHAR(20) DEFAULT 'image'"); } catch(Exception $e) {}
 
-    sendJSON(['success' => true, 'message' => 'Image uploaded successfully', 'image_id' => $db->lastInsertId()]);
+    $fileType = $isImage ? 'image' : ($isVideo ? 'video' : ($isAudio ? 'audio' : 'document'));
+
+    $stmt = $db->prepare("INSERT INTO gallery_images
+        (title, description, file_path, thumbnail_path, file_type, category, created_by)
+        VALUES (?,?,?,?,?,?,?)");
+    $stmt->execute([$title, $desc, $dbFile, $dbThumb, $fileType, $category ?: null, $_SESSION['user_id'] ?? null]);
+
+    sendJSON(['success' => true, 'message' => 'File uploaded successfully', 'image_id' => $db->lastInsertId()]);
 
 } catch (Exception $e) {
     sendJSON(['success' => false, 'message' => 'DB error: ' . $e->getMessage()]);

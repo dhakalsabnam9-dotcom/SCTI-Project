@@ -143,11 +143,11 @@ require_once '../includes/config.php';
 </div>
 <div class="layout">
   <div class="panel">
-    <h3><i class="fa fa-cloud-upload-alt"></i> Upload New Image</h3>
+    <h3><i class="fa fa-cloud-upload-alt"></i> Upload Media</h3>
     <div id="upAlert" class="alert"></div>
     <form id="upForm" enctype="multipart/form-data">
       <div class="dz" id="dz">
-        <input type="file" id="fileInput" name="image" accept="image/*" required>
+        <input type="file" id="fileInput" name="image" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.zip,.rar,.txt" required>
         <i class="fa fa-cloud-upload-alt"></i>
         <p><strong>Drag &amp; drop</strong> or click to browse</p>
         <p>JPG, PNG, GIF, WEBP � max 10MB</p>
@@ -171,7 +171,7 @@ require_once '../includes/config.php';
         </div>
       </div>
       <div class="fg"><label>Description</label><textarea name="description" class="fc" placeholder="Optional..."></textarea></div>
-      <button type="submit" class="btn-upload" id="upBtn"><i class="fa fa-upload"></i> Upload Image</button>
+      <button type="submit" class="btn-upload" id="upBtn"><i class="fa fa-upload"></i> Upload File</button>
     </form>
   </div>
   <div class="content">
@@ -341,7 +341,7 @@ document.getElementById('upForm').addEventListener('submit', async e => {
       showAlert(al, d.message || 'Upload failed', 'err');
     }
   } catch(err) { showAlert(al, err.message, 'err'); }
-  btn.disabled = false; btn.innerHTML = '<i class="fa fa-upload"></i> Upload Image';
+  btn.disabled = false; btn.innerHTML = '<i class="fa fa-upload"></i> Upload File';
 });
 
 // -- Gallery -------------------------------------------------

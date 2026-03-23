@@ -130,17 +130,9 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
     </div>
     <div class="ctrl-group">
       <label><i class="fa fa-chalkboard"></i> Class / Subject</label>
-      <input type="text" id="attClass" placeholder="e.g. BIT Semester 1 — Math" list="classSuggestions">
-      <datalist id="classSuggestions">
-        <option value="BIT Semester 1">
-        <option value="BIT Semester 2">
-        <option value="BIT Semester 3">
-        <option value="BIT Semester 4">
-        <option value="BIT Semester 5">
-        <option value="BIT Semester 6">
-        <option value="CTEVT IT">
-        <option value="General Class">
-      </datalist>
+      <select id="attClass" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
+        <option value="">— Select Class —</option>
+      </select>
     </div>
     <div class="ctrl-group">
       <label><i class="fa fa-clock"></i> Period (optional)</label>
@@ -199,17 +191,28 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 var allStudents = [];
 var existingMap = {};
 
+// Load class list from DB on page load
+fetch('attendance-data.php?action=classes').then(r=>r.json()).then(function(res){
+  if (!res.success) return;
+  var sel = document.getElementById('attClass');
+  res.classes.forEach(function(c){
+    var opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.appendChild(opt);
+  });
+});
+
 function loadStudents() {
   var date  = document.getElementById('attDate').value;
   var cls   = document.getElementById('attClass').value.trim();
-  if (!date || !cls) { showAlert('Please enter both date and class name.','err'); return; }
+  if (!date || !cls) { showAlert('Please select both date and class.','err'); return; }
 
   document.getElementById('tableWrap').innerHTML = '<div class="empty-state"><i class="fa fa-spinner fa-spin" style="color:#28a745"></i><p>Loading students...</p></div>';
   document.getElementById('btnSave').disabled = true;
 
   // Load students + existing attendance in parallel
   Promise.all([
-    fetch('attendance-data.php?action=students').then(r=>r.json()),
+    fetch('attendance-data.php?action=students&class='+encodeURIComponent(cls)).then(r=>r.json()),
     fetch('attendance-data.php?action=existing&date='+encodeURIComponent(date)+'&class='+encodeURIComponent(cls)).then(r=>r.json())
   ]).then(function(results) {
     var sRes = results[0], eRes = results[1];

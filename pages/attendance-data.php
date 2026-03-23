@@ -13,11 +13,40 @@ $action = $_GET['action'] ?? 'student_chart';
 try {
     $db = getDBConnection();
 
-    // ── 1. Student list ──────────────────────────────────────────────────────
+    // ── 1. Student list (optionally filtered by course+semester) ─────────────
     if ($action === 'students') {
-        $rows = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
+        $class = trim($_GET['class'] ?? '');
+        // Try to match "COURSE Semester N" pattern e.g. "BIT Semester 1"
+        if ($class && preg_match('/^(.+?)\s+Semester\s+(\d+)$/i', $class, $m)) {
+            $course   = trim($m[1]);
+            $semester = 'Semester ' . $m[2];
+            $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? AND semester=? ORDER BY full_name ASC");
+            $stmt->execute([$course, $semester]);
+        } elseif ($class) {
+            // fallback: match course name only
+            $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? ORDER BY full_name ASC");
+            $stmt->execute([$class]);
+        } else {
+            $stmt = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC");
+        }
+        $rows = $stmt->fetchAll();
         ob_end_clean();
         echo json_encode(['success'=>true,'students'=>$rows]); exit();
+    }
+
+    // ── 1b. Get distinct classes from students ────────────────────────────────
+    if ($action === 'classes') {
+        $rows = $db->query("SELECT DISTINCT course, semester FROM students WHERE status='active' AND course IS NOT NULL AND course != '' ORDER BY course, semester ASC")->fetchAll();
+        $classes = [];
+        foreach ($rows as $r) {
+            if ($r['semester']) {
+                $classes[] = $r['course'] . ' ' . $r['semester'];
+            } else {
+                $classes[] = $r['course'];
+            }
+        }
+        ob_end_clean();
+        echo json_encode(['success'=>true,'classes'=>array_values(array_unique($classes))]); exit();
     }
 
     // ── 2. Existing attendance for a date (for mark-attendance page) ─────────

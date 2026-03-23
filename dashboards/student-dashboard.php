@@ -16,11 +16,23 @@ try {
     $stu->execute([$studentId]);
     $stuData = $stu->fetch() ?: [];
 
-    // Enrolled courses (from programs table based on student course)
+    // Enrolled courses — count subjects in the student's program
     $program = $stuData['course'] ?? '';
     $enrolledCourses = 0;
     if ($program) {
-        $enrolledCourses = $db->query("SELECT COUNT(*) FROM programs WHERE status='active'")->fetchColumn();
+        $pStmt = $db->prepare("SELECT content FROM programs WHERE title=? AND status='active' LIMIT 1");
+        $pStmt->execute([$program]);
+        $pRow = $pStmt->fetch();
+        if (!$pRow) {
+            $pStmt2 = $db->prepare("SELECT content FROM programs WHERE title LIKE ? AND status='active' LIMIT 1");
+            $pStmt2->execute(['%'.$program.'%']);
+            $pRow = $pStmt2->fetch();
+        }
+        if ($pRow && !empty($pRow['content'])) {
+            $enrolledCourses = count(array_filter(array_map('trim', explode('|', $pRow['content']))));
+        } else {
+            $enrolledCourses = 1; // at least enrolled in 1 program
+        }
     }
 
     // Assignments count
@@ -44,8 +56,27 @@ try {
     // Recent notices
     $notices = $db->query("SELECT title, created_at FROM notices ORDER BY created_at DESC LIMIT 4")->fetchAll();
 
-    // Courses list
-    $courses = $db->query("SELECT * FROM programs WHERE status='active' ORDER BY id ASC LIMIT 4")->fetchAll();
+    // Courses list — get subjects from student's enrolled program
+    $courses = [];
+    if (!empty($stuData['course'])) {
+        $cpStmt = $db->prepare("SELECT * FROM programs WHERE title=? AND status='active' LIMIT 1");
+        $cpStmt->execute([$stuData['course']]);
+        $cpRow = $cpStmt->fetch();
+        if (!$cpRow) {
+            $cpStmt2 = $db->prepare("SELECT * FROM programs WHERE title LIKE ? AND status='active' LIMIT 1");
+            $cpStmt2->execute(['%'.$stuData['course'].'%']);
+            $cpRow = $cpStmt2->fetch();
+        }
+        if ($cpRow && !empty($cpRow['content'])) {
+            $subjects = array_filter(array_map('trim', explode('|', $cpRow['content'])));
+            foreach (array_slice(array_values($subjects), 0, 4) as $subj) {
+                $courses[] = ['title' => $subj, 'duration' => $cpRow['duration'] ?? '', 'status' => $cpRow['status'] ?? 'active'];
+            }
+        }
+    }
+    if (empty($courses)) {
+        $courses = $db->query("SELECT title, duration, status FROM programs WHERE status='active' ORDER BY id ASC LIMIT 4")->fetchAll();
+    }
 
 } catch(Exception $e) {
     $enrolledCourses = 0; $pendingAssign = 0; $attPct = 0; $gpa = 0;
@@ -182,7 +213,7 @@ function timeAgo($dt) {
         <?php foreach ($courses as $c): ?>
         <li class="course-item" onclick="window.location.href='../pages/student-courses.php'">
           <div>
-            <div class="course-name"><?=htmlspecialchars($c['name'])?></div>
+            <div class="course-name"><?=htmlspecialchars($c['title'])?></div>
             <small style="color:#666"><?=htmlspecialchars($c['duration'] ?? '')?></small>
           </div>
           <div style="display:flex;align-items:center;gap:10px">

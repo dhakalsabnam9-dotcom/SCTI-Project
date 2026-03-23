@@ -1,215 +1,208 @@
 # SCTI School Management System
 
-A comprehensive web-based school management system for Sindhuli Community Technical Institute (SCTI).
-
-## 🎓 Features
-
-- **User Authentication System**
-  - Three user types: Admin, Teacher, Student
-  - Secure login with session management
-  - Role-based dashboard access
-
-- **Admin Dashboard**
-  - Notice board management
-  - Add, edit, delete notices
-  - Statistics and analytics
-  - Search and filter functionality
-
-- **Teacher Dashboard**
-  - View assigned classes
-  - Manage students
-  - Check schedules
-  - Grade management
-
-- **Student Dashboard**
-  - View enrolled courses
-  - Check grades and attendance
-  - Access course materials
-  - View GPA
-
-- **Public Pages**
-  - Homepage with banner
-  - Programs listing
-  - Photo gallery
-  - Notice board
-  - Contact information
-
-## 🚀 Installation
-
-### Prerequisites
-- XAMPP (Apache + MySQL + PHP)
-- Web browser
-- Git (optional)
-
-### Setup Steps
-
-1. **Clone or Download**
-   ```bash
-   git clone https://github.com/dhakalsabnam9-dotcom/SCTI-Project.git
-   cd SCTI-Project
-   ```
-
-2. **Move to XAMPP**
-   - Copy project folder to `C:\xampp\htdocs\scti-school\`
-
-3. **Start XAMPP**
-   - Start Apache
-   - Start MySQL
-
-4. **Import Database**
-   - Open phpMyAdmin: `http://localhost/phpmyadmin`
-   - Click "Import"
-   - Choose `database-setup.sql`
-   - Click "Go"
-
-5. **Access Application**
-   - Open browser: `http://localhost/scti-school/`
-
-## 🔐 Login Credentials
-
-### Administrator
-- **Username:** admin
-- **Password:** admin123
-- **Access:** Full system control
-
-### Teacher
-- **Username:** teacher
-- **Password:** teacher123
-- **Access:** Class and student management
-
-### Student
-- **Username:** student
-- **Password:** student123
-- **Access:** Course and grade viewing
-
-## 📁 Project Structure
-
-```
-scti-school/
-├── index.html              # Homepage
-├── index.php               # Landing page handler
-├── login-simple.php        # Login page
-├── logout.php              # Logout handler
-├── config.php              # Database configuration
-├── database-setup.sql      # Database schema
-├── Admin-Notice-Board.html # Admin dashboard
-├── teacher-dashboard.php   # Teacher dashboard
-├── student-dashboard.php   # Student dashboard
-├── About Us.html           # About page
-├── Programs.html           # Programs page
-├── Gallery.html            # Gallery page
-├── Notice Board.html       # Public notice board
-├── Contact Us.html         # Contact page
-├── style.css               # Main stylesheet
-├── .htaccess               # Apache configuration
-└── images/                 # Image assets
-```
-
-## 🛠️ Technologies Used
-
-- **Frontend:** HTML5, CSS3, JavaScript
-- **Backend:** PHP 8.1+
-- **Database:** MySQL
-- **Server:** Apache
-- **Icons:** Font Awesome
-- **Version Control:** Git
-
-## 📱 Responsive Design
-
-The system is fully responsive and works on:
-- Desktop computers
-- Tablets
-- Mobile phones
-
-## 🔒 Security Features
-
-- Password hashing (bcrypt)
-- SQL injection prevention (PDO prepared statements)
-- XSS protection
-- Session management
-- CSRF token support
-- Protected configuration files
-
-## 📊 Database Schema
-
-### Tables
-- `admins` - Administrator accounts
-- `teachers` - Teacher accounts
-- `students` - Student accounts
-- `notices` - Notice board entries
-
-## 🌐 URLs
-
-- **Homepage:** `http://localhost/scti-school/`
-- **Login:** `http://localhost/scti-school/login-simple.php`
-- **Admin Dashboard:** `http://localhost/scti-school/Admin-Notice-Board.html`
-- **Teacher Dashboard:** `http://localhost/scti-school/teacher-dashboard.php`
-- **Student Dashboard:** `http://localhost/scti-school/student-dashboard.php`
-
-## 📝 Configuration
-
-Edit `config.php` to change database settings:
-
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'scti_school');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is developed for Sindhuli Community Technical Institute (SCTI).
-
-## 👥 Authors
-
-- Development Team - SCTI Project
-
-## 📞 Support
-
-For support and queries:
-- Email: admin@scti.edu.np
-- Website: [SCTI Official Website]
-
-## 🎯 Future Enhancements
-
-- [ ] Online exam system
-- [ ] Attendance tracking
-- [ ] Fee management
-- [ ] Library management
-- [ ] Email notifications
-- [ ] Mobile app
-- [ ] Parent portal
-- [ ] Report generation
-
-## 📸 Screenshots
-
-### Homepage
-Clean and professional homepage with banner, courses, and teacher information.
-
-### Login Page
-Secure login with three user types and remember me functionality.
-
-### Admin Dashboard
-Comprehensive notice board management with statistics and search.
-
-### Teacher Dashboard
-Class management with student lists and schedules.
-
-### Student Dashboard
-Course overview with grades and attendance tracking.
+A web-based school management system for **Sindhuli Community Technical Institute (SCTI)**, built with PHP, MySQL, and vanilla JavaScript. Runs on XAMPP (Apache + MySQL).
 
 ---
 
-**© 2025 Sindhuli Community Technical Institute (SCTI)**
+## Tech Stack
 
-**Version:** 1.0  
-**Last Updated:** March 2025
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
+- **Backend:** PHP 8.x
+- **Database:** MySQL
+- **Server:** Apache via XAMPP
+- **Icons:** Font Awesome 6.5.1
+- **Charts:** Chart.js 4.4.0
+
+---
+
+## Setup
+
+1. Clone or copy the project to `C:\xampp\htdocs\scti-school\`
+2. Start Apache and MySQL in XAMPP Control Panel
+3. Open `http://localhost/phpmyadmin/` and create database `scti_school`
+4. Import `database-setup.sql` to create all tables
+5. Run any additional SQL migration files if needed (see below)
+6. Visit `http://localhost/scti-school/`
+
+### Database Config
+
+Edit `includes/config.php` if your credentials differ:
+
+```php
+DB_HOST: localhost
+DB_NAME: scti_school
+DB_USER: root
+DB_PASS: (empty by default)
+```
+
+### SQL Migration Files
+
+Run these in phpMyAdmin if you encounter column errors:
+
+| File | Purpose |
+|---|---|
+| `database-setup.sql` | Full schema — run first |
+| `fix-attendance-table.sql` | Renames `date` → `attendance_date`, adds `marked_by` |
+| `add-attendance-late-reason.sql` | Adds `late_reason` column to attendance |
+| `add-contact-table.sql` | Contacts table |
+| `add-notice-audience.sql` | Audience column for notices |
+| `add-student-qualification.sql` | Qualification column for students |
+| `add-teacher-columns.sql` | Extra teacher profile columns |
+| `create-programs-table.sql` | Programs/courses table |
+| `create-gallery-table.sql` | Gallery table |
+| `create-assignments-table.sql` | Assignments table |
+| `create-materials-table.sql` | Course materials table |
+| `create-submissions-table.sql` | Assignment submissions table |
+
+---
+
+## Default Login Credentials
+
+| Role | Username | Password | Dashboard |
+|---|---|---|---|
+| Admin | `admin` | `admin123` | `/dashboards/admin-dashboard.php` |
+| Teacher | `teacher` | `teacher123` | `/dashboards/teacher-dashboard.php` |
+| Student | `student` | `student123` | `/dashboards/student-dashboard.php` |
+
+> Passwords are hashed with PHP `password_hash()`. Change defaults after first login.
+
+---
+
+## Project Structure
+
+```
+scti-school/
+├── index.html                  # Public SPA (Home, Programs, Gallery, Notices, Contact)
+├── index.php                   # Redirects to index.html
+├── .htaccess                   # Apache config
+│
+├── assets/
+│   ├── css/style.css           # Global stylesheet
+│   ├── js/
+│   │   ├── app.js              # SPA router
+│   │   ├── menu.js             # Navigation
+│   │   ├── pages.js            # Page loader
+│   │   └── pages/              # Per-page JS modules
+│   └── images/                 # Logos, banners, photos
+│
+├── includes/
+│   ├── config.php              # DB connection
+│   └── logout.php              # Session logout
+│
+├── dashboards/
+│   ├── admin-dashboard.php
+│   ├── teacher-dashboard.php
+│   └── student-dashboard.php
+│
+├── pages/                      # PHP page handlers (88 files)
+│   ├── login-simple.php
+│   ├── attendance-save.php
+│   ├── attendance-data.php
+│   ├── student-attendance-data.php
+│   ├── teacher-attendance.php
+│   ├── student-attendance.php
+│   ├── gallery-*.php
+│   ├── assignment-*.php
+│   ├── notice-*.php
+│   └── ...
+│
+├── admin/
+│   └── Admin-Notice-Board.html
+│
+└── uploads/
+    ├── gallery/                # Uploaded gallery images
+    └── materials/              # Uploaded course materials
+```
+
+---
+
+## Features
+
+### Public Website (SPA)
+- Home page with banner, events, campus info
+- Programs page — course listings with details
+- Gallery — dynamic image/video gallery
+- Notice Board — public announcements
+- Contact form — stored in DB, viewable by admin
+
+### Admin Dashboard
+- Manage students, teachers, programs
+- Notice board management with audience targeting
+- View and reply to contact messages
+- Gallery management (upload images/videos)
+- Assignment and grade oversight
+
+### Teacher Dashboard
+- Mark attendance by class/date/period
+- View attendance charts and analytics
+- Create and manage assignments
+- Upload course materials
+- Enter student grades
+- Add new students
+
+### Student Dashboard
+- View attendance rate with charts
+- View grades and GPA
+- Submit assignments
+- Access course materials
+- Edit profile (name, email, phone, address)
+- View notices
+
+---
+
+## Key Pages Reference
+
+| URL | Description |
+|---|---|
+| `http://localhost/scti-school/` | Public homepage |
+| `/dashboards/admin-dashboard.php` | Admin panel |
+| `/dashboards/teacher-dashboard.php` | Teacher panel |
+| `/dashboards/student-dashboard.php` | Student panel |
+| `/pages/teacher-attendance.php` | Mark attendance |
+| `/pages/student-attendance.php` | Student attendance view |
+| `/pages/manage-gallery.php` | Gallery management |
+| `/pages/manage-programs.php` | Program/course management |
+
+---
+
+## Database Tables
+
+| Table | Description |
+|---|---|
+| `students` | Student accounts (`course`, `semester`, `student_id`, etc.) |
+| `teachers` | Teacher accounts |
+| `admins` | Admin accounts |
+| `programs` | Courses (`title`, `content` pipe-separated subjects, `status`) |
+| `attendance` | Records (`student_id`, `attendance_date`, `status`, `marked_by`) |
+| `grades` | Marks (`student_id`, `subject`, `internal_marks`, `external_marks`) |
+| `assignments` | Tasks (`created_by`, `due_date`, `subject`) |
+| `assignment_submissions` | Student submissions |
+| `materials` | Course files (`uploaded_by`, `file_path`) |
+| `gallery` | Media items (`file_type`, `category`) |
+| `notices` | Announcements (`audience`, `status`) |
+| `contacts` | Contact form submissions |
+
+---
+
+## Notes
+
+- `students.course` stores the program title (e.g. `"BIT"`)
+- `students.semester` stores full string (e.g. `"Semester 1"`)
+- `programs.content` stores subjects as pipe-separated string (e.g. `"Math|Physics|English"`)
+- `materials` table uses `uploaded_by` (not `teacher_id`)
+- `attendance` table uses `attendance_date` (not `date`) and `marked_by` (not `teacher_id`)
+- No public signup — admin/teacher creates all user accounts
+- Git branch: `Sabnam_learning`
+
+---
+
+## Theme Colors
+
+| Name | Hex |
+|---|---|
+| Primary Blue | `#004080` |
+| Secondary Blue | `#0059b3` |
+| Dark Navy | `#00264d` |
+| Success Green | `#28a745` |
+| Warning Orange | `#fd7e14` |
+| Danger Red | `#dc3545` |

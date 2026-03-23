@@ -212,13 +212,20 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
         </div>
         <div class="fgrid" style="margin-bottom:14px">
           <div class="fg">
+            <label>Designation</label>
+            <input type="text" id="fDesignation" class="fc" placeholder="e.g. Assistant Professor">
+          </div>
+          <div class="fg">
             <label>Experience</label>
             <input type="text" id="fExp" class="fc" placeholder="e.g. 5 Years">
           </div>
+        </div>
+        <div class="fgrid" style="margin-bottom:14px">
           <div class="fg">
             <label>Joining Date</label>
             <input type="date" id="fJoining" class="fc">
           </div>
+          <div class="fg"></div>
         </div>
         <div class="fgrid full" style="margin-bottom:14px">
           <div class="fg">
@@ -403,6 +410,7 @@ function saveTeacher() {
     email:         document.getElementById('fEmail').value.trim(),
     phone:         document.getElementById('fPhone').value.trim(),
     qualification: document.getElementById('fQual').value.trim(),
+    designation:   document.getElementById('fDesignation').value.trim(),
     experience:    document.getElementById('fExp').value.trim(),
     subjects:      document.getElementById('fSubjects').value.trim(),
     status:        document.getElementById('fStatus').value
@@ -437,7 +445,7 @@ function saveTeacher() {
 // ── RESET ─────────────────────────────────────────────────────
 function resetForm() {
   ['fName','fTeacherId','fUsername','fPassword','fEmail','fPhone','fAddress',
-   'fEmergency','fQual','fSpec','fExp','fSubjects','fBio','fSalary','fDob','fJoining']
+   'fEmergency','fQual','fSpec','fExp','fDesignation','fSubjects','fBio','fSalary','fDob','fJoining']
     .forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('fDept').value   = '';
   document.getElementById('fGender').value = '';

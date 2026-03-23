@@ -18,7 +18,7 @@ try {
     $stmt2 = $db->prepare("SELECT COUNT(*) FROM assignments WHERE created_by=?");
     $stmt2->execute([$teacherId]);
     $pendingAssign = $stmt2->fetchColumn();
-    $totalMaterials = $db->prepare("SELECT COUNT(*) FROM materials WHERE teacher_id=?");
+    $totalMaterials = $db->prepare("SELECT COUNT(*) FROM materials WHERE uploaded_by=?");
     $totalMaterials->execute([$teacherId]);
     $materialsCount = $totalMaterials->fetchColumn();
     // Recent notices

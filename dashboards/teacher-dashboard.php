@@ -26,10 +26,10 @@ try {
 
     // Recent activity
     $activities = [];
-    $recentAtt = $db->prepare("SELECT a.date, COUNT(*) as cnt FROM attendance a WHERE a.teacher_id=? GROUP BY a.date ORDER BY a.date DESC LIMIT 2");
+    $recentAtt = $db->prepare("SELECT attendance_date, COUNT(*) as cnt FROM attendance WHERE marked_by=? GROUP BY attendance_date ORDER BY attendance_date DESC LIMIT 2");
     $recentAtt->execute([$teacherId]);
     foreach ($recentAtt->fetchAll() as $r) {
-        $activities[] = ['icon'=>'fa-calendar-check','color'=>'#004080','label'=>'Attendance marked','name'=>date('M d, Y', strtotime($r['date'])).' — '.$r['cnt'].' students','time'=>$r['date'].' 00:00:00','link'=>'../pages/teacher-attendance.php'];
+        $activities[] = ['icon'=>'fa-calendar-check','color'=>'#004080','label'=>'Attendance marked','name'=>date('M d, Y', strtotime($r['attendance_date'])).' — '.$r['cnt'].' students','time'=>$r['attendance_date'].' 00:00:00','link'=>'../pages/teacher-attendance.php'];
     }
     $recentAssign = $db->prepare("SELECT title, created_at FROM assignments WHERE created_by=? ORDER BY created_at DESC LIMIT 2");
     $recentAssign->execute([$teacherId]);

@@ -36,7 +36,7 @@ try {
     $now = date('Y-m-d H:i:s');
     $pendingAssign = $db->query("SELECT COUNT(*) FROM assignments WHERE due_date > '$now'")->fetchColumn();
 
-    $attStmt = $db->prepare("SELECT COUNT(*) as total, SUM(CASE WHEN status='present' THEN 1 ELSE 0 END) as present FROM attendance WHERE student_id=?");
+    $attStmt = $db->prepare("SELECT COUNT(*) as total, SUM(CASE WHEN status='present' OR status='late' THEN 1 ELSE 0 END) as present FROM attendance WHERE student_id=?");
     $attStmt->execute([$studentId]);
     $attRow = $attStmt->fetch();
     $attPct = ($attRow['total'] > 0) ? round(($attRow['present'] / $attRow['total']) * 100) : 0;
@@ -54,10 +54,10 @@ try {
     foreach ($recentGrades->fetchAll() as $r) {
         $activities[] = ['icon'=>'fa-star','color'=>'#fd7e14','label'=>'Grade received','name'=>$r['subject'].' — '.$r['marks'].' marks','time'=>$r['created_at'],'link'=>'../pages/student-grades.php'];
     }
-    $recentAtt = $db->prepare("SELECT date, status FROM attendance WHERE student_id=? ORDER BY date DESC LIMIT 2");
+    $recentAtt = $db->prepare("SELECT attendance_date, status FROM attendance WHERE student_id=? ORDER BY attendance_date DESC LIMIT 2");
     $recentAtt->execute([$studentId]);
     foreach ($recentAtt->fetchAll() as $r) {
-        $activities[] = ['icon'=>'fa-calendar-check','color'=>'#004080','label'=>'Attendance marked','name'=>date('M d, Y', strtotime($r['date'])).' — '.ucfirst($r['status']),'time'=>$r['date'],'link'=>'../pages/student-attendance.php'];
+        $activities[] = ['icon'=>'fa-calendar-check','color'=>'#004080','label'=>'Attendance marked','name'=>date('M d, Y', strtotime($r['attendance_date'])).' — '.ucfirst($r['status']),'time'=>$r['attendance_date'],'link'=>'../pages/student-attendance.php'];
     }
     $recentSub = $db->prepare("SELECT a.title, s.submitted_at FROM assignment_submissions s JOIN assignments a ON a.id=s.assignment_id WHERE s.student_id=? ORDER BY s.submitted_at DESC LIMIT 2");
     $recentSub->execute([$studentId]);

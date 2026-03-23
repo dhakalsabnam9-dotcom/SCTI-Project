@@ -39,8 +39,13 @@ $newName  = time() . '_' . uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_
 $uploadDir = '../uploads/materials/';
 $filePath  = $uploadDir . $newName;
 
+// Auto-create folder if missing
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
+
 if (!move_uploaded_file($file['tmp_name'], $filePath)) {
-    echo json_encode(['success'=>false,'message'=>'Upload failed. Check folder permissions.']); exit();
+    echo json_encode(['success'=>false,'message'=>'Upload failed. Check folder permissions for uploads/materials/']); exit();
 }
 
 $sizeBytes = $file['size'];

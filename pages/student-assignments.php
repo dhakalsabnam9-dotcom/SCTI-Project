@@ -4,362 +4,458 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header('Location: ../index.php'); exit();
 }
 require_once '../includes/config.php';
-$studentId = intval($_SESSION['user_id'] ?? 0);
-
+$studentId = intval($_SESSION['user_id']);
+$studentName = $_SESSION['full_name'] ?? 'Student';
 try {
     $db = getDBConnection();
     $stmt = $db->prepare("
-        SELECT a.*, t.full_name as teacher_name,
-               s.id as sub_id, s.file_path, s.file_name, s.notes as sub_notes,
-               s.grade, s.feedback, s.status as sub_status, s.submitted_at, s.graded_at
+        SELECT a.*,
+               s.id AS sub_id, s.status AS sub_status, s.submitted_at,
+               s.file_name, s.grade, s.feedback, s.notes AS sub_notes
         FROM assignments a
-        LEFT JOIN teachers t ON a.created_by = t.id
         LEFT JOIN assignment_submissions s ON s.assignment_id = a.id AND s.student_id = ?
+        WHERE a.status = 'active'
         ORDER BY a.due_date ASC
     ");
     $stmt->execute([$studentId]);
-    $assignments = $stmt->fetchAll();
-    $now = time();
-    $total=count($assignments); $pending=0; $overdue=0; $submitted=0; $graded=0;
-    foreach ($assignments as $a) {
-        if ($a['sub_id']) { $submitted++; if ($a['sub_status']==='graded') $graded++; }
-        elseif (strtotime($a['due_date']) < $now) $overdue++;
-        else $pending++;
-    }
-} catch(Exception $e) { $assignments=[]; $total=0; $pending=0; $overdue=0; $submitted=0; $graded=0; }
+    $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(Exception $e) { $assignments = []; }
+
+$total     = count($assignments);
+$submitted = count(array_filter($assignments, fn($a) => !empty($a['sub_id'])));
+$pending   = count(array_filter($assignments, fn($a) => empty($a['sub_id']) && strtotime($a['due_date']) > time()));
+$overdue   = count(array_filter($assignments, fn($a) => empty($a['sub_id']) && strtotime($a['due_date']) <= time()));
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Assignments | SCTI Student</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Assignments | SCTI Student</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
 .top-bar{background:#00264d;color:white;padding:7px 20px;font-size:13px}
-.pg-header{background:linear-gradient(135deg,#6f42c1,#e83e8c);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 18px rgba(111,66,193,.25)}
+.pg-header{background:linear-gradient(135deg,#004080,#0059b3);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 18px rgba(0,64,128,.25)}
 .pg-header h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 3px}
 .pg-header .bc{font-size:12px;color:rgba(255,255,255,.75)}
 .pg-header .bc a{color:#fff;text-decoration:none}
-.btn-back{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;transition:.2s;text-decoration:none;background:rgba(255,255,255,.18);color:#fff}
-.btn-back:hover{background:rgba(255,255,255,.32)}
-.wrap{max-width:1000px;margin:24px auto;padding:0 20px 60px}
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
-.stat-pill{background:white;border-radius:12px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:flex;align-items:center;gap:10px;cursor:pointer;border:2px solid transparent;transition:.2s}
-.stat-pill:hover,.stat-pill.active{border-color:#6f42c1;transform:translateY(-2px)}
-.sp-ico{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:white;flex-shrink:0}
-.si-purple{background:linear-gradient(135deg,#6f42c1,#e83e8c)}
-.si-yellow{background:linear-gradient(135deg,#fd7e14,#ffc107)}
-.si-red{background:linear-gradient(135deg,#dc3545,#fd7e14)}
-.si-green{background:linear-gradient(135deg,#28a745,#20c997)}
-.si-blue{background:linear-gradient(135deg,#007bff,#17a2b8)}
-.sp-val{font-size:22px;font-weight:800;color:#1a202c;line-height:1}
-.sp-lbl{font-size:11px;color:#888;margin-top:2px;font-weight:600}
-.filter-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
-.ftab{padding:8px 18px;border:2px solid #6f42c1;border-radius:8px;background:white;color:#6f42c1;cursor:pointer;font-weight:700;font-size:13px;transition:.2s}
-.ftab:hover{background:#f3eeff}
-.ftab.active{background:linear-gradient(135deg,#6f42c1,#e83e8c);color:white;border-color:transparent}
-.grid{display:grid;gap:16px}
-.acard{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);border-left:6px solid #6f42c1;overflow:hidden;transition:.25s}
-.acard:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(111,66,193,.15)}
-.acard.overdue{border-left-color:#dc3545}
-.acard.submitted{border-left-color:#28a745}
-.acard.graded{border-left-color:#007bff}
-.acard.closed{border-left-color:#aaa}
-.acard-top{padding:18px 20px 14px}
-.acard-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
-.acard-title{font-size:16px;font-weight:800;color:#1a202c}
-.acard-sub{font-size:12px;color:#888;margin-top:3px;display:flex;align-items:center;gap:5px}
-.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
-.badge-upcoming{background:#fef3c7;color:#92400e}
-.badge-overdue{background:#fee2e2;color:#991b1b}
-.badge-today{background:#dbeafe;color:#1e40af}
+.btn-hdr{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:none;transition:.2s;text-decoration:none;background:rgba(255,255,255,.18);color:#fff}
+.btn-hdr:hover{background:rgba(255,255,255,.32)}
+.wrap{max-width:1000px;margin:28px auto;padding:0 20px 60px}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:white;border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;box-shadow:0 3px 14px rgba(0,0,0,.08);border-left:5px solid #004080;transition:.2s;cursor:pointer}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.13)}
+.stat-card.blue{border-left-color:#004080}.stat-card.green{border-left-color:#10b981}.stat-card.orange{border-left-color:#f97316}.stat-card.red{border-left-color:#dc2626}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:white;flex-shrink:0}
+.stat-card.blue .stat-icon{background:linear-gradient(135deg,#004080,#0059b3)}
+.stat-card.green .stat-icon{background:linear-gradient(135deg,#059669,#10b981)}
+.stat-card.orange .stat-icon{background:linear-gradient(135deg,#ea580c,#f97316)}
+.stat-card.red .stat-icon{background:linear-gradient(135deg,#b91c1c,#dc2626)}
+.stat-info h3{font-size:26px;font-weight:800;color:#1a202c;margin:0 0 2px}
+.stat-info p{font-size:12px;color:#888;margin:0;font-weight:500}
+/* FILTER */
+.filter-bar{background:white;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.filter-label{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-right:4px}
+.fbtn{padding:8px 18px;border:2px solid #e0e6ef;background:#f8fafc;color:#5a6a80;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.fbtn:hover{border-color:#004080;color:#004080}
+.fbtn.active{background:linear-gradient(135deg,#004080,#0059b3);border-color:transparent;color:white;box-shadow:0 4px 14px rgba(0,64,128,.3)}
+.search-box{margin-left:auto;display:flex;gap:0;border:2px solid #e0e6ef;border-radius:20px;overflow:hidden}
+.search-box input{padding:8px 14px;border:none;outline:none;font-size:13px;width:200px}
+.search-box button{padding:8px 14px;background:#004080;color:white;border:none;cursor:pointer;font-size:13px}
+/* CARDS */
+.asg-card{background:white;border-radius:16px;box-shadow:0 3px 14px rgba(0,0,0,.08);margin-bottom:18px;overflow:hidden;transition:.25s;border-left:5px solid #004080}
+.asg-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.13)}
+.asg-card.submitted{border-left-color:#10b981}
+.asg-card.overdue{border-left-color:#dc2626}
+.asg-card.pending{border-left-color:#f97316}
+.asg-card.graded{border-left-color:#7c3aed}
+.asg-head{padding:20px 24px 14px;display:flex;align-items:flex-start;gap:16px}
+.asg-icon{width:52px;height:52px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;flex-shrink:0}
+.asg-icon.submitted{background:linear-gradient(135deg,#059669,#10b981)}
+.asg-icon.overdue{background:linear-gradient(135deg,#b91c1c,#dc2626)}
+.asg-icon.pending{background:linear-gradient(135deg,#ea580c,#f97316)}
+.asg-icon.graded{background:linear-gradient(135deg,#5b21b6,#7c3aed)}
+.asg-info{flex:1;min-width:0}
+.asg-title{font-size:18px;font-weight:800;color:#1a202c;margin:0 0 6px}
+.asg-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.asg-badge{padding:3px 11px;border-radius:14px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
 .badge-submitted{background:#d1fae5;color:#065f46}
-.badge-graded{background:#dbeafe;color:#1e40af}
-.badge-late{background:#fee2e2;color:#991b1b}
-.badge-closed{background:#f0f0f0;color:#888}
-.acard-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#777;margin-bottom:10px}
-.acard-meta span{display:flex;align-items:center;gap:5px}
-.acard-meta i{color:#6f42c1}
-.deadline-warn{background:#fff7ed;border-left:3px solid #fd7e14;border-radius:8px;padding:8px 12px;font-size:12px;color:#9a3412;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.deadline-closed{background:#fee2e2;border-left:3px solid #dc3545;border-radius:8px;padding:8px 12px;font-size:12px;color:#991b1b;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.acard-desc{font-size:13px;color:#666;background:#f8f4ff;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.6;border-left:3px solid #c4b5fd}
-.acard-submit{border-top:1px solid #f0f0f0;padding:16px 20px;background:#fafbff}
-.submit-head{font-size:13px;font-weight:700;color:#6f42c1;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.upload-area{border:2px dashed #c4b5fd;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:.2s;background:#fff;margin-bottom:10px}
-.upload-area:hover{border-color:#6f42c1;background:#f8f4ff}
-.upload-area i{font-size:24px;color:#c4b5fd;display:block;margin-bottom:6px}
-.upload-area p{font-size:12px;color:#999;margin:0}
-.upload-area input[type=file]{display:none}
-.file-preview{display:none;align-items:center;gap:8px;background:#ede9fe;border-radius:8px;padding:8px 12px;font-size:12px;color:#5b21b6;margin-bottom:10px}
-.notes-input{width:100%;padding:9px 12px;border:2px solid #e0e6ef;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;min-height:60px;transition:.2s}
-.notes-input:focus{outline:none;border-color:#6f42c1}
-.btn-submit-work{width:100%;padding:11px;background:linear-gradient(135deg,#6f42c1,#e83e8c);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.25s;margin-top:10px}
-.btn-submit-work:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(111,66,193,.35)}
-.btn-submit-work:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btn-delete-sub{width:100%;padding:9px;background:#fee2e2;color:#991b1b;border:2px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.2s;margin-top:8px}
-.btn-delete-sub:hover{background:#dc3545;color:white;border-color:#dc3545}
-.submitted-info{background:#d1fae5;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#065f46}
-.si-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.si-row:last-child{margin-bottom:0}
-.feedback-box{background:linear-gradient(135deg,#e8f4fd,#f0f8ff);border:1px solid #bee5eb;border-radius:10px;padding:14px 16px;margin-top:10px}
-.feedback-box h5{font-size:13px;font-weight:700;color:#004080;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.grade-display{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#6f42c1,#e83e8c);color:white;padding:6px 16px;border-radius:20px;font-size:15px;font-weight:800;margin-bottom:8px}
-.feedback-text{font-size:13px;color:#555;line-height:1.6;background:white;border-radius:8px;padding:10px 12px}
-.empty{text-align:center;padding:60px 20px;color:#aaa;background:white;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.empty i{font-size:56px;display:block;margin-bottom:14px;color:#c4b5fd}
-.toast{position:fixed;bottom:22px;right:22px;color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;display:none;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
-.toast.ok{background:linear-gradient(135deg,#6f42c1,#e83e8c)}
-.toast.err{background:#dc3545}
-footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:13px;margin-top:40px}
-@media(max-width:600px){.acard-meta{gap:8px}.stats-row{grid-template-columns:repeat(2,1fr)}}
+.badge-pending{background:#fef3c7;color:#92400e}
+.badge-overdue{background:#fee2e2;color:#991b1b}
+.badge-graded{background:#ede9fe;color:#5b21b6}
+.asg-due{font-size:12px;color:#888;display:flex;align-items:center;gap:5px}
+.asg-due.overdue-text{color:#dc2626;font-weight:700}
+.asg-desc{padding:0 24px 14px;font-size:13px;color:#4a5568;line-height:1.7;border-bottom:1px solid #f0f4f8}
+.asg-footer{padding:14px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fafbff}
+.asg-class{font-size:12px;color:#888;display:flex;align-items:center;gap:5px}
+.btn-submit{margin-left:auto;padding:9px 22px;background:linear-gradient(135deg,#004080,#0059b3);color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,64,128,.35)}
+.btn-resubmit{background:linear-gradient(135deg,#059669,#10b981)}
+.btn-resubmit:hover{box-shadow:0 6px 18px rgba(16,185,129,.35)}
+.btn-view-grade{background:linear-gradient(135deg,#5b21b6,#7c3aed)}
+.btn-view-grade:hover{box-shadow:0 6px 18px rgba(124,58,237,.35)}
+.grade-pill{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;background:#ede9fe;color:#5b21b6;display:inline-flex;align-items:center;gap:6px}
+/* SUBMIT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:white;border-radius:20px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.3);animation:modalIn .25s ease}
+@keyframes modalIn{from{transform:translateY(-20px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.modal-head{background:linear-gradient(135deg,#004080,#0059b3);padding:22px 28px;color:white;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{margin:0;font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
+.modal-close{background:rgba(255,255,255,.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;transition:.2s}
+.modal-close:hover{background:rgba(255,255,255,.35)}
+.modal-body{padding:24px 28px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.fc{width:100%;padding:11px 14px;border:2px solid #e0e6ef;border-radius:10px;font-size:14px;font-family:inherit;transition:.2s;background:#fff;color:#333}
+.fc:focus{outline:none;border-color:#004080;box-shadow:0 0 0 3px rgba(0,64,128,.1)}
+textarea.fc{resize:vertical;min-height:80px}
+.file-drop{border:2px dashed #c0cfe0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:.2s;background:#f8fafc}
+.file-drop:hover{border-color:#004080;background:#f0f4ff}
+.file-drop i{font-size:32px;color:#004080;margin-bottom:8px}
+.file-drop p{font-size:13px;color:#888;margin:0}
+.file-drop .file-name{font-size:13px;color:#004080;font-weight:700;margin-top:6px}
+.modal-alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.modal-alert.ok{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
+.modal-alert.err{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.modal-foot{padding:16px 28px;border-top:1px solid #f0f0f0;display:flex;gap:10px;justify-content:flex-end;background:#fafafa}
+.mbtn{padding:11px 24px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px}
+.mbtn-save{background:linear-gradient(135deg,#004080,#0059b3);color:white}
+.mbtn-save:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,64,128,.35)}
+.mbtn-cancel{background:#f0f0f0;color:#555}
+.mbtn-cancel:hover{background:#e0e0e0}
+/* GRADE MODAL */
+.grade-modal-box{max-width:460px}
+.grade-display{text-align:center;padding:20px 0}
+.grade-circle{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#5b21b6,#7c3aed);color:white;font-size:36px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(124,58,237,.35)}
+.grade-feedback{background:#f8f7ff;border-radius:10px;padding:14px;font-size:14px;color:#374151;line-height:1.7;margin-top:14px;border-left:4px solid #7c3aed}
+.empty-state{text-align:center;padding:80px 20px}
+.empty-state i{font-size:64px;color:#c5cfe0;margin-bottom:16px}
+.empty-state h3{color:#4a5568;font-size:20px;margin:0 0 8px}
+.empty-state p{color:#888;font-size:14px}
+.toast{position:fixed;bottom:22px;right:22px;color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;display:none;box-shadow:0 4px 15px rgba(0,0,0,.2);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast.ok{background:linear-gradient(135deg,#28a745,#20c997)}
+.toast.err{background:linear-gradient(135deg,#dc3545,#c82333)}
+footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:13px}
+@media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.asg-head{flex-direction:column}.btn-submit{margin-left:0}}
 </style>
 </head>
 <body>
-<div class="top-bar"><marquee>SCTI Student Portal — Assignments</marquee></div>
+<div class="top-bar"><marquee>SCTI Student Portal — My Assignments</marquee></div>
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-tasks"></i> My Assignments</h1>
-    <div class="bc"><a href="../dashboards/student-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Assignments</div>
+    <div class="bc">
+      <a href="../dashboards/student-dashboard.php"><i class="fa fa-home"></i> Dashboard</a> / Assignments
+    </div>
   </div>
-  <a href="../dashboards/student-dashboard.php" class="btn-back"><i class="fa fa-arrow-left"></i> Back</a>
+  <a href="../dashboards/student-dashboard.php" class="btn-hdr"><i class="fa fa-arrow-left"></i> Back</a>
 </div>
 
 <div class="wrap">
-  <!-- Stats -->
+  <!-- STATS -->
   <div class="stats-row">
-    <div class="stat-pill active" id="sc-all" onclick="setFilter('all')"><div class="sp-ico si-purple"><i class="fa fa-list"></i></div><div><div class="sp-val"><?=$total?></div><div class="sp-lbl">Total</div></div></div>
-    <div class="stat-pill" id="sc-pending" onclick="setFilter('pending')"><div class="sp-ico si-yellow"><i class="fa fa-clock"></i></div><div><div class="sp-val"><?=$pending?></div><div class="sp-lbl">Pending</div></div></div>
-    <div class="stat-pill" id="sc-overdue" onclick="setFilter('overdue')"><div class="sp-ico si-red"><i class="fa fa-exclamation-circle"></i></div><div><div class="sp-val"><?=$overdue?></div><div class="sp-lbl">Overdue</div></div></div>
-    <div class="stat-pill" id="sc-submitted" onclick="setFilter('submitted')"><div class="sp-ico si-green"><i class="fa fa-paper-plane"></i></div><div><div class="sp-val"><?=$submitted?></div><div class="sp-lbl">Submitted</div></div></div>
-    <div class="stat-pill" id="sc-graded" onclick="setFilter('graded')"><div class="sp-ico si-blue"><i class="fa fa-star"></i></div><div><div class="sp-val"><?=$graded?></div><div class="sp-lbl">Graded</div></div></div>
+    <div class="stat-card blue" onclick="filterCards('all')">
+      <div class="stat-icon"><i class="fa fa-tasks"></i></div>
+      <div class="stat-info"><h3><?=$total?></h3><p>Total Assignments</p></div>
+    </div>
+    <div class="stat-card green" onclick="filterCards('submitted')">
+      <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+      <div class="stat-info"><h3><?=$submitted?></h3><p>Submitted</p></div>
+    </div>
+    <div class="stat-card orange" onclick="filterCards('pending')">
+      <div class="stat-icon"><i class="fa fa-clock"></i></div>
+      <div class="stat-info"><h3><?=$pending?></h3><p>Pending</p></div>
+    </div>
+    <div class="stat-card red" onclick="filterCards('overdue')">
+      <div class="stat-icon"><i class="fa fa-exclamation-circle"></i></div>
+      <div class="stat-info"><h3><?=$overdue?></h3><p>Overdue</p></div>
+    </div>
   </div>
 
-  <!-- Filter tabs -->
-  <div class="filter-tabs">
-    <button class="ftab active" id="tab-all"       onclick="setFilter('all')">All (<?=$total?>)</button>
-    <button class="ftab"        id="tab-pending"   onclick="setFilter('pending')">Pending (<?=$pending?>)</button>
-    <button class="ftab"        id="tab-overdue"   onclick="setFilter('overdue')">Overdue (<?=$overdue?>)</button>
-    <button class="ftab"        id="tab-submitted" onclick="setFilter('submitted')">Submitted (<?=$submitted?>)</button>
-    <button class="ftab"        id="tab-graded"    onclick="setFilter('graded')">Graded (<?=$graded?>)</button>
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <button class="fbtn active" id="fbAll" onclick="filterCards('all')"><i class="fa fa-border-all"></i> All</button>
+    <button class="fbtn" id="fbPending" onclick="filterCards('pending')"><i class="fa fa-clock"></i> Pending</button>
+    <button class="fbtn" id="fbSubmitted" onclick="filterCards('submitted')"><i class="fa fa-check"></i> Submitted</button>
+    <button class="fbtn" id="fbOverdue" onclick="filterCards('overdue')"><i class="fa fa-exclamation-circle"></i> Overdue</button>
+    <button class="fbtn" id="fbGraded" onclick="filterCards('graded')"><i class="fa fa-star"></i> Graded</button>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search assignments..." oninput="filterCards(currentFilter)">
+      <button><i class="fa fa-search"></i></button>
+    </div>
   </div>
 
-  <div class="grid" id="grid">
-
+  <!-- ASSIGNMENT CARDS -->
+  <div id="asgList">
 <?php if (empty($assignments)): ?>
-    <div class="empty"><i class="fa fa-tasks"></i><p>No assignments yet.</p></div>
+    <div class="empty-state">
+      <i class="fa fa-tasks"></i>
+      <h3>No Assignments Yet</h3>
+      <p>Your teacher hasn't posted any assignments yet. Check back later.</p>
+    </div>
 <?php else: ?>
 <?php foreach ($assignments as $a):
-    $dueTs    = strtotime($a['due_date']);
-    $isOver   = $dueTs < $now;
-    $isToday  = date('Y-m-d',$dueTs) === date('Y-m-d');
-    $hasSub   = !empty($a['sub_id']);
-    $isGraded = $hasSub && $a['sub_status']==='graded';
-    $aid      = intval($a['id']);
-    $dueStr   = date('M d, Y g:i A', $dueTs);
-    $hoursLeft= ($dueTs - $now) / 3600;
+    $isSubmitted = !empty($a['sub_id']);
+    $isGraded    = $isSubmitted && !empty($a['grade']);
+    $isOverdue   = !$isSubmitted && strtotime($a['due_date']) <= time();
+    $isPending   = !$isSubmitted && !$isOverdue;
+    $dueTs       = strtotime($a['due_date']);
+    $dueStr      = date('M d, Y h:i A', $dueTs);
+    $daysLeft    = ceil(($dueTs - time()) / 86400);
 
-    if ($isGraded)   $cardCls='graded';
-    elseif ($hasSub) $cardCls='submitted';
-    elseif ($isOver) $cardCls='overdue';
-    else             $cardCls='pending';
+    if ($isGraded)       $cardClass = 'graded';
+    elseif ($isSubmitted) $cardClass = 'submitted';
+    elseif ($isOverdue)   $cardClass = 'overdue';
+    else                  $cardClass = 'pending';
 
-    $filterTag = $isGraded?'graded':($hasSub?'submitted':($isOver?'overdue':'pending'));
+    $iconClass = $cardClass;
+    $iconFa    = $isGraded ? 'fa-star' : ($isSubmitted ? 'fa-check-circle' : ($isOverdue ? 'fa-times-circle' : 'fa-hourglass-half'));
 
-    if ($isGraded)       { $bdg='badge-graded';    $bdgTxt='Graded'; }
-    elseif ($hasSub)     { $bdg='badge-submitted'; $bdgTxt='Submitted'; }
-    elseif ($isOver)     { $bdg='badge-overdue';   $bdgTxt='Overdue'; }
-    elseif ($isToday)    { $bdg='badge-today';     $bdgTxt='Due Today'; }
-    else                 { $bdg='badge-upcoming';  $bdgTxt='Upcoming'; }
-
-    $diff = $dueTs - $now;
-    if ($diff < 0)       $dlTxt = abs(floor($diff/86400)).' days overdue';
-    elseif ($diff < 3600) $dlTxt = 'Less than 1 hour left!';
-    elseif ($diff < 86400) $dlTxt = floor($diff/3600).' hours left';
-    else                  $dlTxt = floor($diff/86400).' days left';
+    $dataAttr = "data-status=\"$cardClass\"";
 ?>
-<div class="acard <?=$cardCls?>" data-filter="<?=$filterTag?>">
-  <div class="acard-top">
-    <div class="acard-header">
-      <div>
-        <div class="acard-title"><?=htmlspecialchars($a['title'])?></div>
-        <div class="acard-sub">
-          <i class="fa fa-chalkboard"></i><?=htmlspecialchars($a['class_name']??'General')?>
-          &nbsp;|&nbsp;<i class="fa fa-user"></i><?=htmlspecialchars($a['teacher_name']??'Teacher')?>
-        </div>
-      </div>
-      <span class="badge <?=$bdg?>"><?=$bdgTxt?></span>
-    </div>
-    <div class="acard-meta">
-      <span><i class="fa fa-calendar-xmark"></i> Deadline: <?=$dueStr?></span>
-      <span><i class="fa fa-hourglass-half"></i> <?=$dlTxt?></span>
-      <span><i class="fa fa-star"></i> <?=intval($a['total_points'])?> pts</span>
-    </div>
-    <?php if (!$isOver && !$hasSub && $hoursLeft < 24 && $hoursLeft > 0): ?>
-    <div class="deadline-warn"><i class="fa fa-triangle-exclamation"></i> Deadline approaching — submit soon!</div>
-    <?php endif; ?>
-    <?php if ($isOver && !$hasSub): ?>
-    <div class="deadline-closed"><i class="fa fa-lock"></i> Deadline passed — submissions are closed.</div>
-    <?php endif; ?>
-    <?php if (!empty($a['description'])): ?>
-    <div class="acard-desc"><?=nl2br(htmlspecialchars($a['description']))?></div>
-    <?php endif; ?>
-  </div>
-
-  <div class="acard-submit">
-    <?php if ($isGraded): ?>
-      <!-- GRADED -->
-      <div class="submitted-info">
-        <div class="si-row"><i class="fa fa-check-circle"></i> Submitted: <?=date('M d, Y g:i A', strtotime($a['submitted_at']))?></div>
-        <?php if ($a['file_name']): ?><div class="si-row"><i class="fa fa-paperclip"></i> <?=htmlspecialchars($a['file_name'])?></div><?php endif; ?>
-        <?php if ($a['sub_notes']): ?><div class="si-row"><i class="fa fa-sticky-note"></i> <?=htmlspecialchars($a['sub_notes'])?></div><?php endif; ?>
-      </div>
-      <div class="feedback-box">
-        <h5><i class="fa fa-comment-dots"></i> Teacher Feedback</h5>
-        <?php if ($a['grade']): ?><div class="grade-display"><i class="fa fa-star"></i> Grade: <?=htmlspecialchars($a['grade'])?> / <?=intval($a['total_points'])?></div><?php endif; ?>
-        <div class="feedback-text"><?=nl2br(htmlspecialchars($a['feedback']??'No feedback yet.'))?></div>
-      </div>
-
-    <?php elseif ($hasSub): ?>
-      <!-- SUBMITTED — can resubmit or delete before deadline -->
-      <div class="submitted-info">
-        <div class="si-row"><i class="fa fa-check-circle"></i> Submitted: <?=date('M d, Y g:i A', strtotime($a['submitted_at']))?></div>
-        <?php if ($a['file_name']): ?><div class="si-row"><i class="fa fa-paperclip"></i> <?=htmlspecialchars($a['file_name'])?></div><?php endif; ?>
-        <?php if ($a['sub_notes']): ?><div class="si-row"><i class="fa fa-sticky-note"></i> <?=htmlspecialchars($a['sub_notes'])?></div><?php endif; ?>
-      </div>
-      <div style="font-size:12px;color:#888;display:flex;align-items:center;gap:6px;margin-bottom:10px">
-        <i class="fa fa-clock" style="color:#fd7e14"></i> Waiting for teacher to grade...
-      </div>
-      <?php if (!$isOver): ?>
-      <!-- Resubmit / Delete only before deadline -->
-      <button class="btn-submit-work" style="background:linear-gradient(135deg,#fd7e14,#ffc107)" onclick="toggleResubmit(<?=$aid?>)">
-        <i class="fa fa-redo"></i> Resubmit (Replace)
-      </button>
-      <div id="resub-<?=$aid?>" style="display:none;margin-top:10px">
-        <form id="form-<?=$aid?>" onsubmit="event.preventDefault();submitWork(<?=$aid?>)">
-          <input type="hidden" name="assignment_id" value="<?=$aid?>">
-          <div class="upload-area" onclick="document.getElementById('file-<?=$aid?>').click()">
-            <i class="fa fa-cloud-upload-alt"></i>
-            <p>Click to upload new file (PDF, DOC, DOCX, TXT, ZIP, Image — max 10MB)</p>
-            <input type="file" id="file-<?=$aid?>" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip,.rar" onchange="previewFile(this,<?=$aid?>)">
+    <div class="asg-card <?=$cardClass?>" <?=$dataAttr?> id="asgCard<?=$a['id']?>">
+      <div class="asg-head">
+        <div class="asg-icon <?=$iconClass?>"><i class="fa <?=$iconFa?>"></i></div>
+        <div class="asg-info">
+          <div class="asg-title"><?=htmlspecialchars($a['title'])?></div>
+          <div class="asg-meta">
+            <?php if ($isGraded): ?>
+              <span class="asg-badge badge-graded"><i class="fa fa-star"></i> Graded: <?=htmlspecialchars($a['grade'])?></span>
+            <?php elseif ($isSubmitted): ?>
+              <span class="asg-badge badge-submitted"><i class="fa fa-check"></i> Submitted</span>
+            <?php elseif ($isOverdue): ?>
+              <span class="asg-badge badge-overdue"><i class="fa fa-times-circle"></i> Overdue</span>
+            <?php else: ?>
+              <span class="asg-badge badge-pending"><i class="fa fa-clock"></i> Pending</span>
+            <?php endif; ?>
+            <span class="asg-due <?=$isOverdue ? 'overdue-text' : ''?>">
+              <i class="fa fa-calendar"></i>
+              Due: <?=$dueStr?>
+              <?php if ($isPending && $daysLeft >= 0): ?>
+                &nbsp;(<?=$daysLeft?> day<?=$daysLeft!=1?'s':''?> left)
+              <?php endif; ?>
+            </span>
           </div>
-          <div class="file-preview" id="fp-<?=$aid?>"><i class="fa fa-paperclip"></i><span class="fp-name"></span><span style="margin-left:auto;cursor:pointer;color:#dc3545" onclick="clearFile(<?=$aid?>)"><i class="fa fa-times"></i></span></div>
-          <textarea class="notes-input" name="notes" placeholder="Add a note (optional)..."></textarea>
-          <button type="submit" class="btn-submit-work"><i class="fa fa-paper-plane"></i> Confirm Resubmit</button>
-        </form>
-      </div>
-      <button class="btn-delete-sub" onclick="deleteSubmission(<?=$aid?>)"><i class="fa fa-trash"></i> Delete Submission</button>
-      <?php else: ?>
-      <div class="deadline-closed"><i class="fa fa-lock"></i> Deadline passed — no changes allowed.</div>
-      <?php endif; ?>
-
-    <?php elseif (!$isOver): ?>
-      <!-- NOT submitted, deadline open -->
-      <div class="submit-head"><i class="fa fa-upload"></i> Submit Your Work</div>
-      <form id="form-<?=$aid?>" onsubmit="event.preventDefault();submitWork(<?=$aid?>)">
-        <input type="hidden" name="assignment_id" value="<?=$aid?>">
-        <div class="upload-area" onclick="document.getElementById('file-<?=$aid?>').click()">
-          <i class="fa fa-cloud-upload-alt"></i>
-          <p>Click to upload file (PDF, DOC, DOCX, TXT, ZIP, Image — max 10MB)</p>
-          <input type="file" id="file-<?=$aid?>" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip,.rar" onchange="previewFile(this,<?=$aid?>)">
         </div>
-        <div class="file-preview" id="fp-<?=$aid?>"><i class="fa fa-paperclip"></i><span class="fp-name"></span><span style="margin-left:auto;cursor:pointer;color:#dc3545" onclick="clearFile(<?=$aid?>)"><i class="fa fa-times"></i></span></div>
-        <textarea class="notes-input" name="notes" placeholder="Add a note to your teacher (optional)..."></textarea>
-        <button type="submit" class="btn-submit-work"><i class="fa fa-paper-plane"></i> Submit Assignment</button>
-      </form>
-
-    <?php else: ?>
-      <!-- NOT submitted, deadline CLOSED -->
-      <div class="deadline-closed"><i class="fa fa-lock"></i> Deadline passed — you did not submit this assignment.</div>
-    <?php endif; ?>
-  </div>
-</div>
+      </div>
+      <?php if (!empty($a['description'])): ?>
+      <div class="asg-desc"><?=nl2br(htmlspecialchars($a['description']))?></div>
+      <?php endif; ?>
+      <div class="asg-footer">
+        <span class="asg-class"><i class="fa fa-chalkboard-teacher"></i> <?=htmlspecialchars($a['class_name'] ?? 'General')?></span>
+        <?php if ($isSubmitted && !empty($a['submitted_at'])): ?>
+          <span class="asg-class"><i class="fa fa-upload"></i> Submitted: <?=date('M d, Y', strtotime($a['submitted_at']))?></span>
+        <?php endif; ?>
+        <?php if ($isGraded): ?>
+          <div class="grade-pill"><i class="fa fa-star"></i> Grade: <?=htmlspecialchars($a['grade'])?></div>
+          <button class="btn-submit btn-view-grade" onclick="openGrade(<?=$a['id']?>)"><i class="fa fa-eye"></i> View Feedback</button>
+        <?php elseif ($isSubmitted): ?>
+          <button class="btn-submit btn-resubmit" onclick="openSubmit(<?=$a['id']?>, '<?=htmlspecialchars(addslashes($a['title']))?>', true)"><i class="fa fa-redo"></i> Resubmit</button>
+        <?php elseif (!$isOverdue): ?>
+          <button class="btn-submit" onclick="openSubmit(<?=$a['id']?>, '<?=htmlspecialchars(addslashes($a['title']))?>', false)"><i class="fa fa-paper-plane"></i> Submit Assignment</button>
+        <?php else: ?>
+          <span style="margin-left:auto;font-size:12px;color:#dc2626;font-weight:700"><i class="fa fa-lock"></i> Submission Closed</span>
+        <?php endif; ?>
+      </div>
+    </div>
 <?php endforeach; ?>
 <?php endif; ?>
+  </div>
+</div>
 
-  </div><!-- /grid -->
-</div><!-- /wrap -->
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submitModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="fa fa-paper-plane"></i> <span id="modalTitleTxt">Submit Assignment</span></h3>
+      <button class="modal-close" onclick="closeModal('submitModal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-alert" id="submitAlert"></div>
+      <input type="hidden" id="submitAsgId">
+      <div class="fg">
+        <label>Assignment</label>
+        <input type="text" id="submitAsgTitle" class="fc" readonly>
+      </div>
+      <div class="fg">
+        <label>Upload File <small style="color:#999;font-weight:400">(PDF, DOC, DOCX, ZIP, Image — max 10MB)</small></label>
+        <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+          <i class="fa fa-cloud-upload-alt"></i>
+          <p>Click to choose file or drag & drop here</p>
+          <div class="file-name" id="fileNameDisplay"></div>
+        </div>
+        <input type="file" id="fileInput" style="display:none" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip,.rar" onchange="onFileSelect(this)">
+      </div>
+      <div class="fg">
+        <label>Notes / Comments <small style="color:#999;font-weight:400">(Optional)</small></label>
+        <textarea id="submitNotes" class="fc" placeholder="Any notes for your teacher..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('submitModal')"><i class="fa fa-times"></i> Cancel</button>
+      <button class="mbtn mbtn-save" id="submitBtn" onclick="doSubmit()"><i class="fa fa-paper-plane"></i> <span id="submitBtnTxt">Submit</span></button>
+    </div>
+  </div>
+</div>
 
-<footer>© 2025 SCTI — Student Portal</footer>
+<!-- GRADE MODAL -->
+<div class="modal-overlay" id="gradeModal">
+  <div class="modal-box grade-modal-box">
+    <div class="modal-head" style="background:linear-gradient(135deg,#5b21b6,#7c3aed)">
+      <h3><i class="fa fa-star"></i> Grade & Feedback</h3>
+      <button class="modal-close" onclick="closeModal('gradeModal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="grade-display">
+        <div class="grade-circle" id="gradeCircle">—</div>
+        <div style="font-size:14px;color:#888;font-weight:600" id="gradeAsgTitle"></div>
+      </div>
+      <div class="grade-feedback" id="gradeFeedback" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('gradeModal')"><i class="fa fa-check"></i> Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
+<footer>© 2025 SCTI — Student Portal</footer>
 
 <script>
-function setFilter(f) {
-  ['all','pending','overdue','submitted','graded'].forEach(function(k){
-    document.getElementById('tab-'+k).classList.toggle('active', k===f);
-    var sc = document.getElementById('sc-'+k);
-    if (sc) sc.classList.toggle('active', k===f);
-  });
-  var cards = document.querySelectorAll('.acard');
-  var shown = 0;
-  cards.forEach(function(c){
-    var match = f==='all' || c.dataset.filter===f;
-    c.style.display = match ? '' : 'none';
-    if (match) shown++;
-  });
-  var grid = document.getElementById('grid');
-  var ex = grid.querySelector('.js-empty');
-  if (shown===0 && !ex) {
-    var d = document.createElement('div');
-    d.className = 'empty js-empty';
-    d.innerHTML = '<i class="fa fa-check"></i><p>No '+f+' assignments.</p>';
-    grid.appendChild(d);
-  } else if (shown>0 && ex) ex.remove();
-}
+var currentFilter = 'all';
 
-function toggleResubmit(id) {
-  var el = document.getElementById('resub-'+id);
-  if (el) el.style.display = el.style.display==='none' ? 'block' : 'none';
-}
-
-function previewFile(input, id) {
-  var prev = document.getElementById('fp-'+id);
-  if (input.files && input.files[0]) {
-    prev.style.display = 'flex';
-    prev.querySelector('.fp-name').textContent = input.files[0].name;
+// Grade data from PHP
+var gradeData = <?php
+  $gd = [];
+  foreach ($assignments as $a) {
+    if (!empty($a['sub_id'])) {
+      $gd[$a['id']] = ['grade' => $a['grade'] ?? '', 'feedback' => $a['feedback'] ?? '', 'title' => $a['title']];
+    }
   }
+  echo json_encode($gd);
+?>;
+
+function filterCards(status) {
+  currentFilter = status;
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  // update filter buttons
+  ['fbAll','fbPending','fbSubmitted','fbOverdue','fbGraded'].forEach(function(id) {
+    document.getElementById(id).classList.remove('active');
+  });
+  var map = {all:'fbAll',pending:'fbPending',submitted:'fbSubmitted',overdue:'fbOverdue',graded:'fbGraded'};
+  if (map[status]) document.getElementById(map[status]).classList.add('active');
+
+  document.querySelectorAll('.asg-card').forEach(function(card) {
+    var s = card.getAttribute('data-status');
+    var title = card.querySelector('.asg-title').textContent.toLowerCase();
+    var matchStatus = (status === 'all') || (s === status);
+    var matchSearch = !q || title.includes(q);
+    card.style.display = (matchStatus && matchSearch) ? 'block' : 'none';
+  });
 }
 
-function clearFile(id) {
-  document.getElementById('file-'+id).value = '';
-  document.getElementById('fp-'+id).style.display = 'none';
+function openSubmit(id, title, isResubmit) {
+  document.getElementById('submitAsgId').value = id;
+  document.getElementById('submitAsgTitle').value = title;
+  document.getElementById('submitNotes').value = '';
+  document.getElementById('fileNameDisplay').textContent = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('submitAlert').style.display = 'none';
+  document.getElementById('modalTitleTxt').textContent = isResubmit ? 'Resubmit Assignment' : 'Submit Assignment';
+  document.getElementById('submitBtnTxt').textContent = isResubmit ? 'Resubmit' : 'Submit';
+  document.getElementById('submitModal').classList.add('open');
 }
 
-function submitWork(aid) {
-  var form = document.getElementById('form-'+aid);
-  var fd   = new FormData(form);
-  var btn  = form.querySelector('.btn-submit-work');
+function onFileSelect(input) {
+  var name = input.files[0] ? input.files[0].name : '';
+  document.getElementById('fileNameDisplay').textContent = name ? '📎 ' + name : '';
+}
+
+function doSubmit() {
+  var id    = document.getElementById('submitAsgId').value;
+  var notes = document.getElementById('submitNotes').value.trim();
+  var file  = document.getElementById('fileInput').files[0];
+  var alert = document.getElementById('submitAlert');
+  alert.style.display = 'none';
+
+  var fd = new FormData();
+  fd.append('assignment_id', id);
+  fd.append('notes', notes);
+  if (file) fd.append('file', file);
+
+  var btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
-  fetch('assignment-submit.php', {method:'POST', body:fd})
+
+  fetch('assignment-submit.php', { method: 'POST', body: fd })
     .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.success) { showToast(d.message,'ok'); setTimeout(function(){ location.reload(); }, 1400); }
-      else { showToast(d.message||'Failed','err'); btn.disabled=false; btn.innerHTML='<i class="fa fa-paper-plane"></i> Submit Assignment'; }
+    .then(function(res) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-paper-plane"></i> <span id="submitBtnTxt">Submit</span>';
+      if (res.success) {
+        closeModal('submitModal');
+        showToast(res.message || 'Submitted!', 'ok');
+        setTimeout(function(){ location.reload(); }, 1500);
+      } else {
+        alert.textContent = res.message || 'Submission failed.';
+        alert.className = 'modal-alert err';
+        alert.style.display = 'block';
+      }
     })
-    .catch(function(){ showToast('Network error','err'); btn.disabled=false; });
+    .catch(function() {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-paper-plane"></i> <span id="submitBtnTxt">Submit</span>';
+      alert.textContent = 'Network error. Please try again.';
+      alert.className = 'modal-alert err';
+      alert.style.display = 'block';
+    });
 }
 
-function deleteSubmission(aid) {
-  if (!confirm('Delete your submission? You can resubmit before the deadline.')) return;
-  fetch('assignment-submission-delete.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({assignment_id:aid})})
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.success) { showToast(d.message,'ok'); setTimeout(function(){ location.reload(); }, 1400); }
-      else showToast(d.message||'Failed','err');
-    })
-    .catch(function(){ showToast('Network error','err'); });
+function openGrade(id) {
+  var d = gradeData[id];
+  if (!d) return;
+  document.getElementById('gradeCircle').textContent = d.grade || '—';
+  document.getElementById('gradeAsgTitle').textContent = d.title || '';
+  var fb = document.getElementById('gradeFeedback');
+  if (d.feedback) {
+    fb.textContent = '💬 ' + d.feedback;
+    fb.style.display = 'block';
+  } else {
+    fb.style.display = 'none';
+  }
+  document.getElementById('gradeModal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
 }
 
 function showToast(msg, type) {
   var t = document.getElementById('toast');
-  t.innerHTML = '<i class="fa fa-'+(type==='ok'?'check':'times')+'-circle"></i> '+msg;
-  t.className = 'toast '+(type||'ok');
-  t.style.display = 'flex';
+  t.textContent = msg; t.className = 'toast ' + (type||'ok');
+  t.style.display = 'block';
   setTimeout(function(){ t.style.display='none'; }, 3500);
 }
+
+// Drag & drop
+var drop = document.getElementById('fileDrop');
+drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.style.borderColor='#004080'; });
+drop.addEventListener('dragleave', function(){ drop.style.borderColor=''; });
+drop.addEventListener('drop', function(e){
+  e.preventDefault(); drop.style.borderColor='';
+  var f = e.dataTransfer.files[0];
+  if (f) {
+    var dt = new DataTransfer(); dt.items.add(f);
+    document.getElementById('fileInput').files = dt.files;
+    document.getElementById('fileNameDisplay').textContent = '📎 ' + f.name;
+  }
+});
 </script>
 </body>
 </html>

@@ -8,9 +8,28 @@ require_once '../includes/config.php';
 try {
     $db = getDBConnection();
     $students = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
-} catch(Exception $e) { $students = []; }
-
-$subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
+    
+    // Load subjects from programs table (extract from content field)
+    $subjects = [];
+    $progs = $db->query("SELECT content FROM programs WHERE status='active' AND content IS NOT NULL AND content != ''")->fetchAll();
+    foreach ($progs as $p) {
+        $subjectList = array_filter(array_map('trim', explode('|', $p['content'])));
+        foreach ($subjectList as $subj) {
+            if ($subj && !in_array($subj, $subjects)) {
+                $subjects[] = $subj;
+            }
+        }
+    }
+    sort($subjects);
+    
+    // Fallback to hardcoded if no programs found
+    if (empty($subjects)) {
+        $subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
+    }
+} catch(Exception $e) { 
+    $students = []; 
+    $subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

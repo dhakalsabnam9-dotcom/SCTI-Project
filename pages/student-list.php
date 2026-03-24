@@ -1,7 +1,7 @@
 <?php
 ob_start();
 session_start();
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['admin','teacher'])) {
     ob_end_clean(); echo json_encode(['success'=>false,'message'=>'Unauthorized']); exit();
 }
 require_once '../includes/config.php';

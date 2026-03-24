@@ -509,23 +509,23 @@ function spLoadTab(tab) {
     document.getElementById('spTableHead').innerHTML = '<tr>'
       +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">#</th>'
       +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Date</th>'
-      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Subject</th>'
+      +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Class</th>'
       +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Status</th>'
       +'<th style="background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:11px 13px;text-align:left;font-size:12px">Remarks</th>'
       +'</tr>';
     document.getElementById('spTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
-    fetch('../pages/student-attendance-data.php')
+    fetch('../pages/student-attendance-data.php?action=log')
       .then(function(r){return r.json();})
       .then(function(d){
-        var rows = (d.attendance||[]);
+        var rows = (d.records||[]);
         if (!rows.length) { document.getElementById('spTableBody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:#999">No attendance records yet</td></tr>'; return; }
         document.getElementById('spTableBody').innerHTML = rows.slice(0,20).map(function(a,i){
-          var isP = a.status==='present';
+          var isP = a.status==='present' || a.status==='late';
           var sc = isP?'background:#d4edda;color:#155724':'background:#f8d7da;color:#721c24';
           return '<tr onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'
             +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+(i+1)+'</td>'
-            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.date)+'</td>'
-            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.subject||'—')+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.attendance_date)+'</td>'
+            +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.class_name||'—')+'</td>'
             +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px"><span style="padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;'+sc+'">'+cap3(a.status)+'</span></td>'
             +'<td style="padding:10px 13px;border-bottom:1px solid #f0f0f0;font-size:13px">'+esc3(a.remarks||'—')+'</td>'
             +'</tr>';

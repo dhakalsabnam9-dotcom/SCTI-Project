@@ -2,22 +2,40 @@
 ob_start();
 session_start();
 header('Content-Type: application/json');
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
+if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['teacher','student'])) {
     ob_end_clean();
     echo json_encode(['success'=>false,'message'=>'Unauthorized']); exit();
 }
 require_once '../includes/config.php';
 
-$subject   = trim($_GET['subject']   ?? '');
-$exam_type = trim($_GET['exam_type'] ?? '');
-
-if (!$subject || !$exam_type) {
-    ob_end_clean();
-    echo json_encode(['success'=>false,'message'=>'Subject and exam type required']); exit();
-}
+$userType = $_SESSION['user_type'];
 
 try {
     $db = getDBConnection();
+
+    // ── Student mode: return this student's own grades as an array ────────────
+    if ($userType === 'student') {
+        $sid = intval($_SESSION['user_id']);
+        $stmt = $db->prepare(
+            "SELECT subject, exam_type, internal_marks, external_marks
+             FROM grades WHERE student_id=? ORDER BY subject ASC"
+        );
+        $stmt->execute([$sid]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ob_end_clean();
+        echo json_encode(['success'=>true,'grades'=>$rows]);
+        exit();
+    }
+
+    // ── Teacher mode: return grade map for a subject/exam_type ───────────────
+    $subject   = trim($_GET['subject']   ?? '');
+    $exam_type = trim($_GET['exam_type'] ?? '');
+
+    if (!$subject || !$exam_type) {
+        ob_end_clean();
+        echo json_encode(['success'=>false,'message'=>'Subject and exam type required']); exit();
+    }
+
     $stmt = $db->prepare(
         "SELECT student_id, student_db_id, internal_marks, external_marks
          FROM grades WHERE subject=? AND exam_type=?"
@@ -25,7 +43,6 @@ try {
     $stmt->execute([$subject, $exam_type]);
     $rows = $stmt->fetchAll();
 
-    // Key by student_id for easy lookup
     $map = [];
     foreach ($rows as $r) {
         $map[$r['student_id']] = [

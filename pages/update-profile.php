@@ -28,8 +28,10 @@ try {
         $stmt = $db->prepare("UPDATE teachers SET full_name=?, phone=?, address=?, department=?, designation=?, qualification=?, experience=? WHERE id=?");
         $stmt->execute([$fullName, $phone, $address, $dept, $desig, $qual, $exp ?: null, $userId]);
     } else {
-        $stmt = $db->prepare("UPDATE students SET full_name=?, phone=?, address=? WHERE id=?");
-        $stmt->execute([$fullName, $phone, $address, $userId]);
+        $qual = trim($_POST['qualification'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $stmt = $db->prepare("UPDATE students SET full_name=?, phone=?, address=?, qualification=?, email=? WHERE id=?");
+        $stmt->execute([$fullName, $phone, $address, $qual, $email, $userId]);
     }
 
     // Update session name

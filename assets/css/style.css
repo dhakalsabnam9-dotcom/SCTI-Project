@@ -34,9 +34,9 @@ body {
   color: white;
   font-size: 13px;
   font-weight: 500;
-  display: flex;
-  align-items: center;
+  display: block;
   height: 36px;
+  line-height: 36px;
   overflow: hidden;
 }
 .ticker-label {

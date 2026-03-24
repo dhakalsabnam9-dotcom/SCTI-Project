@@ -6,14 +6,8 @@ require_once('../includes/config.php');
 header('Content-Type: application/json');
 
 // Must be logged in as teacher or student
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['teacher', 'student'])) {
     echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
-    exit();
-}
-
-$userType = $_SESSION['user_type'] ?? '';
-if (!in_array($userType, ['teacher', 'student'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized user type.']);
     exit();
 }
 

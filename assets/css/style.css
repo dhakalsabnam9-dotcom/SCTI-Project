@@ -30,14 +30,17 @@ body {
 
 /* ===== TOP HEADER ===== */
 .top-header {
-  background: #00264d;
+  background: #004080;
   color: white;
   font-size: 13px;
   font-weight: 500;
-  display: block;
+  display: flex;
   height: 36px;
   line-height: 36px;
   overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 1001;
 }
 .ticker-label {
   background: #e63946;
@@ -60,17 +63,35 @@ body {
   height: 100%;
   display: flex;
   align-items: center;
+  background: #004080;
 }
-.ticker-outer marquee {
-  color: rgba(255,255,255,.9);
+.ticker-track {
+  display: flex;
+  white-space: nowrap;
+  width: max-content;
+  animation: ticker-scroll 30s linear infinite;
+}
+.ticker-track span {
+  color: #ffffff;
+  font-size: 13px;
   letter-spacing: .2px;
-  width: 100%;
+}
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 .ticker-text {
   white-space: nowrap;
-  color: rgba(255,255,255,.9);
+  color: #ffffff;
   font-size: 13px;
   letter-spacing: .2px;
+  display: inline-block;
+  position: absolute;
+  will-change: transform;
+}
+  letter-spacing: .2px;
+  display: inline-block;
+  position: absolute;
   will-change: transform;
 }
 

@@ -245,7 +245,7 @@ function renderTable(list) {
     html += '<tr id="row_'+s.id+'">'
       + '<td style="color:#aaa;font-size:12px">'+(i+1)+'</td>'
       + '<td><div class="student-name">'+esc(s.full_name)+'</div>'
-      +   '<div class="student-meta">'+esc(s.student_id)+' &nbsp;|&nbsp; '+esc(s.course||'')+(s.semester?' &nbsp;Sem '+esc(s.semester):'')+'</div>'
+      +   '<div class="student-meta">'+esc(s.student_id)+' &nbsp;|&nbsp; '+esc(s.course||'')+(s.semester?' &nbsp;'+esc(s.semester):'')+'</div>'
       + '</td>'
       + '<td>'
       +   '<div class="status-group">'

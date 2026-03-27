@@ -30,30 +30,30 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="assets/css/style.css?v=32">
+  <link rel="stylesheet" href="assets/css/style.css?v=35">
 </head>
 
 <body>
 
 <!-- ===== TOP HEADER ===== -->
 <div class="top-header">
-  <span class="ticker-label"><i class="fa fa-bullhorn"></i> NOTICE</span>
-  <div class="ticker-outer">
-    <div class="ticker-text" id="tickerText">
-      📢 Examination form submission deadline is 25th Poush 2081 &nbsp;&nbsp;|&nbsp;&nbsp; 🎓 Annual Sports Day on 1st Magh 2081 — All students must participate &nbsp;&nbsp;|&nbsp;&nbsp; 📝 Enrollment for new batch 2025–26 is now open &nbsp;&nbsp;|&nbsp;&nbsp; 🏫 College closed on 15th Poush for national holiday &nbsp;&nbsp;|&nbsp;&nbsp; 📋 Result of 1st semester internal exam published — check notice board &nbsp;&nbsp;|&nbsp;&nbsp; 🔔 Library books must be returned before Magh 5th &nbsp;&nbsp;|&nbsp;&nbsp; 🎉 Congratulations to all distinction holders of board exam &nbsp;&nbsp;|&nbsp;&nbsp; 📌 Parent-teacher meeting on Magh 10th at 10:00 AM &nbsp;&nbsp;|&nbsp;&nbsp;
+  <div class="ticker-label"><i class="fa fa-bullhorn"></i> NOTICE</div>
+  <div class="ticker-outer" id="tickerOuter">
+    <div class="ticker-track" id="tickerTrack">
+      📢 Examination form submission deadline is 25th Poush 2081 &nbsp;&nbsp;|&nbsp;&nbsp; 🎓 Annual Sports Day on 1st Magh 2081 — All students must participate &nbsp;&nbsp;|&nbsp;&nbsp; 📝 Enrollment for new batch 2025–26 is now open &nbsp;&nbsp;|&nbsp;&nbsp; 🏫 College closed on 15th Poush for national holiday &nbsp;&nbsp;|&nbsp;&nbsp; 📋 Result of 1st semester internal exam published &nbsp;&nbsp;|&nbsp;&nbsp; 🔔 Library books must be returned before Magh 5th &nbsp;&nbsp;|&nbsp;&nbsp; 🎉 Congratulations to all distinction holders &nbsp;&nbsp;|&nbsp;&nbsp; 📌 Parent-teacher meeting on Magh 10th at 10:00 AM &nbsp;&nbsp;&nbsp;&nbsp;
     </div>
   </div>
 </div>
 <script>
 (function(){
-  var el = document.getElementById('tickerText');
-  if (!el) return;
-  var pos = el.parentElement.offsetWidth;
-  el.style.transform = 'translateX(' + pos + 'px)';
-  function tick() {
+  var outer = document.getElementById('tickerOuter');
+  var track = document.getElementById('tickerTrack');
+  var pos = outer.offsetWidth;
+  track.style.transform = 'translateX(' + pos + 'px)';
+  function tick(){
     pos -= 1;
-    if (pos < -(el.offsetWidth)) pos = el.parentElement.offsetWidth;
-    el.style.transform = 'translateX(' + pos + 'px)';
+    if(pos < -(track.offsetWidth)) pos = outer.offsetWidth;
+    track.style.transform = 'translateX(' + pos + 'px)';
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);

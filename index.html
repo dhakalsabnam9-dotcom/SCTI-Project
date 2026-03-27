@@ -12,17 +12,80 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="assets/css/style.css?v=3">
+  <link rel="stylesheet" href="assets/css/style.css?v=35">
+  <style>
+    .top-header {
+      background: #28a745 !important;
+      display: flex !important;
+      height: 36px !important;
+      overflow: hidden !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1001 !important;
+    }
+    .ticker-label {
+      background: #1a7a30 !important;
+      color: white !important;
+      padding: 0 14px !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+      z-index: 2 !important;
+      position: relative !important;
+    }
+    .ticker-outer {
+      flex: 1 !important;
+      overflow: hidden !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      background: #28a745 !important;
+      position: relative !important;
+    }
+    .ticker-track {
+      white-space: nowrap !important;
+      color: #ffffff !important;
+      font-size: 13px !important;
+      position: absolute !important;
+      will-change: transform !important;
+    }
+  </style>
 </head>
 
 <body>
 
 <!-- ===== TOP HEADER ===== -->
 <div class="top-header">
-  <marquee>
-    Examination Notification | Genius 2025 | Enrollment Open 2025–26
-  </marquee>
+  <div class="ticker-label">
+    <i class="fa fa-bullhorn"></i> NOTICE
+  </div>
+  <div class="ticker-outer" id="tickerOuter">
+    <div class="ticker-track" id="tickerTrack">
+      📢 Examination form submission deadline is 25th Poush 2081 &nbsp;&nbsp;|&nbsp;&nbsp; 🎓 Annual Sports Day on 1st Magh 2081 &nbsp;&nbsp;|&nbsp;&nbsp; 📝 Enrollment for new batch 2025–26 is now open &nbsp;&nbsp;|&nbsp;&nbsp; 🏫 College closed on 15th Poush for national holiday &nbsp;&nbsp;|&nbsp;&nbsp; 📋 Result of 1st semester internal exam published &nbsp;&nbsp;|&nbsp;&nbsp; 🔔 Library books must be returned before Magh 5th &nbsp;&nbsp;|&nbsp;&nbsp; 🎉 Congratulations to all distinction holders &nbsp;&nbsp;|&nbsp;&nbsp; 📌 Parent-teacher meeting on Magh 10th at 10:00 AM &nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
 </div>
+<script>
+(function(){
+  var outer = document.getElementById('tickerOuter');
+  var track = document.getElementById('tickerTrack');
+  var pos = outer.offsetWidth;
+  track.style.transform = 'translateX(' + pos + 'px)';
+  function tick(){
+    pos -= 1;
+    if(pos < -(track.offsetWidth)) pos = outer.offsetWidth;
+    track.style.transform = 'translateX(' + pos + 'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
 
 <!-- ===== HEADER & MENU (STICKY) ===== -->
 <header class="header">

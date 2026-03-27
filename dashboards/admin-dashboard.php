@@ -400,7 +400,7 @@ function timeAgo($datetime) {
 
 <!-- Top Header -->
 <div class="top-header">
-  <marquee>Welcome to SCTI Admin Dashboard - Manage your institution efficiently</marquee>
+  <marquee behavior="scroll" direction="left" scrollamount="5" style="width:100%;display:block;line-height:36px;color:white;">Welcome to SCTI Admin Dashboard - Manage your institution efficiently</marquee>
 </div>
 
 <!-- Main Dashboard -->

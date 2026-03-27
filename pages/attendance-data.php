@@ -16,14 +16,13 @@ try {
     // ── 1. Student list (optionally filtered by course+semester) ─────────────
     if ($action === 'students') {
         $class = trim($_GET['class'] ?? '');
-        // Try to match "COURSE Semester N" pattern e.g. "BIT Semester 1"
         if ($class && preg_match('/^(.+?)\s+Semester\s+(\d+)$/i', $class, $m)) {
             $course   = trim($m[1]);
-            $semester = 'Semester ' . $m[2];
-            $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? AND semester=? ORDER BY full_name ASC");
-            $stmt->execute([$course, $semester]);
+            $semText  = 'Semester ' . $m[2];
+            $semNum   = intval($m[2]);
+            $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? AND (semester=? OR semester=?) ORDER BY full_name ASC");
+            $stmt->execute([$course, $semText, $semNum]);
         } elseif ($class) {
-            // fallback: match course name only
             $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? ORDER BY full_name ASC");
             $stmt->execute([$class]);
         } else {
@@ -39,8 +38,13 @@ try {
         $rows = $db->query("SELECT DISTINCT course, semester FROM students WHERE status='active' AND course IS NOT NULL AND course != '' ORDER BY course, semester ASC")->fetchAll();
         $classes = [];
         foreach ($rows as $r) {
-            if ($r['semester']) {
-                $classes[] = $r['course'] . ' ' . $r['semester'];
+            $sem = trim($r['semester'] ?? '');
+            if ($sem !== '' && $sem !== null) {
+                // Handle both "1" and "Semester 1" formats
+                if (is_numeric($sem)) {
+                    $sem = 'Semester ' . $sem;
+                }
+                $classes[] = $r['course'] . ' ' . $sem;
             } else {
                 $classes[] = $r['course'];
             }

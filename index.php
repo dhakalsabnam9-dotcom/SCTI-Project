@@ -30,7 +30,56 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="assets/css/style.css?v=35">
+  <link rel="stylesheet" href="assets/css/style.css?v=36">
+  <style>
+    .header {
+      background: #004080 !important;
+      position: sticky !important;
+      top: 36px !important;
+      z-index: 1000 !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+    }
+    .menu ul li a { color: white !important; }
+    .top-header {
+      background: #c0392b !important;
+      display: flex !important;
+      height: 36px !important;
+      overflow: hidden !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1001 !important;
+    }
+    .ticker-label {
+      background: #922b21 !important;
+      color: white !important;
+      padding: 0 14px !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    .ticker-outer {
+      flex: 1 !important;
+      overflow: hidden !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      background: #c0392b !important;
+      position: relative !important;
+    }
+    .ticker-track {
+      white-space: nowrap !important;
+      color: #ffffff !important;
+      font-size: 13px !important;
+      position: absolute !important;
+      will-change: transform !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -88,7 +137,83 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 
 <!-- ===== DYNAMIC CONTENT AREA ===== -->
 <div id="content-area">
-  <!-- Content will be loaded here dynamically -->
+  <!-- ===== BANNER ===== -->
+  <div class="banner">
+    <img src="assets/images/banner.png" alt="SCTI Banner">
+  </div>
+
+  <!-- ===== NOTICE & EVENTS ===== -->
+  <section class="section">
+    <section class="updates">
+      <div class="update-card notice">
+        <h3><i class="fa fa-bullhorn"></i> Notice Board</h3>
+        <ul>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">2025/26</span>
+            <span class="item-text">Admission Open</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Nov 10</span>
+            <span class="item-text">Orientation Program</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Nov 12</span>
+            <span class="item-text">Classes Begin</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+        </ul>
+        <div class="card-footer-link" onclick="loadPage('notices')">
+          <span>View All Notices</span> <i class="fa fa-arrow-right"></i>
+        </div>
+      </div>
+      <div class="update-card events">
+        <h3><i class="fa fa-calendar-alt"></i> Recent Events</h3>
+        <ul>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Sept 14</span>
+            <span class="item-text">AI Workshop</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+          <li class="update-item" onclick="loadPage('notices')">
+            <span class="date">Aug 30</span>
+            <span class="item-text">Sports Week</span>
+            <i class="fa fa-chevron-right item-arrow"></i>
+          </li>
+        </ul>
+        <div class="card-footer-link" onclick="loadPage('notices')">
+          <span>View All Events</span> <i class="fa fa-arrow-right"></i>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ===== CAMPUS INFO ===== -->
+  <section class="section bg-grey">
+    <div class="container campus-flex">
+      <div class="campus-img">
+        <img src="assets/images/work.jpg" alt="Campus Image">
+      </div>
+      <div class="campus-text">
+        <h2>Campus Information</h2>
+        <p>Sindhuli Community Technical Institute (SCTI) was established in 2014 AD as a nonprofit community-based technical institution supported by DCC Sindhuli, Kamalamai Municipality, and CTEVT.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COURSES ===== -->
+  <section class="section">
+    <div class="container">
+      <h2>Our Popular Courses</h2>
+      <div class="course-grid">
+        <div class="course">B.Tech Ed in IT</div>
+        <div class="course">B.Tech Ed in Civil</div>
+        <div class="course">Diploma in Civil Engineering</div>
+        <div class="course">Diploma in Animal Science</div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <!-- ===== FOOTER ===== -->
@@ -99,22 +224,20 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 <!-- ===== JAVASCRIPT ===== -->
 <script src="assets/js/menu.js"></script>
 <script src="assets/js/pages/home.js"></script>
-<script src="assets/js/pages/programs.js?v=35"></script>
-<script src="assets/js/pages/gallery.js?v=36"></script>
-<script src="assets/js/pages/notices.js?v=44"></script>
-<script src="assets/js/pages/contact.js?v=45"></script>
-<script src="assets/js/pages/login.js?v=2"></script>
-<script src="assets/js/pages.js?v=2"></script>
-<script src="assets/js/app.js?v=37"></script>
+<script src="assets/js/pages/programs.js"></script>
+<script src="assets/js/pages/gallery.js"></script>
+<script src="assets/js/pages/notices.js"></script>
+<script src="assets/js/pages/contact.js"></script>
+<script src="assets/js/pages/login.js"></script>
+<script src="assets/js/pages.js"></script>
+<script src="assets/js/app.js"></script>
 <script>
-// Handle ?page= URL parameter
-(function(){
-  var params = new URLSearchParams(window.location.search);
-  var pg = params.get('page');
-  if (pg && typeof pages !== 'undefined' && pages[pg]) {
-    window.onload = function(){ loadPage(pg); };
-  }
-})();
+// Reload content area on nav click since home is pre-rendered
+document.addEventListener('DOMContentLoaded', function(){
+  // Nav links already work via loadPage()
+  // Re-render home content via JS so dynamic switching works
+  if(typeof loadPage === 'function') loadPage('home');
+});
 </script>
 
 </body>

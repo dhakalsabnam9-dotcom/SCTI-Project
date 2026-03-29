@@ -14,13 +14,25 @@ try {
     $db  = getDBConnection();
     $tid = intval($_SESSION['user_id'] ?? 0);
 
-    // Verify ownership
-    $chk = $db->prepare("SELECT id FROM assignments WHERE id=? AND created_by=?");
+    // Verify ownership and get class_name
+    $chk = $db->prepare("SELECT id, class_name FROM assignments WHERE id=? AND created_by=?");
     $chk->execute([$aid, $tid]);
-    if (!$chk->fetch()) { ob_end_clean(); echo json_encode(['success'=>false,'message'=>'Not authorized']); exit(); }
+    $asgn = $chk->fetch();
+    if (!$asgn) { ob_end_clean(); echo json_encode(['success'=>false,'message'=>'Not authorized']); exit(); }
 
-    // All active students
-    $students = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
+    // Only students matching the assignment's class
+    $className = $asgn['class_name'];
+    if (preg_match('/^(.+?)\s+Semester\s+(\d+)$/i', $className, $m)) {
+        $course = trim($m[1]);
+        $sem    = 'Semester ' . $m[2];
+        $semNum = intval($m[2]);
+        $stmt2  = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? AND (semester=? OR semester=?) ORDER BY full_name ASC");
+        $stmt2->execute([$course, $sem, $semNum]);
+    } else {
+        $stmt2 = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? ORDER BY full_name ASC");
+        $stmt2->execute([$className]);
+    }
+    $students = $stmt2->fetchAll();
 
     // Submissions for this assignment
     $stmt = $db->prepare("SELECT s.*, st.full_name, st.student_id as sid FROM assignment_submissions s JOIN students st ON st.id=s.student_id WHERE s.assignment_id=?");

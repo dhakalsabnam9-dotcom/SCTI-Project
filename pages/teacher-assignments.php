@@ -138,10 +138,10 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 <div class="wrap">
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-pill"><div class="sp-ico green"><i class="fa fa-tasks"></i></div><div><div class="sp-val" id="stTotal">0</div><div class="sp-lbl">Total Assignments</div></div></div>
-    <div class="stat-pill"><div class="sp-ico blue"><i class="fa fa-paper-plane"></i></div><div><div class="sp-val" id="stSubs">0</div><div class="sp-lbl">Total Submissions</div></div></div>
-    <div class="stat-pill"><div class="sp-ico orange"><i class="fa fa-clock"></i></div><div><div class="sp-val" id="stActive">0</div><div class="sp-lbl">Active</div></div></div>
-    <div class="stat-pill"><div class="sp-ico red"><i class="fa fa-calendar-xmark"></i></div><div><div class="sp-val" id="stOverdue">0</div><div class="sp-lbl">Overdue</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('all')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico green"><i class="fa fa-tasks"></i></div><div><div class="sp-val" id="stTotal">0</div><div class="sp-lbl">Total Assignments</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('subs')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico blue"><i class="fa fa-paper-plane"></i></div><div><div class="sp-val" id="stSubs">0</div><div class="sp-lbl">Total Submissions</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('active')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico orange"><i class="fa fa-clock"></i></div><div><div class="sp-val" id="stActive">0</div><div class="sp-lbl">Active</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('overdue')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico red"><i class="fa fa-calendar-xmark"></i></div><div><div class="sp-val" id="stOverdue">0</div><div class="sp-lbl">Overdue</div></div></div>
   </div>
 
   <!-- Toolbar -->
@@ -174,21 +174,19 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
       <input type="hidden" id="asgId">
       <div class="fg"><label>Title <span class="req">*</span></label><input type="text" id="asgTitle" class="fc" placeholder="e.g. Database Design Project"></div>
       <div class="frow">
-        <div class="fg"><label>Class / Subject <span class="req">*</span></label><input type="text" id="asgClass" class="fc" placeholder="e.g. BIT Semester 3"></div>
-        <div class="fg"><label>Total Points <span class="req">*</span></label><input type="number" id="asgPoints" class="fc" placeholder="100" min="1" value="100"></div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Submission Deadline <span class="req">*</span></label><input type="datetime-local" id="asgDue" class="fc"></div>
-        <div class="fg"><label>Status</label>
-          <select id="asgStatus" class="fc">
-            <option value="active">Active</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="graded">Graded</option>
-            <option value="pending">Pending</option>
+        <div class="fg">
+          <label>Program / Semester <span class="req">*</span></label>
+          <select id="asgClass" class="fc">
+            <option value="">— Loading classes... —</option>
           </select>
         </div>
+        <div class="fg"><label>Total Points</label><input type="number" id="asgPoints" class="fc" min="1" value="100"></div>
       </div>
-      <div class="fg"><label>Description / Instructions</label><textarea id="asgDesc" class="fc" placeholder="Describe the assignment requirements, format, submission guidelines..."></textarea></div>
+      <div class="frow">
+        <div class="fg"><label>Assign Date <span class="req">*</span></label><input type="datetime-local" id="asgAssignDate" class="fc"></div>
+        <div class="fg"><label>Submission Deadline <span class="req">*</span></label><input type="datetime-local" id="asgDue" class="fc"></div>
+      </div>
+      <div class="fg"><label>Description / Instructions</label><textarea id="asgDesc" class="fc" placeholder="Describe the assignment requirements..."></textarea></div>
     </div>
     <div class="modal-foot">
       <button class="mbtn mbtn-cancel" onclick="closeModal('asgModal')"><i class="fa fa-times"></i> Cancel</button>
@@ -214,6 +212,21 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 
 <script>
 var allAssignments = [];
+
+// Load class dropdown from DB
+fetch('assignment-classes.php')
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    var sel = document.getElementById('asgClass');
+    sel.innerHTML = '<option value="">— Select Program/Semester —</option>';
+    if (res.success) {
+      res.classes.forEach(function(c){
+        var opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        sel.appendChild(opt);
+      });
+    }
+  });
 
 function loadAssignments() {
   fetch('assignment-list.php')
@@ -242,6 +255,25 @@ function applyFilter() {
     return (!status || a.status===status)
         && (!q || a.title.toLowerCase().includes(q) || a.class_name.toLowerCase().includes(q));
   });
+  renderGrid(list);
+}
+
+function filterByPill(type) {
+  var now = new Date();
+  var list;
+  if (type === 'all') {
+    document.getElementById('filterStatus').value = '';
+    list = allAssignments;
+  } else if (type === 'active') {
+    document.getElementById('filterStatus').value = 'active';
+    list = allAssignments.filter(function(a){ return a.status === 'active'; });
+  } else if (type === 'overdue') {
+    document.getElementById('filterStatus').value = '';
+    list = allAssignments.filter(function(a){ return new Date(a.due_date) < now; });
+  } else if (type === 'subs') {
+    document.getElementById('filterStatus').value = '';
+    list = allAssignments.filter(function(a){ return parseInt(a.sub_count) > 0; });
+  }
   renderGrid(list);
 }
 
@@ -276,6 +308,7 @@ function buildCard(a) {
     +   '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="badge '+(badgeMap[a.status]||'badge-active')+'">'+(labelMap[a.status]||a.status)+'</span>'+overBadge+'</div>'
     + '</div>'
     + '<div class="acard-meta">'
+    +   '<span><i class="fa fa-calendar-plus"></i> Assigned: '+(a.assign_date ? new Date(a.assign_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'N/A')+'</span>'
     +   '<span><i class="fa fa-calendar-xmark"></i> Deadline: '+dueStr+'</span>'
     +   '<span><i class="fa fa-star"></i> '+esc(String(a.total_points))+' pts</span>'
     +   '<span><i class="fa fa-users"></i> '+subCount+' / '+total+' submitted</span>'
@@ -301,13 +334,14 @@ function buildCard(a) {
 }
 
 function openCreate() {
-  document.getElementById('asgId').value     = '';
-  document.getElementById('asgTitle').value  = '';
-  document.getElementById('asgClass').value  = '';
-  document.getElementById('asgPoints').value = '100';
-  document.getElementById('asgDue').value    = '';
-  document.getElementById('asgDesc').value   = '';
-  document.getElementById('asgStatus').value = 'active';
+  document.getElementById('asgId').value          = '';
+  document.getElementById('asgTitle').value       = '';
+  document.getElementById('asgClass').value       = '';
+  document.getElementById('asgPoints').value      = '100';
+  document.getElementById('asgDue').value         = '';
+  document.getElementById('asgAssignDate').value  = '';
+  document.getElementById('asgDesc').value        = '';
+  document.getElementById('asgStatus').value      = 'active';
   document.getElementById('modalTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Assignment';
   document.getElementById('saveTxt').textContent  = 'Create Assignment';
   document.getElementById('formAlert').style.display = 'none';
@@ -315,15 +349,15 @@ function openCreate() {
 }
 
 function openEdit(a) {
-  document.getElementById('asgId').value     = a.id;
-  document.getElementById('asgTitle').value  = a.title;
-  document.getElementById('asgClass').value  = a.class_name;
-  document.getElementById('asgPoints').value = a.total_points;
-  // Convert date to datetime-local format
+  document.getElementById('asgId').value          = a.id;
+  document.getElementById('asgTitle').value       = a.title;
+  document.getElementById('asgClass').value       = a.class_name;
+  document.getElementById('asgPoints').value      = a.total_points;
   var d = a.due_date ? a.due_date.replace(' ','T').substring(0,16) : '';
-  document.getElementById('asgDue').value    = d;
-  document.getElementById('asgDesc').value   = a.description || '';
-  document.getElementById('asgStatus').value = a.status;
+  document.getElementById('asgDue').value         = d;
+  var ad = a.assign_date ? a.assign_date.replace(' ','T').substring(0,16) : '';
+  document.getElementById('asgAssignDate').value  = ad;
+  document.getElementById('asgDesc').value        = a.description || '';
   document.getElementById('modalTitle').innerHTML = '<i class="fa fa-pen"></i> Edit Assignment';
   document.getElementById('saveTxt').textContent  = 'Update Assignment';
   document.getElementById('formAlert').style.display = 'none';
@@ -342,7 +376,7 @@ function saveAssignment() {
   if (!title||!cls||!points||!due) {
     alert.textContent='Please fill all required fields.'; alert.className='modal-alert err'; alert.style.display='block'; return;
   }
-  var payload = {id:id?parseInt(id):0,title:title,class_name:cls,total_points:parseInt(points),due_date:due,status:document.getElementById('asgStatus').value,description:document.getElementById('asgDesc').value.trim()};
+  var payload = {id:id?parseInt(id):0,title:title,class_name:cls,total_points:parseInt(points),due_date:due,assign_date:document.getElementById('asgAssignDate').value,status:'active',description:document.getElementById('asgDesc').value.trim()};
   fetch('assignment-save.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(function(r){ return r.json(); })
     .then(function(res){

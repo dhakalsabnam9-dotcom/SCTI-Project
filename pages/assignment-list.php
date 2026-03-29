@@ -11,11 +11,15 @@ try {
     $tid = intval($_SESSION['user_id'] ?? 0);
     $stmt = $db->prepare("
         SELECT a.*,
-               COUNT(DISTINCT s.id)         AS sub_count,
-               COUNT(DISTINCT st.id)        AS total_students
+               COUNT(DISTINCT s.id) AS sub_count,
+               (SELECT COUNT(*) FROM students st
+                WHERE st.status='active'
+                AND st.course = SUBSTRING_INDEX(a.class_name,' Semester',1)
+                AND (st.semester = CONCAT('Semester ', SUBSTRING_INDEX(a.class_name,'Semester ',-1))
+                     OR st.semester = CAST(SUBSTRING_INDEX(a.class_name,'Semester ',-1) AS UNSIGNED))
+               ) AS total_students
         FROM assignments a
-        LEFT JOIN assignment_submissions s  ON s.assignment_id = a.id
-        LEFT JOIN students st               ON st.status = 'active'
+        LEFT JOIN assignment_submissions s ON s.assignment_id = a.id
         WHERE a.created_by = ?
         GROUP BY a.id
         ORDER BY a.created_at DESC

@@ -3,18 +3,20 @@ session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
 }
-$teacherId   = intval($_SESSION['user_id'] ?? 0);
-$teacherName = $_SESSION['full_name'] ?? 'Teacher';
+$teacherId = intval($_SESSION['user_id'] ?? 0);
 require_once '../includes/config.php';
 try {
     $db = getDBConnection();
-    $totalA = $db->prepare("SELECT COUNT(*) FROM assignments WHERE created_by=?");
-    $totalA->execute([$teacherId]);
-    $totalAssign = $totalA->fetchColumn();
-    $totalSubs = $db->prepare("SELECT COUNT(*) FROM assignment_submissions s JOIN assignments a ON a.id=s.assignment_id WHERE a.created_by=?");
-    $totalSubs->execute([$teacherId]);
-    $totalSubmissions = $totalSubs->fetchColumn();
-} catch(Exception $e) { $totalAssign=0; $totalSubmissions=0; }
+    // Load programs from DB
+    $progRows = $db->query("SELECT DISTINCT title FROM programs WHERE status='active' ORDER BY title ASC")->fetchAll();
+    $programs = array_column($progRows, 'title');
+    if (empty($programs)) {
+        $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+    }
+} catch(Exception $e) {
+    $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+}
+$programsJson = json_encode($programs);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +39,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
 .btn-hdr.create{background:white;color:#28a745}.btn-hdr.create:hover{background:#f0fff4}
 .wrap{max-width:1200px;margin:24px auto;padding:0 20px 60px}
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
-.stat-pill{background:white;border-radius:12px;padding:16px 18px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:flex;align-items:center;gap:12px}
+.stat-pill{background:white;border-radius:12px;padding:16px 18px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:flex;align-items:center;gap:12px;cursor:pointer;transition:.2s}
+.stat-pill:hover{transform:translateY(-3px)}
 .sp-ico{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:white;flex-shrink:0}
 .sp-ico.green{background:linear-gradient(135deg,#28a745,#20c997)}
 .sp-ico.blue{background:linear-gradient(135deg,#004080,#0059b3)}
@@ -59,7 +62,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
 .acard-class{font-size:12px;color:#888;margin-top:3px;display:flex;align-items:center;gap:5px}
 .badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
 .badge-active{background:#d1fae5;color:#065f46}
-.badge-upcoming{background:#fef3c7;color:#92400e}
 .badge-graded{background:#dbeafe;color:#1e40af}
 .badge-pending{background:#fee2e2;color:#991b1b}
 .badge-overdue{background:#fee2e2;color:#991b1b}
@@ -79,34 +81,32 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
 .abtn-subs{background:#dbeafe;color:#1e40af}.abtn-subs:hover{background:#3b82f6;color:#fff}
 .empty{text-align:center;padding:60px 20px;color:#aaa;background:white;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .empty i{font-size:56px;display:block;margin-bottom:14px;color:#a7f3d0}
-/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
-.modal-box{background:white;border-radius:16px;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.3);animation:mIn .25s ease}
+.modal-box{background:white;border-radius:16px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.3);animation:mIn .25s ease}
 @keyframes mIn{from{transform:translateY(-28px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
 .modal-head{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;border-radius:16px 16px 0 0}
 .modal-head h2{margin:0;font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px}
 .modal-close{background:rgba(255,255,255,.2);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px;transition:.2s}
 .modal-close:hover{background:rgba(255,255,255,.35)}
-.modal-body{padding:28px}
-.fg{margin-bottom:16px}
-.fg label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.modal-body{padding:24px 28px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
 .fg label .req{color:#dc3545}
-.fc{width:100%;padding:11px 14px;border:2px solid #e0e6ef;border-radius:10px;font-size:14px;font-family:inherit;transition:.2s}
+.fc{width:100%;padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:14px;font-family:inherit;transition:.2s}
 .fc:focus{outline:none;border-color:#28a745;box-shadow:0 0 0 3px rgba(40,167,69,.1)}
-textarea.fc{resize:vertical;min-height:90px}
+textarea.fc{resize:vertical;min-height:80px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.modal-foot{padding:18px 28px;border-top:1px solid #f0f0f0;display:flex;gap:10px;justify-content:flex-end;background:#fafafa;border-radius:0 0 16px 16px}
+.student-count-box{padding:10px 13px;background:#f0fff4;border:2px solid #a7f3d0;border-radius:9px;font-size:13px;color:#065f46;font-weight:700;min-height:42px;display:flex;align-items:center;gap:8px}
+.modal-foot{padding:16px 28px;border-top:1px solid #f0f0f0;display:flex;gap:10px;justify-content:flex-end;background:#fafafa;border-radius:0 0 16px 16px}
 .mbtn{padding:11px 26px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px}
 .mbtn-save{background:linear-gradient(135deg,#28a745,#20c997);color:white}.mbtn-save:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(40,167,69,.35)}
 .mbtn-cancel{background:#f0f0f0;color:#555}.mbtn-cancel:hover{background:#e0e0e0}
 .modal-alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
-.modal-alert.ok{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
 .modal-alert.err{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
-/* SUBMISSIONS MODAL */
-.subs-modal-box{max-width:900px}
+.subs-modal-box{max-width:960px}
 .subs-table{width:100%;border-collapse:collapse;font-size:13px}
-.subs-table th{background:#f8fffe;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e8f5e9}
+.subs-table th{background:#f0fff4;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #a7f3d0}
 .subs-table td{padding:11px 14px;border-bottom:1px solid #f0f0f0;color:#333;vertical-align:middle}
 .subs-table tr:last-child td{border-bottom:none}
 .subs-table tr:hover td{background:#f8fffe}
@@ -115,7 +115,6 @@ textarea.fc{resize:vertical;min-height:90px}
 .btn-grade{padding:6px 14px;background:linear-gradient(135deg,#28a745,#20c997);color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s}
 .btn-grade:hover{opacity:.88}
 .no-sub-row td{color:#bbb;font-style:italic}
-/* TOAST */
 .toast{position:fixed;bottom:22px;right:22px;color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;display:none;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
 .toast.ok{background:#28a745}.toast.err{background:#dc3545}
 footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:13px;margin-top:40px}
@@ -134,32 +133,24 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
     <a href="../dashboards/teacher-dashboard.php" class="btn-hdr ghost"><i class="fa fa-arrow-left"></i> Back</a>
   </div>
 </div>
-
 <div class="wrap">
-  <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-pill" onclick="filterByPill('all')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico green"><i class="fa fa-tasks"></i></div><div><div class="sp-val" id="stTotal">0</div><div class="sp-lbl">Total Assignments</div></div></div>
-    <div class="stat-pill" onclick="filterByPill('subs')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico blue"><i class="fa fa-paper-plane"></i></div><div><div class="sp-val" id="stSubs">0</div><div class="sp-lbl">Total Submissions</div></div></div>
-    <div class="stat-pill" onclick="filterByPill('active')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico orange"><i class="fa fa-clock"></i></div><div><div class="sp-val" id="stActive">0</div><div class="sp-lbl">Active</div></div></div>
-    <div class="stat-pill" onclick="filterByPill('overdue')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="sp-ico red"><i class="fa fa-calendar-xmark"></i></div><div><div class="sp-val" id="stOverdue">0</div><div class="sp-lbl">Overdue</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('all')"><div class="sp-ico green"><i class="fa fa-tasks"></i></div><div><div class="sp-val" id="stTotal">0</div><div class="sp-lbl">Total</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('subs')"><div class="sp-ico blue"><i class="fa fa-paper-plane"></i></div><div><div class="sp-val" id="stSubs">0</div><div class="sp-lbl">Submissions</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('active')"><div class="sp-ico orange"><i class="fa fa-clock"></i></div><div><div class="sp-val" id="stActive">0</div><div class="sp-lbl">Active</div></div></div>
+    <div class="stat-pill" onclick="filterByPill('overdue')"><div class="sp-ico red"><i class="fa fa-calendar-xmark"></i></div><div><div class="sp-val" id="stOverdue">0</div><div class="sp-lbl">Overdue</div></div></div>
   </div>
-
-  <!-- Toolbar -->
   <div class="toolbar">
     <select id="filterStatus" onchange="applyFilter()">
       <option value="">All Status</option>
       <option value="active">Active</option>
-      <option value="upcoming">Upcoming</option>
       <option value="graded">Graded</option>
       <option value="pending">Pending</option>
     </select>
     <input type="text" id="searchInput" placeholder="Search by title or class..." oninput="applyFilter()">
   </div>
-
-  <div id="alertBox" style="padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none"></div>
   <div class="grid" id="grid"><div class="empty"><i class="fa fa-spinner fa-spin" style="color:#28a745"></i><p>Loading...</p></div></div>
 </div>
-
 <footer>© 2025 SCTI — Teacher Portal</footer>
 
 <!-- CREATE / EDIT MODAL -->
@@ -172,38 +163,46 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
     <div class="modal-body">
       <div class="modal-alert" id="formAlert"></div>
       <input type="hidden" id="asgId">
-      <div class="fg"><label>Title <span class="req">*</span></label><input type="text" id="asgTitle" class="fc" placeholder="e.g. Database Design Project"></div>
+      <div class="fg">
+        <label>Title <span class="req">*</span></label>
+        <input type="text" id="asgTitle" class="fc" placeholder="e.g. Database Design Project">
+      </div>
       <div class="frow">
         <div class="fg">
           <label>Program <span class="req">*</span></label>
-          <select id="asgProgram" class="fc" onchange="loadSemestersForAssign()">
+          <select id="asgProgram" class="fc" onchange="onProgramChange()">
             <option value="">— Select Program —</option>
-            <option>Animal Husbandry</option>
-            <option>B.Tech Ed in IT</option>
-            <option>B.Tech Ed in Civil</option>
-            <option>Diploma in Civil</option>
-            <option>Diploma Electrical</option>
           </select>
         </div>
         <div class="fg">
           <label>Semester <span class="req">*</span></label>
-          <select id="asgSemester" class="fc">
+          <select id="asgSemester" class="fc" onchange="updateStudentCount()">
             <option value="">— Select Semester —</option>
-            <option>Semester 1</option><option>Semester 2</option>
-            <option>Semester 3</option><option>Semester 4</option>
-            <option>Semester 5</option><option>Semester 6</option>
           </select>
         </div>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Assign Date <span class="req">*</span></label><input type="datetime-local" id="asgAssignDate" class="fc"></div>
-        <div class="fg"><label>Submission Deadline <span class="req">*</span></label><input type="datetime-local" id="asgDue" class="fc"></div>
+      <div class="fg">
+        <label><i class="fa fa-users" style="color:#28a745"></i> Enrolled Students</label>
+        <div class="student-count-box" id="asgStudentCount"><i class="fa fa-info-circle"></i> Select program &amp; semester first</div>
       </div>
       <div class="frow">
-        <div class="fg"><label>Total Points</label><input type="number" id="asgPoints" class="fc" min="1" value="100"></div>
-        <div class="fg"><label>Student Count</label><div id="asgStudentCount" style="padding:11px 14px;background:#f8fffe;border:2px solid #e0e6ef;border-radius:10px;font-size:13px;color:#28a745;font-weight:700">Select program & semester</div></div>
+        <div class="fg">
+          <label>Assign Date <span class="req">*</span></label>
+          <input type="datetime-local" id="asgAssignDate" class="fc">
+        </div>
+        <div class="fg">
+          <label>Submission Deadline <span class="req">*</span></label>
+          <input type="datetime-local" id="asgDue" class="fc">
+        </div>
       </div>
-      <div class="fg"><label>Description / Instructions</label><textarea id="asgDesc" class="fc" placeholder="Describe the assignment requirements..."></textarea></div>
+      <div class="fg">
+        <label>Total Points</label>
+        <input type="number" id="asgPoints" class="fc" min="1" value="100" style="max-width:160px">
+      </div>
+      <div class="fg">
+        <label>Description / Instructions</label>
+        <textarea id="asgDesc" class="fc" placeholder="Describe the assignment requirements..."></textarea>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="mbtn mbtn-cancel" onclick="closeModal('asgModal')"><i class="fa fa-times"></i> Cancel</button>
@@ -220,7 +219,7 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
       <button class="modal-close" onclick="closeModal('subsModal')"><i class="fa fa-times"></i></button>
     </div>
     <div class="modal-body" id="subsModalBody" style="padding:0">
-      <div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-spinner fa-spin" style="font-size:32px"></i></div>
+      <div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-spinner fa-spin" style="font-size:32px;color:#28a745"></i></div>
     </div>
   </div>
 </div>
@@ -229,11 +228,23 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 
 <script>
 var allAssignments = [];
+var dbPrograms = <?= $programsJson ?>;
+var semesters = ['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6'];
 
-// No need to fetch classes - using hardcoded dropdowns
+// Populate program dropdown from DB
+(function(){
+  var sel = document.getElementById('asgProgram');
+  dbPrograms.forEach(function(p){
+    var o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o);
+  });
+})();
 
-function loadSemestersForAssign() {
-  // Show student count preview when program+semester selected
+function onProgramChange() {
+  var semSel = document.getElementById('asgSemester');
+  semSel.innerHTML = '<option value="">— Select Semester —</option>';
+  semesters.forEach(function(s){
+    var o = document.createElement('option'); o.value = s; o.textContent = s; semSel.appendChild(o);
+  });
   updateStudentCount();
 }
 
@@ -241,19 +252,19 @@ function updateStudentCount() {
   var prog = document.getElementById('asgProgram').value;
   var sem  = document.getElementById('asgSemester').value;
   var el   = document.getElementById('asgStudentCount');
-  if (!prog || !sem) { el.textContent = 'Select program & semester'; el.style.color='#888'; return; }
+  if (!prog || !sem) {
+    el.innerHTML = '<i class="fa fa-info-circle"></i> Select program &amp; semester first';
+    el.style.color = '#888'; return;
+  }
+  el.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Loading...';
   fetch('assignment-classes.php?count=1&program='+encodeURIComponent(prog)+'&semester='+encodeURIComponent(sem))
-    .then(function(r){return r.json();})
+    .then(function(r){ return r.json(); })
     .then(function(d){
-      el.textContent = (d.count||0)+' students enrolled';
-      el.style.color = '#28a745';
-    }).catch(function(){ el.textContent = 'Could not load count'; });
+      var cnt = parseInt(d.count) || 0;
+      el.innerHTML = '<i class="fa fa-users"></i> <strong>'+cnt+'</strong> students enrolled';
+      el.style.color = cnt > 0 ? '#065f46' : '#991b1b';
+    }).catch(function(){ el.innerHTML = '<i class="fa fa-exclamation-circle"></i> Could not load'; });
 }
-
-document.addEventListener('DOMContentLoaded', function(){
-  var semSel = document.getElementById('asgSemester');
-  if (semSel) semSel.addEventListener('change', updateStudentCount);
-});
 
 function loadAssignments() {
   fetch('assignment-list.php')
@@ -261,8 +272,7 @@ function loadAssignments() {
     .then(function(res){
       if (!res.success) { showGrid('<div class="empty"><i class="fa fa-exclamation-circle"></i><p>'+esc(res.message)+'</p></div>'); return; }
       allAssignments = res.assignments || [];
-      updateStats();
-      applyFilter();
+      updateStats(); applyFilter();
     })
     .catch(function(){ showGrid('<div class="empty"><i class="fa fa-exclamation-circle"></i><p>Failed to load.</p></div>'); });
 }
@@ -270,300 +280,244 @@ function loadAssignments() {
 function updateStats() {
   var now = new Date();
   document.getElementById('stTotal').textContent   = allAssignments.length;
-  document.getElementById('stSubs').textContent    = allAssignments.reduce(function(s,a){ return s + (parseInt(a.sub_count)||0); }, 0);
+  document.getElementById('stSubs').textContent    = allAssignments.reduce(function(s,a){ return s+(parseInt(a.sub_count)||0); },0);
   document.getElementById('stActive').textContent  = allAssignments.filter(function(a){ return a.status==='active'; }).length;
-  document.getElementById('stOverdue').textContent = allAssignments.filter(function(a){ return new Date(a.due_date) < now; }).length;
+  document.getElementById('stOverdue').textContent = allAssignments.filter(function(a){ return new Date(a.due_date)<now; }).length;
 }
 
 function applyFilter() {
   var status = document.getElementById('filterStatus').value;
-  var q      = document.getElementById('searchInput').value.toLowerCase();
-  var list   = allAssignments.filter(function(a){
-    return (!status || a.status===status)
-        && (!q || a.title.toLowerCase().includes(q) || a.class_name.toLowerCase().includes(q));
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var list = allAssignments.filter(function(a){
+    return (!status||a.status===status) && (!q||a.title.toLowerCase().includes(q)||(a.class_name||'').toLowerCase().includes(q));
   });
   renderGrid(list);
 }
 
 function filterByPill(type) {
-  var now = new Date();
-  var list;
-  if (type === 'all') {
-    document.getElementById('filterStatus').value = '';
-    list = allAssignments;
-  } else if (type === 'active') {
-    document.getElementById('filterStatus').value = 'active';
-    list = allAssignments.filter(function(a){ return a.status === 'active'; });
-  } else if (type === 'overdue') {
-    document.getElementById('filterStatus').value = '';
-    list = allAssignments.filter(function(a){ return new Date(a.due_date) < now; });
-  } else if (type === 'subs') {
-    document.getElementById('filterStatus').value = '';
-    list = allAssignments.filter(function(a){ return parseInt(a.sub_count) > 0; });
-  }
+  var now = new Date(); var list;
+  if (type==='all')    { document.getElementById('filterStatus').value=''; list=allAssignments; }
+  else if (type==='active')  { document.getElementById('filterStatus').value='active'; list=allAssignments.filter(function(a){return a.status==='active';}); }
+  else if (type==='overdue') { document.getElementById('filterStatus').value=''; list=allAssignments.filter(function(a){return new Date(a.due_date)<now;}); }
+  else if (type==='subs')    { document.getElementById('filterStatus').value=''; list=allAssignments.filter(function(a){return parseInt(a.sub_count)>0;}); }
   renderGrid(list);
 }
 
 function renderGrid(list) {
   if (!list.length) { showGrid('<div class="empty"><i class="fa fa-tasks"></i><p>No assignments found.</p></div>'); return; }
-  var grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  var grid = document.getElementById('grid'); grid.innerHTML='';
   list.forEach(function(a){ grid.appendChild(buildCard(a)); });
 }
-
-function showGrid(html) { document.getElementById('grid').innerHTML = html; }
+function showGrid(html){ document.getElementById('grid').innerHTML=html; }
 
 function buildCard(a) {
-  var now      = new Date();
-  var dueDate  = new Date(a.due_date);
-  var isOver   = dueDate < now;
-  var dueStr   = dueDate.toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  var total    = parseInt(a.total_students) || 0;
-  var subCount = parseInt(a.sub_count) || 0;
-  var pct      = total > 0 ? Math.round(subCount/total*100) : 0;
-  var badgeMap = {active:'badge-active',upcoming:'badge-upcoming',graded:'badge-graded',pending:'badge-pending'};
-  var labelMap = {active:'Active',upcoming:'Upcoming',graded:'Graded',pending:'Pending'};
-  var overBadge = isOver ? '<span class="badge badge-overdue" style="margin-left:6px">Overdue</span>' : '';
-
-  var el = document.createElement('div');
-  el.className = 'acard' + (isOver ? ' overdue' : '');
-  el.innerHTML =
+  var now=new Date(), dueDate=new Date(a.due_date), isOver=dueDate<now;
+  var dueStr=dueDate.toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var total=parseInt(a.total_students)||0, subCount=parseInt(a.sub_count)||0;
+  var pct=total>0?Math.round(subCount/total*100):0;
+  var badgeMap={active:'badge-active',graded:'badge-graded',pending:'badge-pending'};
+  var labelMap={active:'Active',graded:'Graded',pending:'Pending'};
+  var el=document.createElement('div'); el.className='acard'+(isOver?' overdue':'');
+  el.innerHTML=
     '<div class="acard-top">'
-    + '<div class="acard-header">'
-    +   '<div><div class="acard-title">'+esc(a.title)+'</div>'
-    +   '<div class="acard-class"><i class="fa fa-chalkboard"></i>'+esc(a.class_name)+'</div></div>'
-    +   '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="badge '+(badgeMap[a.status]||'badge-active')+'">'+(labelMap[a.status]||a.status)+'</span>'+overBadge+'</div>'
-    + '</div>'
-    + '<div class="acard-meta">'
-    +   '<span><i class="fa fa-calendar-plus"></i> Assigned: '+(a.assign_date ? new Date(a.assign_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'N/A')+'</span>'
-    +   '<span><i class="fa fa-calendar-xmark"></i> Deadline: '+dueStr+'</span>'
-    +   '<span><i class="fa fa-star"></i> '+esc(String(a.total_points))+' pts</span>'
-    +   '<span><i class="fa fa-users"></i> '+subCount+' / '+total+' submitted</span>'
-    + '</div>'
-    + (a.description ? '<div class="acard-desc">'+esc(a.description)+'</div>' : '')
-    + '</div>'
-    + '<div class="sub-bar">'
-    +   '<div class="sub-progress">'
-    +     '<div class="sub-progress-bar"><div class="sub-progress-fill" style="width:'+pct+'%"></div></div>'
-    +     '<span class="sub-count">'+pct+'% submitted</span>'
-    +   '</div>'
-    +   '<div class="acard-actions">'
-    +     '<button class="abtn abtn-subs"><i class="fa fa-inbox"></i> View Submissions</button>'
-    +     '<button class="abtn abtn-edit"><i class="fa fa-pen"></i> Edit</button>'
-    +     '<button class="abtn abtn-del"><i class="fa fa-trash"></i> Delete</button>'
-    +   '</div>'
-    + '</div>';
-
-  el.querySelector('.abtn-edit').addEventListener('click', function(){ openEdit(a); });
-  el.querySelector('.abtn-del').addEventListener('click', function(){ deleteAssignment(a.id); });
-  el.querySelector('.abtn-subs').addEventListener('click', function(){ openSubmissions(a); });
+    +'<div class="acard-header">'
+    +'<div><div class="acard-title">'+esc(a.title)+'</div>'
+    +'<div class="acard-class"><i class="fa fa-chalkboard"></i> '+esc(a.class_name||'')+'</div></div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
+    +'<span class="badge '+(badgeMap[a.status]||'badge-active')+'">'+(labelMap[a.status]||a.status)+'</span>'
+    +(isOver?'<span class="badge badge-overdue">Overdue</span>':'')
+    +'</div></div>'
+    +'<div class="acard-meta">'
+    +'<span><i class="fa fa-calendar-plus"></i> Assigned: '+(a.assign_date?new Date(a.assign_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'N/A')+'</span>'
+    +'<span><i class="fa fa-calendar-xmark"></i> Deadline: '+dueStr+'</span>'
+    +'<span><i class="fa fa-star"></i> '+esc(String(a.total_points))+' pts</span>'
+    +'<span><i class="fa fa-users"></i> '+subCount+' / '+total+' submitted</span>'
+    +'</div>'
+    +(a.description?'<div class="acard-desc">'+esc(a.description)+'</div>':'')
+    +'</div>'
+    +'<div class="sub-bar">'
+    +'<div class="sub-progress"><div class="sub-progress-bar"><div class="sub-progress-fill" style="width:'+pct+'%"></div></div>'
+    +'<span class="sub-count">'+pct+'% submitted</span></div>'
+    +'<div class="acard-actions">'
+    +'<button class="abtn abtn-subs"><i class="fa fa-inbox"></i> View Submissions</button>'
+    +'<button class="abtn abtn-edit"><i class="fa fa-pen"></i> Edit</button>'
+    +'<button class="abtn abtn-del"><i class="fa fa-trash"></i> Delete</button>'
+    +'</div></div>';
+  el.querySelector('.abtn-edit').addEventListener('click',function(){ openEdit(a); });
+  el.querySelector('.abtn-del').addEventListener('click',function(){ deleteAssignment(a.id); });
+  el.querySelector('.abtn-subs').addEventListener('click',function(){ openSubmissions(a); });
   return el;
 }
 
 function openCreate() {
-  document.getElementById('asgId').value          = '';
-  document.getElementById('asgTitle').value       = '';
-  document.getElementById('asgProgram').value     = '';
-  document.getElementById('asgSemester').value    = '';
-  document.getElementById('asgPoints').value      = '100';
-  document.getElementById('asgDue').value         = '';
-  document.getElementById('asgAssignDate').value  = '';
-  document.getElementById('asgDesc').value        = '';
-  document.getElementById('asgStudentCount').textContent = 'Select program & semester';
-  document.getElementById('modalTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Assignment';
-  document.getElementById('saveTxt').textContent  = 'Create Assignment';
-  document.getElementById('formAlert').style.display = 'none';
+  document.getElementById('asgId').value='';
+  document.getElementById('asgTitle').value='';
+  document.getElementById('asgProgram').value='';
+  document.getElementById('asgSemester').innerHTML='<option value="">— Select Semester —</option>';
+  semesters.forEach(function(s){ var o=document.createElement('option');o.value=s;o.textContent=s;document.getElementById('asgSemester').appendChild(o); });
+  document.getElementById('asgPoints').value='100';
+  document.getElementById('asgDue').value='';
+  document.getElementById('asgAssignDate').value='';
+  document.getElementById('asgDesc').value='';
+  document.getElementById('asgStudentCount').innerHTML='<i class="fa fa-info-circle"></i> Select program &amp; semester first';
+  document.getElementById('modalTitle').innerHTML='<i class="fa fa-plus-circle"></i> Create Assignment';
+  document.getElementById('saveTxt').textContent='Create Assignment';
+  document.getElementById('formAlert').style.display='none';
+  // Set default assign date to now
+  var now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+  document.getElementById('asgAssignDate').value=now.toISOString().slice(0,16);
   document.getElementById('asgModal').classList.add('open');
 }
 
 function openEdit(a) {
-  document.getElementById('asgId').value          = a.id;
-  document.getElementById('asgTitle').value       = a.title;
-  // Parse class_name back to program + semester
-  var parts = a.class_name ? a.class_name.split(' Semester ') : ['',''];
-  document.getElementById('asgProgram').value     = parts[0] || a.class_name;
-  document.getElementById('asgSemester').value    = parts[1] ? 'Semester '+parts[1] : '';
-  document.getElementById('asgPoints').value      = a.total_points;
-  var d = a.due_date ? a.due_date.replace(' ','T').substring(0,16) : '';
-  document.getElementById('asgDue').value         = d;
-  var ad = a.assign_date ? a.assign_date.replace(' ','T').substring(0,16) : '';
-  document.getElementById('asgAssignDate').value  = ad;
-  document.getElementById('asgDesc').value        = a.description || '';
-  document.getElementById('modalTitle').innerHTML = '<i class="fa fa-pen"></i> Edit Assignment';
-  document.getElementById('saveTxt').textContent  = 'Update Assignment';
-  document.getElementById('formAlert').style.display = 'none';
+  document.getElementById('asgId').value=a.id;
+  document.getElementById('asgTitle').value=a.title;
+  var parts=a.class_name?a.class_name.split(' Semester '):['',''];
+  document.getElementById('asgProgram').value=parts[0]||a.class_name;
+  // Rebuild semester dropdown
+  document.getElementById('asgSemester').innerHTML='<option value="">— Select Semester —</option>';
+  semesters.forEach(function(s){ var o=document.createElement('option');o.value=s;o.textContent=s;document.getElementById('asgSemester').appendChild(o); });
+  document.getElementById('asgSemester').value=parts[1]?'Semester '+parts[1]:'';
+  document.getElementById('asgPoints').value=a.total_points;
+  document.getElementById('asgDue').value=a.due_date?a.due_date.replace(' ','T').substring(0,16):'';
+  document.getElementById('asgAssignDate').value=a.assign_date?a.assign_date.replace(' ','T').substring(0,16):'';
+  document.getElementById('asgDesc').value=a.description||'';
+  document.getElementById('modalTitle').innerHTML='<i class="fa fa-pen"></i> Edit Assignment';
+  document.getElementById('saveTxt').textContent='Update Assignment';
+  document.getElementById('formAlert').style.display='none';
   updateStudentCount();
   document.getElementById('asgModal').classList.add('open');
 }
 
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
 function saveAssignment() {
-  var id     = document.getElementById('asgId').value;
-  var title  = document.getElementById('asgTitle').value.trim();
-  var prog   = document.getElementById('asgProgram').value.trim();
-  var sem    = document.getElementById('asgSemester').value.trim();
-  var cls    = prog + ' ' + sem;
-  var points = document.getElementById('asgPoints').value.trim();
-  var due    = document.getElementById('asgDue').value;
-  var alert  = document.getElementById('formAlert');
+  var id=document.getElementById('asgId').value;
+  var title=document.getElementById('asgTitle').value.trim();
+  var prog=document.getElementById('asgProgram').value.trim();
+  var sem=document.getElementById('asgSemester').value.trim();
+  var due=document.getElementById('asgDue').value;
+  var alert=document.getElementById('formAlert');
   if (!title||!prog||!sem||!due) {
     alert.textContent='Please fill all required fields.'; alert.className='modal-alert err'; alert.style.display='block'; return;
   }
-  var payload = {id:id?parseInt(id):0,title:title,class_name:cls,total_points:parseInt(points)||100,due_date:due,assign_date:document.getElementById('asgAssignDate').value,status:'active',description:document.getElementById('asgDesc').value.trim()};
+  var cls=prog+' '+sem;
+  var payload={id:id?parseInt(id):0,title:title,class_name:cls,total_points:parseInt(document.getElementById('asgPoints').value)||100,due_date:due,assign_date:document.getElementById('asgAssignDate').value,status:'active',description:document.getElementById('asgDesc').value.trim()};
   fetch('assignment-save.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-    .then(function(r){ return r.json(); })
+    .then(function(r){return r.json();})
     .then(function(res){
-      if (res.success) { closeModal('asgModal'); showToast(id?'Assignment updated!':'Assignment created!','ok'); loadAssignments(); }
-      else { alert.textContent=res.message||'Save failed'; alert.className='modal-alert err'; alert.style.display='block'; }
-    })
-    .catch(function(){ alert.textContent='Network error'; alert.className='modal-alert err'; alert.style.display='block'; });
+      if (res.success){closeModal('asgModal');showToast(id?'Assignment updated!':'Assignment created!','ok');loadAssignments();}
+      else{alert.textContent=res.message||'Save failed';alert.className='modal-alert err';alert.style.display='block';}
+    }).catch(function(){alert.textContent='Network error';alert.className='modal-alert err';alert.style.display='block';});
 }
 
 function deleteAssignment(id) {
-  if (!confirm('Delete this assignment and ALL its submissions? This cannot be undone.')) return;
+  if (!confirm('Delete this assignment and ALL its submissions?')) return;
   fetch('assignment-delete.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})})
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      if (res.success) { showToast('Assignment deleted.','ok'); loadAssignments(); }
-      else showToast(res.message||'Delete failed','err');
-    })
-    .catch(function(){ showToast('Network error','err'); });
+    .then(function(r){return r.json();})
+    .then(function(res){ if(res.success){showToast('Deleted.','ok');loadAssignments();}else showToast(res.message||'Failed','err'); })
+    .catch(function(){showToast('Network error','err');});
 }
 
 function openSubmissions(a) {
-  document.getElementById('subsModalTitle').innerHTML = '<i class="fa fa-inbox"></i> Submissions — '+esc(a.title);
-  document.getElementById('subsModalBody').innerHTML  = '<div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-spinner fa-spin" style="font-size:32px;color:#28a745"></i></div>';
+  document.getElementById('subsModalTitle').innerHTML='<i class="fa fa-inbox"></i> Submissions — '+esc(a.title);
+  document.getElementById('subsModalBody').innerHTML='<div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-spinner fa-spin" style="font-size:32px;color:#28a745"></i></div>';
   document.getElementById('subsModal').classList.add('open');
-
   fetch('assignment-submissions-list.php?assignment_id='+a.id)
-    .then(function(r){ return r.json(); })
+    .then(function(r){return r.json();})
     .then(function(res){
-      if (!res.success) { document.getElementById('subsModalBody').innerHTML='<div style="padding:30px;color:#dc3545">'+esc(res.message)+'</div>'; return; }
-      renderSubmissions(res, a);
-    })
-    .catch(function(e){ document.getElementById('subsModalBody').innerHTML='<div style="padding:30px;color:#dc3545">Network error: '+esc(e.message)+'</div>'; });
+      if (!res.success){document.getElementById('subsModalBody').innerHTML='<div style="padding:30px;color:#dc3545">'+esc(res.message)+'</div>';return;}
+      renderSubmissions(res,a);
+    }).catch(function(e){document.getElementById('subsModalBody').innerHTML='<div style="padding:30px;color:#dc3545">Error: '+esc(e.message)+'</div>';});
 }
 
 function renderSubmissions(res, a) {
-  var subs    = res.submissions || [];
-  var all     = res.all_students || [];
-  // Key by student_id (integer FK) — coerced to string as object key
-  var subMap  = {};
-  subs.forEach(function(s){ subMap[String(s.student_id)] = s; });
-  var dueDate = new Date(a.due_date);
-  var isOver  = dueDate < new Date();
+  var subs=res.submissions||[], all=res.all_students||[];
+  var subMap={};
+  subs.forEach(function(s){ subMap[String(s.student_id)]=s; });
+  var dueDate=new Date(a.due_date), isOver=dueDate<new Date();
 
-  // Summary bar
-  var html = '<div style="padding:14px 20px;background:#f8fffe;border-bottom:2px solid #e8f5e9;display:flex;gap:20px;flex-wrap:wrap;align-items:center">'
-    + '<span style="font-size:13px;font-weight:700;color:#28a745"><i class="fa fa-check-circle"></i> '+subs.length+' submitted</span>'
-    + '<span style="font-size:13px;font-weight:700;color:#dc3545"><i class="fa fa-times-circle"></i> '+(all.length-subs.length)+' not submitted</span>'
-    + '<span style="font-size:13px;color:#888"><i class="fa fa-users"></i> '+all.length+' total enrolled</span>'
-    + '<span style="font-size:13px;color:'+(isOver?'#dc3545':'#28a745')+'"><i class="fa fa-calendar"></i> Due: '+dueDate.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</span>'
-    + '</div>';
+  var html='<div style="padding:14px 20px;background:#f0fff4;border-bottom:2px solid #a7f3d0;display:flex;gap:20px;flex-wrap:wrap;align-items:center">'
+    +'<span style="font-size:13px;font-weight:700;color:#065f46"><i class="fa fa-check-circle"></i> '+subs.length+' submitted</span>'
+    +'<span style="font-size:13px;font-weight:700;color:#dc3545"><i class="fa fa-times-circle"></i> '+(all.length-subs.length)+' not submitted</span>'
+    +'<span style="font-size:13px;color:#888"><i class="fa fa-users"></i> '+all.length+' total enrolled</span>'
+    +'<span style="font-size:13px;color:'+(isOver?'#dc3545':'#28a745')+'"><i class="fa fa-calendar"></i> Due: '+dueDate.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</span>'
+    +'</div>';
 
   if (!all.length) {
-    html += '<div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-users" style="font-size:40px;display:block;margin-bottom:12px"></i><p>No students enrolled in this class yet.</p><p style="font-size:12px;margin-top:6px">Make sure students are added with the matching program and semester.</p></div>';
-    document.getElementById('subsModalBody').innerHTML = html;
-    return;
+    html+='<div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-users" style="font-size:40px;display:block;margin-bottom:12px"></i><p>No students enrolled in this class yet.</p><p style="font-size:12px;margin-top:6px;color:#bbb">Make sure students are added with matching program and semester.</p></div>';
+    document.getElementById('subsModalBody').innerHTML=html; return;
   }
 
-  html += '<div style="overflow-x:auto"><table class="subs-table"><thead><tr>'
-    + '<th style="width:40px">#</th>'
-    + '<th>Student</th>'
-    + '<th>Status</th>'
-    + '<th>Submitted At</th>'
-    + '<th>Uploaded Document</th>'
-    + '<th>Notes</th>'
-    + '<th style="width:100px">Grade</th>'
-    + '<th style="width:80px">Action</th>'
-    + '</tr></thead><tbody>';
+  html+='<div style="overflow-x:auto"><table class="subs-table"><thead><tr>'
+    +'<th style="width:36px">#</th>'
+    +'<th>Student</th>'
+    +'<th>Status</th>'
+    +'<th>Submitted At</th>'
+    +'<th>Uploaded Document</th>'
+    +'<th>Notes</th>'
+    +'<th style="width:90px">Grade</th>'
+    +'<th style="width:70px">Action</th>'
+    +'</tr></thead><tbody>';
 
-  // Submitted students first, then not submitted
-  var submitted    = all.filter(function(st){ return subMap[String(st.id)]; });
-  var notSubmitted = all.filter(function(st){ return !subMap[String(st.id)]; });
-  var sorted = submitted.concat(notSubmitted);
-
-  sorted.forEach(function(st, i) {
-    var sub = subMap[String(st.id)];
+  var submitted=all.filter(function(st){return subMap[String(st.id)];});
+  var notSubmitted=all.filter(function(st){return !subMap[String(st.id)];});
+  submitted.concat(notSubmitted).forEach(function(st,i){
+    var sub=subMap[String(st.id)];
     if (sub) {
-      var isLate = new Date(sub.submitted_at) > dueDate;
-      var badge;
-      if (sub.grade) {
-        badge = '<span class="badge badge-graded"><i class="fa fa-star"></i> Graded ('+esc(sub.grade)+')</span>';
-      } else if (isLate) {
-        badge = '<span class="badge badge-overdue"><i class="fa fa-clock"></i> Late</span>';
-      } else {
-        badge = '<span class="badge badge-active"><i class="fa fa-check"></i> On Time</span>';
-      }
-
-      var fileLink;
-      if (sub.file_path) {
-        var fname = sub.file_name || sub.file_path.split('/').pop();
-        var ext   = fname.split('.').pop().toLowerCase();
-        var iconMap = {pdf:'fa-file-pdf',doc:'fa-file-word',docx:'fa-file-word',txt:'fa-file-alt',zip:'fa-file-archive',rar:'fa-file-archive',jpg:'fa-file-image',jpeg:'fa-file-image',png:'fa-file-image'};
-        var ficon = iconMap[ext] || 'fa-file';
-        fileLink = '<a href="../'+esc(sub.file_path)+'" target="_blank" download="'+esc(fname)+'" '
-          + 'style="display:inline-flex;align-items:center;gap:6px;color:#1e40af;font-size:12px;font-weight:700;padding:6px 12px;background:#dbeafe;border-radius:8px;text-decoration:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" '
-          + 'title="'+esc(fname)+'">'
-          + '<i class="fa '+ficon+'" style="flex-shrink:0"></i>'+esc(fname)+'</a>';
-      } else {
-        fileLink = '<span style="color:#bbb;font-size:12px"><i class="fa fa-minus"></i> No file</span>';
-      }
-
-      html += '<tr style="background:#f8fffe">'
-        + '<td style="color:#aaa;font-size:12px;text-align:center">'+(i+1)+'</td>'
-        + '<td><div style="font-weight:700;font-size:13px;color:#1a202c">'+esc(st.full_name)+'</div>'
-        +     '<div style="font-size:11px;color:#888;margin-top:2px"><i class="fa fa-id-card" style="color:#28a745"></i> '+esc(st.student_id)+'</div></td>'
-        + '<td>'+badge+'</td>'
-        + '<td style="font-size:12px;color:#555;white-space:nowrap">'+new Date(sub.submitted_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</td>'
-        + '<td>'+fileLink+'</td>'
-        + '<td style="font-size:12px;color:#666;max-width:140px;word-break:break-word">'+esc(sub.notes||'—')+'</td>'
-        + '<td><input type="text" class="grade-input" id="grade_'+sub.id+'" value="'+esc(sub.grade||'')+'" placeholder="0-100"></td>'
-        + '<td><button class="btn-grade" onclick="gradeSubmission('+sub.id+','+a.id+')"><i class="fa fa-check"></i> Save</button></td>'
-        + '</tr>';
+      var isLate=new Date(sub.submitted_at)>dueDate;
+      var badge=sub.grade
+        ?'<span class="badge badge-graded"><i class="fa fa-star"></i> Graded ('+esc(sub.grade)+')</span>'
+        :(isLate?'<span class="badge badge-overdue"><i class="fa fa-clock"></i> Late</span>'
+               :'<span class="badge badge-active"><i class="fa fa-check"></i> On Time</span>');
+      var fname=sub.file_name||(sub.file_path?(sub.file_path.split('/').pop()):'');
+      var ext=fname?fname.split('.').pop().toLowerCase():'';
+      var iconMap={pdf:'fa-file-pdf',doc:'fa-file-word',docx:'fa-file-word',txt:'fa-file-alt',zip:'fa-file-archive',rar:'fa-file-archive',jpg:'fa-file-image',jpeg:'fa-file-image',png:'fa-file-image'};
+      var fileLink=sub.file_path
+        ?'<a href="../'+esc(sub.file_path)+'" target="_blank" download="'+esc(fname)+'" style="display:inline-flex;align-items:center;gap:6px;color:#1e40af;font-size:12px;font-weight:700;padding:5px 10px;background:#dbeafe;border-radius:7px;text-decoration:none;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(fname)+'"><i class="fa '+(iconMap[ext]||'fa-file')+'" style="flex-shrink:0"></i>'+esc(fname)+'</a>'
+        :'<span style="color:#bbb;font-size:12px"><i class="fa fa-minus"></i> No file</span>';
+      html+='<tr style="background:#f8fffe">'
+        +'<td style="color:#aaa;font-size:12px;text-align:center">'+(i+1)+'</td>'
+        +'<td><div style="font-weight:700;font-size:13px">'+esc(st.full_name)+'</div><div style="font-size:11px;color:#888;margin-top:2px"><i class="fa fa-id-card" style="color:#28a745"></i> '+esc(st.student_id)+'</div></td>'
+        +'<td>'+badge+'</td>'
+        +'<td style="font-size:12px;color:#555;white-space:nowrap">'+new Date(sub.submitted_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</td>'
+        +'<td>'+fileLink+'</td>'
+        +'<td style="font-size:12px;color:#666;max-width:130px;word-break:break-word">'+esc(sub.notes||'—')+'</td>'
+        +'<td><input type="text" class="grade-input" id="grade_'+sub.id+'" value="'+esc(sub.grade||'')+'" placeholder="0-100"></td>'
+        +'<td><button class="btn-grade" onclick="gradeSubmission('+sub.id+','+a.id+')"><i class="fa fa-check"></i></button></td>'
+        +'</tr>';
     } else {
-      html += '<tr class="no-sub-row">'
-        + '<td style="color:#ccc;font-size:12px;text-align:center">'+(i+1)+'</td>'
-        + '<td><div style="font-weight:600;font-size:13px;color:#aaa">'+esc(st.full_name)+'</div>'
-        +     '<div style="font-size:11px;color:#ccc;margin-top:2px"><i class="fa fa-id-card"></i> '+esc(st.student_id)+'</div></td>'
-        + '<td><span class="badge" style="background:#f5f5f5;color:#bbb"><i class="fa fa-times"></i> Not Submitted</span></td>'
-        + '<td style="color:#ddd;font-size:12px">—</td>'
-        + '<td style="color:#ddd;font-size:12px">—</td>'
-        + '<td style="color:#ddd;font-size:12px">—</td>'
-        + '<td style="color:#ddd;font-size:12px">—</td>'
-        + '<td style="color:#ddd;font-size:12px">—</td>'
-        + '</tr>';
+      html+='<tr class="no-sub-row">'
+        +'<td style="color:#ccc;font-size:12px;text-align:center">'+(i+1)+'</td>'
+        +'<td><div style="font-weight:600;font-size:13px;color:#aaa">'+esc(st.full_name)+'</div><div style="font-size:11px;color:#ccc;margin-top:2px"><i class="fa fa-id-card"></i> '+esc(st.student_id)+'</div></td>'
+        +'<td><span class="badge" style="background:#f5f5f5;color:#bbb"><i class="fa fa-times"></i> Not Submitted</span></td>'
+        +'<td style="color:#ddd">—</td><td style="color:#ddd">—</td><td style="color:#ddd">—</td><td style="color:#ddd">—</td><td style="color:#ddd">—</td>'
+        +'</tr>';
     }
   });
-  html += '</tbody></table></div>';
-  document.getElementById('subsModalBody').innerHTML = html;
+  html+='</tbody></table></div>';
+  document.getElementById('subsModalBody').innerHTML=html;
 }
 
-function gradeSubmission(subId, asgId) {
-  var grade = document.getElementById('grade_'+subId).value.trim();
-  if (!grade) { showToast('Enter a grade first','err'); return; }
+function gradeSubmission(subId,asgId) {
+  var grade=document.getElementById('grade_'+subId).value.trim();
+  if (!grade){showToast('Enter a grade first','err');return;}
   fetch('assignment-grade.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({submission_id:subId,grade:grade})})
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      if (res.success) showToast('Grade saved!','ok');
-      else showToast(res.message||'Failed','err');
-    })
-    .catch(function(){ showToast('Network error','err'); });
+    .then(function(r){return r.json();})
+    .then(function(res){ if(res.success)showToast('Grade saved!','ok'); else showToast(res.message||'Failed','err'); })
+    .catch(function(){showToast('Network error','err');});
 }
 
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.innerHTML = '<i class="fa fa-'+(type==='ok'?'check':'times')+'-circle"></i> '+msg;
-  t.className = 'toast '+(type||'ok');
-  t.style.display = 'flex';
-  setTimeout(function(){ t.style.display='none'; }, 3000);
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  t.innerHTML='<i class="fa fa-'+(type==='ok'?'check':'times')+'-circle"></i> '+msg;
+  t.className='toast '+(type||'ok'); t.style.display='flex';
+  setTimeout(function(){t.style.display='none';},3000);
 }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-document.getElementById('asgModal').addEventListener('click', function(e){ if(e.target===this) closeModal('asgModal'); });
-document.getElementById('subsModal').addEventListener('click', function(e){ if(e.target===this) closeModal('subsModal'); });
+document.getElementById('asgModal').addEventListener('click',function(e){if(e.target===this)closeModal('asgModal');});
+document.getElementById('subsModal').addEventListener('click',function(e){if(e.target===this)closeModal('subsModal');});
 loadAssignments();
 </script>
 </body>

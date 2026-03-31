@@ -1,8 +1,4 @@
-﻿<?php
-session_start();
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
-    header('Location: ../index.php'); exit();
-}
+﻿
 require_once '../includes/config.php';
 
 $teacherId = $_SESSION['user_id'] ?? 0;

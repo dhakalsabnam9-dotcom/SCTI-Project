@@ -102,9 +102,9 @@ function getGradePoint($marks) {
   <div class="gpa-card">
     <h2 style="color:#666;margin:0">Current GPA</h2>
     <div class="gpa-display"><?=number_format($gpa,1)?></div>
-    <p style="color:#666;font-size:15px">Out of 4.0 <?=($gpa>=3.5?'— Excellent Performance!':($gpa>=2.5?'— Good Performance!':'— Keep it up!'))?></p>
+    <p style="color:#666;font-size:15px">Out of 4.0 <?=($gpa>=3.5?'ï¿½ Excellent Performance!':($gpa>=2.5?'ï¿½ Good Performance!':'ï¿½ Keep it up!'))?></p>
     <?php if (!empty($semester)): ?>
-    <p style="color:#999;font-size:13px;margin-top:8px"><?=htmlspecialchars($semester)?></p>
+    <p style="color:#999;font-size:13px;margin-top:8px"><?= is_numeric($semester) ? 'Semester '.$semester : htmlspecialchars($semester) ?></p>
     <?php endif; ?>
   </div>
 
@@ -132,17 +132,17 @@ function getGradePoint($marks) {
       <tr>
         <td><?=htmlspecialchars($g['subject'])?></td>
         <td><?=htmlspecialchars($g['exam_type'])?></td>
-        <td><?=htmlspecialchars($g['internal_marks'] ?? '—')?></td>
-        <td><?=htmlspecialchars($g['external_marks'] ?? '—')?></td>
-        <td><?=$total > 0 ? $total.'/100' : '—'?></td>
-        <td><?=$total > 0 ? '<span class="grade-badge '.$cls.'">'.$letter.'</span>' : '—'?></td>
-        <td><?=$total > 0 ? $gp : '—'?></td>
+        <td><?=htmlspecialchars($g['internal_marks'] ?? 'ï¿½')?></td>
+        <td><?=htmlspecialchars($g['external_marks'] ?? 'ï¿½')?></td>
+        <td><?=$total > 0 ? $total.'/100' : 'ï¿½'?></td>
+        <td><?=$total > 0 ? '<span class="grade-badge '.$cls.'">'.$letter.'</span>' : 'ï¿½'?></td>
+        <td><?=$total > 0 ? $gp : 'ï¿½'?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
   <?php endif; ?>
 </div>
-<footer class="footer"><p>© 2025 SCTI - Student Portal</p></footer>
+<footer class="footer"><p>ï¿½ 2025 SCTI - Student Portal</p></footer>
 </body>
 </html>

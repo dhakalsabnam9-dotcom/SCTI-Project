@@ -53,7 +53,7 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
     .pstat:active{transform:translateY(0)}
     .pstat::after{content:'\f054';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#004080;opacity:0;transition:.2s}
     .pstat:hover::after{opacity:1}
-    .pstat .num{font-size:16px;font-weight:700;color:#004080}
+    .pstat .num{font-size:14px;font-weight:700;color:#004080;word-break:break-word;line-height:1.3}
     .pstat .lbl{font-size:11px;color:#666}
     .info-card{background:white;border-radius:10px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:20px;transition:box-shadow .25s,transform .25s}
     .info-card:hover{box-shadow:0 8px 28px rgba(0,64,128,.13);transform:translateY(-2px)}
@@ -105,7 +105,7 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
           <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($studentDbId)?></div><div class="lbl">Student ID</div></a>
           <a class="pstat" href="student-courses.php" title="View Courses"><div class="num"><?=htmlspecialchars($semester !== '�' ? $semester : '�')?></div><div class="lbl">Semester</div></a>
           <a class="pstat" href="student-attendance.php" title="View Attendance"><div class="num"><?=$status?></div><div class="lbl">Status</div></a>
-          <a class="pstat" href="student-courses.php" title="View Program"><div class="num"><?=htmlspecialchars($program !== '�' ? substr($program,0,6) : '�')?></div><div class="lbl">Program</div></a>
+          <a class="pstat" href="student-courses.php" title="View Program"><div class="num"><?=htmlspecialchars($program !== '�' ? $program : '�')?></div><div class="lbl">Program</div></a>
         </div>
       </div>
     </div>
@@ -114,7 +114,7 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
       <div class="info-card">
         <h3>
           <span><i class="fa fa-id-card"></i> Personal Information</span>
-          <button class="edit-btn-sm" onclick="openEdit()"><i class="fa fa-edit"></i> Edit</button>
+          
         </h3>
         <div class="info-grid">
           <div class="info-item"><label>Full Name</label><span><?=htmlspecialchars($fullName)?></span></div>

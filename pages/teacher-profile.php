@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
@@ -20,15 +20,15 @@ try {
 
 $fullName      = $t['full_name']        ?? ($_SESSION['full_name'] ?? 'Teacher');
 $username      = $t['username']         ?? ($_SESSION['username']  ?? 'teacher');
-$email         = $t['email']            ?? '—';
-$phone         = $t['phone']            ?? '—';
-$address       = $t['address']          ?? '—';
-$department    = $t['department']       ?? '—';
-$designation   = $t['designation']      ?? '—';
-$teacherDbId   = $t['teacher_id']       ?? '—';
-$qualification = $t['qualification']    ?? '—';
-$expYears      = $t['experience']        ?? '—';
-$joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at'])) : '—';
+$email         = $t['email']            ?? 'â€”';
+$phone         = $t['phone']            ?? 'â€”';
+$address       = $t['address']          ?? 'â€”';
+$department    = $t['department']       ?? 'â€”';
+$designation   = $t['designation']      ?? 'â€”';
+$teacherDbId   = $t['teacher_id']       ?? 'â€”';
+$qualification = $t['qualification']    ?? 'â€”';
+$expYears      = $t['experience']        ?? 'â€”';
+$joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at'])) : 'â€”';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -101,12 +101,12 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
       <div class="profile-card">
         <div class="avatar"><i class="fa fa-user-tie"></i></div>
         <div class="profile-name"><?=htmlspecialchars($fullName)?></div>
-        <div class="profile-role"><?=htmlspecialchars($designation !== '—' ? $designation : 'Teacher')?></div>
+        <div class="profile-role"><?=htmlspecialchars($designation !== 'â€”' ? $designation : 'Teacher')?></div>
         <div class="profile-stats">
           <div class="pstat"><div class="num"><?=$totalAssignments?></div><div class="lbl">Assignments</div></div>
           <div class="pstat"><div class="num"><?=$totalStudents?></div><div class="lbl">Students</div></div>
-          <div class="pstat"><div class="num"><?=htmlspecialchars($expYears !== '—' ? $expYears : '—')?></div><div class="lbl">Yrs Exp.</div></div>
-          <div class="pstat"><div class="num"><?=htmlspecialchars($department !== '—' ? substr($department,0,4) : '—')?></div><div class="lbl">Dept.</div></div>
+          <div class="pstat"><div class="num"><?=htmlspecialchars($expYears !== 'â€”' ? $expYears : 'â€”')?></div><div class="lbl">Yrs Exp.</div></div>
+          <div class="pstat"><div class="num"><?=htmlspecialchars($department !== 'â€”' ? $department : 'â€”')?></div><div class="lbl">Dept.</div></div>
         </div>
       </div>
     </div>
@@ -115,7 +115,7 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
       <div class="info-card">
         <h3>
           <span><i class="fa fa-id-card"></i> Personal Information</span>
-          <button class="edit-btn-sm" onclick="openEdit()"><i class="fa fa-edit"></i> Edit</button>
+          
         </h3>
         <div class="info-grid">
           <div class="info-item"><label>Full Name</label><span><?=htmlspecialchars($fullName)?></span></div>
@@ -135,7 +135,7 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
           <div class="info-item"><label>Employee ID</label><span><?=htmlspecialchars($teacherDbId)?></span></div>
           <div class="info-item"><label>Department</label><span><?=htmlspecialchars($department)?></span></div>
           <div class="info-item"><label>Qualification</label><span><?=htmlspecialchars($qualification)?></span></div>
-          <div class="info-item"><label>Experience</label><span><?=($expYears !== '—' ? htmlspecialchars($expYears).' Years' : '—')?></span></div>
+          <div class="info-item"><label>Experience</label><span><?=($expYears !== 'â€”' ? htmlspecialchars($expYears).' Years' : 'â€”')?></span></div>
         </div>
       </div>
 
@@ -163,7 +163,7 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
     </div>
   </div>
 </div>
-<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer"><p>Â© 2025 SCTI - Teacher Portal</p></footer>
 
 <!-- EDIT PROFILE MODAL -->
 <div class="modal-overlay" id="editModal">
@@ -181,31 +181,31 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
         </div>
         <div class="form-group">
           <label>Phone</label>
-          <input type="text" id="ePhone" class="form-control" value="<?=htmlspecialchars($phone !== '—' ? $phone : '')?>">
+          <input type="text" id="ePhone" class="form-control" value="<?=htmlspecialchars($phone !== 'â€”' ? $phone : '')?>">
         </div>
       </div>
       <div class="form-group">
         <label>Address</label>
-        <input type="text" id="eAddress" class="form-control" value="<?=htmlspecialchars($address !== '—' ? $address : '')?>">
+        <input type="text" id="eAddress" class="form-control" value="<?=htmlspecialchars($address !== 'â€”' ? $address : '')?>">
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Department</label>
-          <input type="text" id="eDept" class="form-control" value="<?=htmlspecialchars($department !== '—' ? $department : '')?>">
+          <input type="text" id="eDept" class="form-control" value="<?=htmlspecialchars($department !== 'â€”' ? $department : '')?>">
         </div>
         <div class="form-group">
           <label>Designation</label>
-          <input type="text" id="eDesig" class="form-control" value="<?=htmlspecialchars($designation !== '—' ? $designation : '')?>">
+          <input type="text" id="eDesig" class="form-control" value="<?=htmlspecialchars($designation !== 'â€”' ? $designation : '')?>">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Qualification</label>
-          <input type="text" id="eQual" class="form-control" value="<?=htmlspecialchars($qualification !== '—' ? $qualification : '')?>">
+          <input type="text" id="eQual" class="form-control" value="<?=htmlspecialchars($qualification !== 'â€”' ? $qualification : '')?>">
         </div>
         <div class="form-group">
           <label>Experience (Years)</label>
-          <input type="number" id="eExp" class="form-control" min="0" max="50" value="<?=($expYears !== '—' ? htmlspecialchars($expYears) : '')?>">
+          <input type="number" id="eExp" class="form-control" min="0" max="50" value="<?=($expYears !== 'â€”' ? htmlspecialchars($expYears) : '')?>">
         </div>
       </div>
       <button class="btn-save" id="saveProfileBtn" onclick="saveProfile()"><i class="fa fa-save"></i> Save Changes</button>

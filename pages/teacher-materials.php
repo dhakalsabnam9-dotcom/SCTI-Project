@@ -5,10 +5,17 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
 }
 require_once '../includes/config.php';
 
-$subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures','Algorithms'];
-
 try {
     $db = getDBConnection();
+    $subjects = [];
+    $progs = $db->query("SELECT content FROM programs WHERE status='active' AND content IS NOT NULL AND content != ''")->fetchAll();
+    foreach ($progs as $p) {
+        foreach (array_filter(array_map('trim', explode('|', $p['content']))) as $subj) {
+            if ($subj && !in_array($subj, $subjects)) $subjects[] = $subj;
+        }
+    }
+    sort($subjects);
+    if (empty($subjects)) $subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures','Algorithms'];
     $db->exec("CREATE TABLE IF NOT EXISTS materials (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,

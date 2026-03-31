@@ -84,7 +84,7 @@ try {
   </style>
 </head>
 <body>
-<div class="top-header">Student Management — View and manage your students</div>
+<div class="top-header">Student Management ï¿½ View and manage your students</div>
 <div class="container">
   <div class="page-header">
     <h1><i class="fa fa-users"></i> My Students</h1>
@@ -129,8 +129,8 @@ try {
           <td><div class="student-name"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
           <td><?=htmlspecialchars($s['student_id'])?></td>
           <td><?=htmlspecialchars($s['email'])?></td>
-          <td><?=htmlspecialchars($s['course']??'—')?></td>
-          <td><?= $s['semester'] ? 'Sem '.$s['semester'] : '—' ?></td>
+          <td><?=htmlspecialchars($s['course']??'ï¿½')?></td>
+          <td><?= $s['semester'] ? 'Sem '.$s['semester'] : 'ï¿½' ?></td>
           <td><span class="status-badge <?=$badgeCls?>"><?=ucfirst($s['status'])?></span></td>
           <td>
             <button class="action-btn btn-view" onclick="viewStudent(<?=$s['id']?>)"><i class="fa fa-eye"></i> View</button>
@@ -142,7 +142,7 @@ try {
     </table>
   </div>
 </div>
-<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer"><p>ï¿½ 2025 SCTI - Teacher Portal</p></footer>
 
 <!-- VIEW MODAL -->
 <div class="modal-overlay" id="viewModal">
@@ -165,7 +165,7 @@ try {
     <div class="modal-body">
       <!-- Form view -->
       <div id="msgForm">
-        <div class="msg-to">To: <strong id="msgToName"></strong> &nbsp;·&nbsp; <span id="msgToEmail" style="color:#888;font-size:13px;"></span></div>
+        <div class="msg-to">To: <strong id="msgToName"></strong> &nbsp;ï¿½&nbsp; <span id="msgToEmail" style="color:#888;font-size:13px;"></span></div>
         <div style="margin-bottom:16px;">
           <label class="msg-label">Subject</label>
           <input type="text" id="msgSubject" class="msg-input" placeholder="Enter subject...">
@@ -207,13 +207,13 @@ function viewStudent(id) {
     + '</div>'
     + '<div class="info-grid">'
     + infoItem('Email', s.email)
-    + infoItem('Phone', s.phone || '—')
-    + infoItem('Program', s.course || '—')
-    + infoItem('Semester', s.semester ? 'Semester ' + s.semester : '—')
-    + infoItem('Status', s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : '—')
-    + infoItem('Joined', s.created_at ? new Date(s.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '—')
-    + infoItem('Address', s.address || '—')
-    + infoItem('Username', s.username || '—')
+    + infoItem('Phone', s.phone || 'ï¿½')
+    + infoItem('Program', s.course || 'ï¿½')
+    + infoItem('Semester', s.semester ? 'Semester ' + s.semester : 'ï¿½')
+    + infoItem('Status', s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : 'ï¿½')
+    + infoItem('Joined', s.created_at ? new Date(s.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'ï¿½')
+    + infoItem('Address', s.address || 'ï¿½')
+    + infoItem('Username', s.username || 'ï¿½')
     + '</div>';
   document.getElementById('viewModal').classList.add('open');
 }
@@ -258,7 +258,7 @@ function applyFilter() {
   var rows    = document.querySelectorAll('#studentsBody tr[data-name]');
   rows.forEach(function(row) {
     var matchCourse = !course || row.dataset.course.toLowerCase() === course;
-    var matchSem    = !sem    || row.dataset.sem === sem;
+    var matchSem    = !sem    || String(row.dataset.sem) === sem;
     var matchSearch = !search || row.dataset.name.includes(search) || row.dataset.id.includes(search) || row.dataset.email.includes(search);
     row.style.display = (matchCourse && matchSem && matchSearch) ? '' : 'none';
   });

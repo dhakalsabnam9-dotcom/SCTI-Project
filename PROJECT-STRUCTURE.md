@@ -1,50 +1,50 @@
-# SCTI Project - Clean Architecture
+﻿# SCTI Project - Clean Architecture
 
 ## Project Structure
 
 ```
 scti-project/
-│
-├── index.html                      # Main SPA landing page
-├── index.php                       # Redirects to index.html
-├── .htaccess                       # Apache configuration
-├── database-setup.sql              # Database schema
-├── README.md                       # Project documentation
-│
-├── assets/                         # Static assets
-│   ├── css/
-│   │   └── style.css              # Main stylesheet
-│   ├── js/                        # JavaScript files (if needed)
-│   └── images/                    # All images
-│       ├── banner.png
-│       ├── scti logo.jpeg
-│       ├── bibek sir.jpg
-│       ├── santosh.png
-│       ├── tej.png
-│       ├── work.jpg
-│       ├── img1.jpg
-│       ├── img 2.jpg
-│       ├── img 3.jpg
-│       ├── img 4.jpg
-│       └── img5.jpg
-│
-├── includes/                       # PHP includes and utilities
-│   ├── config.php                 # Database configuration
-│   └── logout.php                 # Logout handler
-│
-├── pages/                          # Authentication pages
-│   ├── login-simple.php           # Login page
-│   └── signup.php                 # Registration page
-│
-├── dashboards/                     # User dashboards
-│   ├── student-dashboard.php      # Student dashboard
-│   └── teacher-dashboard.php      # Teacher dashboard
-│
-├── admin/                          # Admin panel
-│   └── Admin-Notice-Board.html    # Admin notice board
-│
-└── .kiro/                          # Kiro IDE configuration
-    └── specs/                      # Project specifications
+Γöé
+Γö£ΓöÇΓöÇ index.html                      # Main SPA landing page
+Γö£ΓöÇΓöÇ index.php                       # Redirects to index.html
+Γö£ΓöÇΓöÇ .htaccess                       # Apache configuration
+Γö£ΓöÇΓöÇ database-setup.sql              # Database schema
+Γö£ΓöÇΓöÇ README.md                       # Project documentation
+Γöé
+Γö£ΓöÇΓöÇ assets/                         # Static assets
+Γöé   Γö£ΓöÇΓöÇ css/
+Γöé   Γöé   ΓööΓöÇΓöÇ style.css              # Main stylesheet
+Γöé   Γö£ΓöÇΓöÇ js/                        # JavaScript files (if needed)
+Γöé   ΓööΓöÇΓöÇ images/                    # All images
+Γöé       Γö£ΓöÇΓöÇ banner.png
+Γöé       Γö£ΓöÇΓöÇ scti logo.jpeg
+Γöé       Γö£ΓöÇΓöÇ bibek sir.jpg
+Γöé       Γö£ΓöÇΓöÇ santosh.png
+Γöé       Γö£ΓöÇΓöÇ tej.png
+Γöé       Γö£ΓöÇΓöÇ work.jpg
+Γöé       Γö£ΓöÇΓöÇ img1.jpg
+Γöé       Γö£ΓöÇΓöÇ img 2.jpg
+Γöé       Γö£ΓöÇΓöÇ img 3.jpg
+Γöé       Γö£ΓöÇΓöÇ img 4.jpg
+Γöé       ΓööΓöÇΓöÇ img5.jpg
+Γöé
+Γö£ΓöÇΓöÇ includes/                       # PHP includes and utilities
+Γöé   Γö£ΓöÇΓöÇ config.php                 # Database configuration
+Γöé   ΓööΓöÇΓöÇ logout.php                 # Logout handler
+Γöé
+Γö£ΓöÇΓöÇ pages/                          # Authentication pages
+Γöé   Γö£ΓöÇΓöÇ login-simple.php           # Login page
+Γöé   ΓööΓöÇΓöÇ signup.php                 # Registration page
+Γöé
+Γö£ΓöÇΓöÇ dashboards/                     # User dashboards
+Γöé   Γö£ΓöÇΓöÇ student-dashboard.php      # Student dashboard
+Γöé   ΓööΓöÇΓöÇ teacher-dashboard.php      # Teacher dashboard
+Γöé
+Γö£ΓöÇΓöÇ admin/                          # Admin panel
+Γöé   ΓööΓöÇΓöÇ Admin-Notice-Board.html    # Admin notice board
+Γöé
+ΓööΓöÇΓöÇ .kiro/                          # Kiro IDE configuration
+    ΓööΓöÇΓöÇ specs/                      # Project specifications
 ```
 
 ## File Organization

@@ -1,6 +1,6 @@
-# SCTI School Management System - Project Summary
+﻿# SCTI School Management System - Project Summary
 
-## 🎨 Theme Colors
+## ≡ƒÄ¿ Theme Colors
 - **Primary Blue:** `#004080`
 - **Secondary Blue:** `#0059b3`
 - **Gold Accent:** `#ffd700`
@@ -9,41 +9,41 @@
 - **Warning Orange:** `#ffc107`
 - **Danger Red:** `#dc3545`
 
-## 📁 Project Structure
+## ≡ƒôü Project Structure
 ```
 scti-school/
-├── index.html (SPA - Single Page Application)
-├── assets/
-│   ├── css/style.css
-│   ├── js/
-│   │   ├── app.js
-│   │   ├── menu.js
-│   │   ├── pages.js
-│   │   └── pages/
-│   │       ├── home.js
-│   │       ├── programs.js
-│   │       ├── gallery.js
-│   │       ├── notices.js
-│   │       ├── contact.js
-│   │       ├── login.js
-│   │       └── signup.js
-│   └── images/
-├── pages/
-│   ├── login-simple.php
-│   ├── signup.php
-│   ├── contact-submit.php
-│   ├── view-contacts.php
-│   └── get-contact-count.php
-├── dashboards/
-│   ├── admin-dashboard.php
-│   ├── teacher-dashboard.php
-│   └── student-dashboard.php
-├── includes/
-│   └── config.php
-└── database-setup.sql
+Γö£ΓöÇΓöÇ index.html (SPA - Single Page Application)
+Γö£ΓöÇΓöÇ assets/
+Γöé   Γö£ΓöÇΓöÇ css/style.css
+Γöé   Γö£ΓöÇΓöÇ js/
+Γöé   Γöé   Γö£ΓöÇΓöÇ app.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ menu.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ pages.js
+Γöé   Γöé   ΓööΓöÇΓöÇ pages/
+Γöé   Γöé       Γö£ΓöÇΓöÇ home.js
+Γöé   Γöé       Γö£ΓöÇΓöÇ programs.js
+Γöé   Γöé       Γö£ΓöÇΓöÇ gallery.js
+Γöé   Γöé       Γö£ΓöÇΓöÇ notices.js
+Γöé   Γöé       Γö£ΓöÇΓöÇ contact.js
+Γöé   Γöé       Γö£ΓöÇΓöÇ login.js
+Γöé   Γöé       ΓööΓöÇΓöÇ signup.js
+Γöé   ΓööΓöÇΓöÇ images/
+Γö£ΓöÇΓöÇ pages/
+Γöé   Γö£ΓöÇΓöÇ login-simple.php
+Γöé   Γö£ΓöÇΓöÇ signup.php
+Γöé   Γö£ΓöÇΓöÇ contact-submit.php
+Γöé   Γö£ΓöÇΓöÇ view-contacts.php
+Γöé   ΓööΓöÇΓöÇ get-contact-count.php
+Γö£ΓöÇΓöÇ dashboards/
+Γöé   Γö£ΓöÇΓöÇ admin-dashboard.php
+Γöé   Γö£ΓöÇΓöÇ teacher-dashboard.php
+Γöé   ΓööΓöÇΓöÇ student-dashboard.php
+Γö£ΓöÇΓöÇ includes/
+Γöé   ΓööΓöÇΓöÇ config.php
+ΓööΓöÇΓöÇ database-setup.sql
 ```
 
-## 🗄️ Database Structure
+## ≡ƒùä∩╕Å Database Structure
 **Database Name:** `scti_school`
 
 ### Tables:
@@ -53,18 +53,18 @@ scti-school/
 4. **contacts** - Contact form submissions
 5. **notices** - Notice board announcements
 
-## ✅ Completed Features
+## Γ£à Completed Features
 
 ### 1. Single Page Application (SPA)
-- ✅ Sticky navigation bar
-- ✅ Dynamic content loading without page refresh
-- ✅ Smooth transitions and animations
-- ✅ Mobile responsive menu
-- ✅ Active menu highlighting
+- Γ£à Sticky navigation bar
+- Γ£à Dynamic content loading without page refresh
+- Γ£à Smooth transitions and animations
+- Γ£à Mobile responsive menu
+- Γ£à Active menu highlighting
 
 ### 2. Authentication System
-- ✅ Login form with password visibility toggle
-- ✅ Signup form with comprehensive validation:
+- Γ£à Login form with password visibility toggle
+- Γ£à Signup form with comprehensive validation:
   - Password: 7-12 characters
   - At least one uppercase letter
   - At least one lowercase letter
@@ -73,43 +73,43 @@ scti-school/
   - Real-time password strength indicator
   - Password match validation
   - Email format validation
-- ✅ Session management
-- ✅ Role-based access (Admin/Teacher/Student)
-- ✅ Auto-redirect to appropriate dashboard
+- Γ£à Session management
+- Γ£à Role-based access (Admin/Teacher/Student)
+- Γ£à Auto-redirect to appropriate dashboard
 
 ### 3. Contact Form System
-- ✅ Contact form with validation
-- ✅ Database storage (contacts table)
-- ✅ AJAX submission
-- ✅ Success/error messages
-- ✅ Admin view for contact messages
-- ✅ Contact count on admin dashboard
+- Γ£à Contact form with validation
+- Γ£à Database storage (contacts table)
+- Γ£à AJAX submission
+- Γ£à Success/error messages
+- Γ£à Admin view for contact messages
+- Γ£à Contact count on admin dashboard
 
 ### 4. Admin Dashboard
-- ✅ Statistics cards (Students, Teachers, Programs, Notices, Contacts)
-- ✅ Quick actions menu
-- ✅ View contact messages button
-- ✅ Recent activity feed
-- ✅ Logout functionality
-- ✅ Live contact count via AJAX
+- Γ£à Statistics cards (Students, Teachers, Programs, Notices, Contacts)
+- Γ£à Quick actions menu
+- Γ£à View contact messages button
+- Γ£à Recent activity feed
+- Γ£à Logout functionality
+- Γ£à Live contact count via AJAX
 
 ### 5. UI Enhancements
-- ✅ Gradient backgrounds
-- ✅ Smooth animations (fade-in, slide-down, hover effects)
-- ✅ Password strength indicator with glow effects
-- ✅ Form validation with real-time feedback
-- ✅ Responsive design for all screen sizes
-- ✅ Modern card-based layouts
-- ✅ Icon integration (Font Awesome)
+- Γ£à Gradient backgrounds
+- Γ£à Smooth animations (fade-in, slide-down, hover effects)
+- Γ£à Password strength indicator with glow effects
+- Γ£à Form validation with real-time feedback
+- Γ£à Responsive design for all screen sizes
+- Γ£à Modern card-based layouts
+- Γ£à Icon integration (Font Awesome)
 
 ### 6. Pages Content
-- ✅ Home page with banner, notices, events, campus info
-- ✅ Programs page with 4 courses (detailed descriptions)
-- ✅ Gallery page with image grid and overlays
-- ✅ Notice Board page with card layout
-- ✅ Contact Us page with form and contact info
+- Γ£à Home page with banner, notices, events, campus info
+- Γ£à Programs page with 4 courses (detailed descriptions)
+- Γ£à Gallery page with image grid and overlays
+- Γ£à Notice Board page with card layout
+- Γ£à Contact Us page with form and contact info
 
-## 🔐 Default Login Credentials
+## ≡ƒöÉ Default Login Credentials
 
 ### Admin
 - Username: `admin`
@@ -126,7 +126,7 @@ scti-school/
 - Password: `student123`
 - Dashboard: `/dashboards/student-dashboard.php`
 
-## 🌐 URLs
+## ≡ƒîÉ URLs
 
 ### Main Application
 - Homepage (SPA): `http://localhost/scti-school/`
@@ -141,7 +141,7 @@ scti-school/
 - phpMyAdmin: `http://localhost/phpmyadmin/`
 - Database: `scti_school`
 
-## 🎯 Key Features
+## ≡ƒÄ» Key Features
 
 ### Password Security
 - Bcrypt hashing for password storage
@@ -162,7 +162,7 @@ scti-school/
 - Touch-friendly navigation
 - Optimized for all screen sizes
 
-## 🔧 Technologies Used
+## ≡ƒöº Technologies Used
 - **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
 - **Backend:** PHP 8.x
 - **Database:** MySQL (via phpMyAdmin)
@@ -170,7 +170,7 @@ scti-school/
 - **Icons:** Font Awesome 7.0.1
 - **Version Control:** Git + GitHub
 
-## 📊 Database Configuration
+## ≡ƒôè Database Configuration
 ```php
 DB_HOST: localhost
 DB_NAME: scti_school
@@ -178,12 +178,12 @@ DB_USER: root
 DB_PASS: (empty)
 ```
 
-## 🚀 Deployment
+## ≡ƒÜÇ Deployment
 - Local: XAMPP (`C:\xampp\htdocs\scti-school\`)
 - Repository: GitHub (dev branch)
 - Repository URL: `https://github.com/dhakalsabnam9-dotcom/SCTI-Project.git`
 
-## 📝 Notes
+## ≡ƒô¥ Notes
 - All passwords are hashed using PHP's `password_hash()` function
 - Session-based authentication
 - AJAX used for form submissions (no page reload)
@@ -191,7 +191,7 @@ DB_PASS: (empty)
 - All forms have comprehensive validation
 - Mobile responsive throughout
 
-## 🎨 UI/UX Highlights
+## ≡ƒÄ¿ UI/UX Highlights
 - Consistent color scheme (Blue theme)
 - Smooth animations and transitions
 - Hover effects on interactive elements
@@ -203,6 +203,6 @@ DB_PASS: (empty)
 
 ---
 
-**Project Status:** ✅ Fully Functional
+**Project Status:** Γ£à Fully Functional
 **Last Updated:** 2025
 **Developer:** Kiro AI Assistant

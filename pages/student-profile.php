@@ -163,80 +163,10 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
 </div>
 <footer class="footer"><p>� 2025 SCTI - Student Portal</p></footer>
 
-<!-- EDIT PROFILE MODAL -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2><i class="fa fa-edit"></i> Edit Profile</h2>
-      <button class="modal-close" onclick="closeEdit()"><i class="fa fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <div id="editMsg" style="display:none;padding:10px;border-radius:6px;margin-bottom:14px;font-size:14px;"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="eFull" class="form-control" value="<?=htmlspecialchars($fullName)?>">
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="text" id="ePhone" class="form-control" value="<?=htmlspecialchars($phone !== '�' ? $phone : '')?>">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="eEmail" class="form-control" value="<?=htmlspecialchars($email ?? '')?>">
-        </div>
-        <div class="form-group">
-          <label>Qualification</label>
-          <input type="text" id="eQual" class="form-control" value="<?=htmlspecialchars($s['qualification'] ?? '')?>">
-        </div>
-      </div>
-            <div class="form-group">
-        <label>Address</label>
-        <input type="text" id="eAddress" class="form-control" value="<?=htmlspecialchars($address !== '�' ? $address : '')?>">
-      </div>
-      <button class="btn-save" id="saveProfileBtn" onclick="saveProfile()"><i class="fa fa-save"></i> Save Changes</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast toast-ok" id="toastOk"><i class="fa fa-check-circle"></i><span id="toastOkMsg">Saved!</span></div>
 <div class="toast toast-err" id="toastErr"><i class="fa fa-times-circle"></i><span id="toastErrMsg">Error</span></div>
 
 <script>
-function openEdit()  { document.getElementById('editModal').classList.add('open'); }
-function closeEdit() { document.getElementById('editModal').classList.remove('open'); }
-document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEdit(); });
-
-function saveProfile() {
-  var fd = new FormData();
-  fd.append('full_name', document.getElementById('eFull').value.trim());
-  fd.append('phone',     document.getElementById('ePhone').value.trim());
-  fd.append('address',   document.getElementById('eAddress').value.trim());
-  fd.append('email',     document.getElementById('eEmail').value.trim());
-  fd.append('qualification', document.getElementById('eQual').value.trim());
-  var btn = document.getElementById('saveProfileBtn');
-  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
-  fetch('update-profile.php', {method:'POST', body:fd})
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      btn.disabled = false; btn.innerHTML = '<i class="fa fa-save"></i> Save Changes';
-      if (res.success) { closeEdit(); showToast('ok', res.message); setTimeout(function(){ location.reload(); }, 1000); }
-      else { showEditMsg(res.message, 'error'); }
-    })
-    .catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Changes'; showToast('err','Network error.'); });
-}
-
-function showEditMsg(text, type) {
-  var el = document.getElementById('editMsg');
-  el.style.display = 'block';
-  el.style.background = type==='success' ? '#d4edda' : '#f8d7da';
-  el.style.color      = type==='success' ? '#155724' : '#721c24';
-  el.style.border     = '1px solid ' + (type==='success' ? '#c3e6cb' : '#f5c6cb');
-  el.textContent = text;
-}
-
 function changePassword() {
   var current = document.getElementById('cpCurrent').value.trim();
   var newPw   = document.getElementById('cpNew').value.trim();

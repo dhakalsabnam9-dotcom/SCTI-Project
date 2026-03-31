@@ -60,27 +60,7 @@ $joinedDate  = !empty($s['created_at']) ? date('M d, Y', strtotime($s['created_a
     .info-card h3{color:#004080;margin-bottom:20px;font-size:18px;border-bottom:2px solid #f0f0f0;padding-bottom:10px;display:flex;justify-content:space-between;align-items:center}
     .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
     .info-item label{display:block;font-size:12px;color:#999;margin-bottom:4px;text-transform:uppercase}
-    .info-item span{font-size:15px;color:#333;font-weight:500}
-    .edit-btn{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:14px;transition:.3s;display:inline-flex;align-items:center;gap:8px}
-    .edit-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,64,128,.3)}
-    .edit-btn-sm{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px}
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center}
-    .modal-overlay.open{display:flex}
-    .modal-box{background:white;border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mIn .25s ease}
-    @keyframes mIn{from{transform:translateY(-24px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .modal-head{background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:20px 26px;display:flex;justify-content:space-between;align-items:center;border-radius:14px 14px 0 0}
-    .modal-head h2{margin:0;font-size:18px}
-    .modal-close{background:rgba(255,255,255,.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
-    .modal-close:hover{background:rgba(255,255,255,.35)}
-    .modal-body{padding:26px}
-    .form-group{margin-bottom:16px}
-    .form-group label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:5px;text-transform:uppercase}
-    .form-control{width:100%;padding:10px 14px;border:2px solid #dee2e6;border-radius:7px;font-size:14px;font-family:inherit;transition:.2s}
-    .form-control:focus{outline:none;border-color:#004080}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .btn-save{width:100%;background:linear-gradient(135deg,#004080,#0059b3);color:white;padding:13px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:6px}
-    .btn-save:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,64,128,.35)}
-    .btn-save:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .info-item span{font-size:15px;color:#333;font-weight:500}to{transform:translateY(0);opacity:1}}
     .toast{display:none;position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:99999;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
     .toast.show{display:flex;animation:tIn .3s ease}
     .toast-ok{background:#28a745;color:white}.toast-err{background:#dc3545;color:white}

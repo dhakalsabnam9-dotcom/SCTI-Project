@@ -63,7 +63,6 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
     .info-item span{font-size:15px;color:#333;font-weight:500}
     .edit-btn{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:14px;transition:.3s;display:inline-flex;align-items:center;gap:8px}
     .edit-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(40,167,69,.3)}
-    .edit-btn-sm{background:linear-gradient(135deg,#28a745,#20c997);color:white;padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px}
     /* MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center}
     .modal-overlay.open{display:flex}

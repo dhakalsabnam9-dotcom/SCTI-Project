@@ -16,12 +16,13 @@ try {
     // ── 1. Student list (optionally filtered by course+semester) ─────────────
     if ($action === 'students') {
         $class = trim($_GET['class'] ?? '');
-        if ($class && preg_match('/^(.+?)\s+Semester\s+(\d+)$/i', $class, $m)) {
-            $course   = trim($m[1]);
-            $semText  = 'Semester ' . $m[2];
-            $semNum   = intval($m[2]);
+        // class = "Animal Husbandry Semester 1" format
+        if ($class && preg_match('/^(.+?)\s+(Semester\s+\d+)$/i', $class, $m)) {
+            $course  = trim($m[1]);
+            $sem     = trim($m[2]);
+            $semNum  = intval(preg_replace('/[^0-9]/','',$sem));
             $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? AND (semester=? OR semester=?) ORDER BY full_name ASC");
-            $stmt->execute([$course, $semText, $semNum]);
+            $stmt->execute([$course, $sem, $semNum]);
         } elseif ($class) {
             $stmt = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? ORDER BY full_name ASC");
             $stmt->execute([$class]);

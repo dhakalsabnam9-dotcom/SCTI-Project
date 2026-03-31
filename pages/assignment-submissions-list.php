@@ -24,10 +24,11 @@ try {
     $className = $asgn['class_name'];
     if (preg_match('/^(.+?)\s+Semester\s+(\d+)$/i', $className, $m)) {
         $course = trim($m[1]);
-        $sem    = 'Semester ' . $m[2];
         $semNum = intval($m[2]);
+        // semester column is INT, also handle legacy string storage
+        $semStr = 'Semester ' . $semNum;
         $stmt2  = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? AND (semester=? OR semester=?) ORDER BY full_name ASC");
-        $stmt2->execute([$course, $sem, $semNum]);
+        $stmt2->execute([$course, $semNum, $semStr]);
     } else {
         $stmt2 = $db->prepare("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' AND course=? ORDER BY full_name ASC");
         $stmt2->execute([$className]);

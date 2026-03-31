@@ -8,7 +8,7 @@ require_once '../includes/config.php';
 header('Content-Type: application/json');
 try {
     $db = getDBConnection();
-    $rows = $db->query("SELECT id, full_name, student_id, username, email, phone, course as program, semester, address, status, created_at FROM students ORDER BY id DESC")->fetchAll();
+    $rows = $db->query("SELECT id, full_name, student_id, username, email, phone, course as program, semester, address, status, created_at FROM students ORDER BY full_name ASC")->fetchAll();
     ob_end_clean();
     echo json_encode(['success'=>true,'students'=>$rows]);
 } catch(Exception $e) {

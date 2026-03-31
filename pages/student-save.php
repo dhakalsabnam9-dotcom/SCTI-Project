@@ -21,7 +21,17 @@ try {
     $email      = trim($data['email']        ?? '');
     $phone      = trim($data['phone']        ?? '');
     $semRaw     = $data['semester'] ?? '';
-    $semester   = ($semRaw !== '' && $semRaw !== null) ? trim($semRaw) : null;
+    // Normalize "Semester 1" → 1 (DB column is INT)
+    if ($semRaw !== '' && $semRaw !== null) {
+        $semClean = trim($semRaw);
+        if (preg_match('/(\d+)/', $semClean, $sm)) {
+            $semester = intval($sm[1]);
+        } else {
+            $semester = intval($semClean) ?: null;
+        }
+    } else {
+        $semester = null;
+    }
     $address    = trim($data['address']      ?? '');
     $qualification = trim($data['qualification'] ?? '');
     $status     = in_array($data['status'] ?? '', ['active','inactive']) ? $data['status'] : 'active';

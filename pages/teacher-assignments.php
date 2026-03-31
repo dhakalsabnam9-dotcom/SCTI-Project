@@ -175,16 +175,33 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
       <div class="fg"><label>Title <span class="req">*</span></label><input type="text" id="asgTitle" class="fc" placeholder="e.g. Database Design Project"></div>
       <div class="frow">
         <div class="fg">
-          <label>Program / Semester <span class="req">*</span></label>
-          <select id="asgClass" class="fc">
-            <option value="">— Loading classes... —</option>
+          <label>Program <span class="req">*</span></label>
+          <select id="asgProgram" class="fc" onchange="loadSemestersForAssign()">
+            <option value="">— Select Program —</option>
+            <option>Animal Husbandry</option>
+            <option>B.Tech Ed in IT</option>
+            <option>B.Tech Ed in Civil</option>
+            <option>Diploma in Civil</option>
+            <option>Diploma Electrical</option>
           </select>
         </div>
-        <div class="fg"><label>Total Points</label><input type="number" id="asgPoints" class="fc" min="1" value="100"></div>
+        <div class="fg">
+          <label>Semester <span class="req">*</span></label>
+          <select id="asgSemester" class="fc">
+            <option value="">— Select Semester —</option>
+            <option>Semester 1</option><option>Semester 2</option>
+            <option>Semester 3</option><option>Semester 4</option>
+            <option>Semester 5</option><option>Semester 6</option>
+          </select>
+        </div>
       </div>
       <div class="frow">
         <div class="fg"><label>Assign Date <span class="req">*</span></label><input type="datetime-local" id="asgAssignDate" class="fc"></div>
         <div class="fg"><label>Submission Deadline <span class="req">*</span></label><input type="datetime-local" id="asgDue" class="fc"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Total Points</label><input type="number" id="asgPoints" class="fc" min="1" value="100"></div>
+        <div class="fg"><label>Student Count</label><div id="asgStudentCount" style="padding:11px 14px;background:#f8fffe;border:2px solid #e0e6ef;border-radius:10px;font-size:13px;color:#28a745;font-weight:700">Select program & semester</div></div>
       </div>
       <div class="fg"><label>Description / Instructions</label><textarea id="asgDesc" class="fc" placeholder="Describe the assignment requirements..."></textarea></div>
     </div>
@@ -213,20 +230,30 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 <script>
 var allAssignments = [];
 
-// Load class dropdown from DB
-fetch('assignment-classes.php')
-  .then(function(r){ return r.json(); })
-  .then(function(res){
-    var sel = document.getElementById('asgClass');
-    sel.innerHTML = '<option value="">— Select Program/Semester —</option>';
-    if (res.success) {
-      res.classes.forEach(function(c){
-        var opt = document.createElement('option');
-        opt.value = c; opt.textContent = c;
-        sel.appendChild(opt);
-      });
-    }
-  });
+// No need to fetch classes - using hardcoded dropdowns
+
+function loadSemestersForAssign() {
+  // Show student count preview when program+semester selected
+  updateStudentCount();
+}
+
+function updateStudentCount() {
+  var prog = document.getElementById('asgProgram').value;
+  var sem  = document.getElementById('asgSemester').value;
+  var el   = document.getElementById('asgStudentCount');
+  if (!prog || !sem) { el.textContent = 'Select program & semester'; el.style.color='#888'; return; }
+  fetch('assignment-classes.php?count=1&program='+encodeURIComponent(prog)+'&semester='+encodeURIComponent(sem))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      el.textContent = (d.count||0)+' students enrolled';
+      el.style.color = '#28a745';
+    }).catch(function(){ el.textContent = 'Could not load count'; });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var semSel = document.getElementById('asgSemester');
+  if (semSel) semSel.addEventListener('change', updateStudentCount);
+});
 
 function loadAssignments() {
   fetch('assignment-list.php')
@@ -336,12 +363,13 @@ function buildCard(a) {
 function openCreate() {
   document.getElementById('asgId').value          = '';
   document.getElementById('asgTitle').value       = '';
-  document.getElementById('asgClass').value       = '';
+  document.getElementById('asgProgram').value     = '';
+  document.getElementById('asgSemester').value    = '';
   document.getElementById('asgPoints').value      = '100';
   document.getElementById('asgDue').value         = '';
   document.getElementById('asgAssignDate').value  = '';
   document.getElementById('asgDesc').value        = '';
-  document.getElementById('asgStatus').value      = 'active';
+  document.getElementById('asgStudentCount').textContent = 'Select program & semester';
   document.getElementById('modalTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Assignment';
   document.getElementById('saveTxt').textContent  = 'Create Assignment';
   document.getElementById('formAlert').style.display = 'none';
@@ -351,7 +379,10 @@ function openCreate() {
 function openEdit(a) {
   document.getElementById('asgId').value          = a.id;
   document.getElementById('asgTitle').value       = a.title;
-  document.getElementById('asgClass').value       = a.class_name;
+  // Parse class_name back to program + semester
+  var parts = a.class_name ? a.class_name.split(' Semester ') : ['',''];
+  document.getElementById('asgProgram').value     = parts[0] || a.class_name;
+  document.getElementById('asgSemester').value    = parts[1] ? 'Semester '+parts[1] : '';
   document.getElementById('asgPoints').value      = a.total_points;
   var d = a.due_date ? a.due_date.replace(' ','T').substring(0,16) : '';
   document.getElementById('asgDue').value         = d;
@@ -361,6 +392,7 @@ function openEdit(a) {
   document.getElementById('modalTitle').innerHTML = '<i class="fa fa-pen"></i> Edit Assignment';
   document.getElementById('saveTxt').textContent  = 'Update Assignment';
   document.getElementById('formAlert').style.display = 'none';
+  updateStudentCount();
   document.getElementById('asgModal').classList.add('open');
 }
 
@@ -369,14 +401,16 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function saveAssignment() {
   var id     = document.getElementById('asgId').value;
   var title  = document.getElementById('asgTitle').value.trim();
-  var cls    = document.getElementById('asgClass').value.trim();
+  var prog   = document.getElementById('asgProgram').value.trim();
+  var sem    = document.getElementById('asgSemester').value.trim();
+  var cls    = prog + ' ' + sem;
   var points = document.getElementById('asgPoints').value.trim();
   var due    = document.getElementById('asgDue').value;
   var alert  = document.getElementById('formAlert');
-  if (!title||!cls||!points||!due) {
+  if (!title||!prog||!sem||!due) {
     alert.textContent='Please fill all required fields.'; alert.className='modal-alert err'; alert.style.display='block'; return;
   }
-  var payload = {id:id?parseInt(id):0,title:title,class_name:cls,total_points:parseInt(points),due_date:due,assign_date:document.getElementById('asgAssignDate').value,status:'active',description:document.getElementById('asgDesc').value.trim()};
+  var payload = {id:id?parseInt(id):0,title:title,class_name:cls,total_points:parseInt(points)||100,due_date:due,assign_date:document.getElementById('asgAssignDate').value,status:'active',description:document.getElementById('asgDesc').value.trim()};
   fetch('assignment-save.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(function(r){ return r.json(); })
     .then(function(res){
@@ -414,49 +448,91 @@ function openSubmissions(a) {
 function renderSubmissions(res, a) {
   var subs    = res.submissions || [];
   var all     = res.all_students || [];
+  // Key by student_id (integer FK) — coerced to string as object key
   var subMap  = {};
-  subs.forEach(function(s){ subMap[s.student_id] = s; });
+  subs.forEach(function(s){ subMap[String(s.student_id)] = s; });
   var dueDate = new Date(a.due_date);
-  var now     = new Date();
-  var isOver  = dueDate < now;
+  var isOver  = dueDate < new Date();
 
-  var html = '<div style="padding:16px 20px;background:#f8fffe;border-bottom:1px solid #e8f5e9;display:flex;gap:16px;flex-wrap:wrap">'
+  // Summary bar
+  var html = '<div style="padding:14px 20px;background:#f8fffe;border-bottom:2px solid #e8f5e9;display:flex;gap:20px;flex-wrap:wrap;align-items:center">'
     + '<span style="font-size:13px;font-weight:700;color:#28a745"><i class="fa fa-check-circle"></i> '+subs.length+' submitted</span>'
     + '<span style="font-size:13px;font-weight:700;color:#dc3545"><i class="fa fa-times-circle"></i> '+(all.length-subs.length)+' not submitted</span>'
-    + '<span style="font-size:13px;color:#888"><i class="fa fa-users"></i> '+all.length+' total students</span>'
-    + '<span style="font-size:13px;color:'+(isOver?'#dc3545':'#28a745')+'"><i class="fa fa-calendar"></i> Deadline: '+dueDate.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</span>'
-    + '</div>'
-    + '<div style="overflow-x:auto"><table class="subs-table"><thead><tr>'
-    + '<th>#</th><th>Student</th><th>Status</th><th>Submitted At</th><th>File</th><th>Notes</th><th>Grade</th><th>Action</th>'
+    + '<span style="font-size:13px;color:#888"><i class="fa fa-users"></i> '+all.length+' total enrolled</span>'
+    + '<span style="font-size:13px;color:'+(isOver?'#dc3545':'#28a745')+'"><i class="fa fa-calendar"></i> Due: '+dueDate.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</span>'
+    + '</div>';
+
+  if (!all.length) {
+    html += '<div style="padding:40px;text-align:center;color:#aaa"><i class="fa fa-users" style="font-size:40px;display:block;margin-bottom:12px"></i><p>No students enrolled in this class yet.</p><p style="font-size:12px;margin-top:6px">Make sure students are added with the matching program and semester.</p></div>';
+    document.getElementById('subsModalBody').innerHTML = html;
+    return;
+  }
+
+  html += '<div style="overflow-x:auto"><table class="subs-table"><thead><tr>'
+    + '<th style="width:40px">#</th>'
+    + '<th>Student</th>'
+    + '<th>Status</th>'
+    + '<th>Submitted At</th>'
+    + '<th>Uploaded Document</th>'
+    + '<th>Notes</th>'
+    + '<th style="width:100px">Grade</th>'
+    + '<th style="width:80px">Action</th>'
     + '</tr></thead><tbody>';
 
-  all.forEach(function(st, i) {
-    var sub = subMap[st.id];
+  // Submitted students first, then not submitted
+  var submitted    = all.filter(function(st){ return subMap[String(st.id)]; });
+  var notSubmitted = all.filter(function(st){ return !subMap[String(st.id)]; });
+  var sorted = submitted.concat(notSubmitted);
+
+  sorted.forEach(function(st, i) {
+    var sub = subMap[String(st.id)];
     if (sub) {
       var isLate = new Date(sub.submitted_at) > dueDate;
-      var stBadge = isLate ? '<span class="badge badge-overdue">Late</span>' : '<span class="badge badge-active">On Time</span>';
-      if (sub.status==='graded') stBadge = '<span class="badge badge-graded">Graded</span>';
-      var fileLink = sub.file_path ? '<a href="../'+esc(sub.file_path)+'" target="_blank" style="color:#004080;font-size:12px;display:flex;align-items:center;gap:4px"><i class="fa fa-paperclip"></i>'+esc(sub.file_name||'File')+'</a>' : '<span style="color:#bbb;font-size:12px">No file</span>';
-      html += '<tr>'
-        + '<td style="color:#aaa;font-size:12px">'+(i+1)+'</td>'
-        + '<td><div style="font-weight:700;font-size:13px">'+esc(st.full_name)+'</div><div style="font-size:11px;color:#888">'+esc(st.student_id)+'</div></td>'
-        + '<td>'+stBadge+'</td>'
-        + '<td style="font-size:12px;color:#666">'+new Date(sub.submitted_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</td>'
+      var badge;
+      if (sub.grade) {
+        badge = '<span class="badge badge-graded"><i class="fa fa-star"></i> Graded ('+esc(sub.grade)+')</span>';
+      } else if (isLate) {
+        badge = '<span class="badge badge-overdue"><i class="fa fa-clock"></i> Late</span>';
+      } else {
+        badge = '<span class="badge badge-active"><i class="fa fa-check"></i> On Time</span>';
+      }
+
+      var fileLink;
+      if (sub.file_path) {
+        var fname = sub.file_name || sub.file_path.split('/').pop();
+        var ext   = fname.split('.').pop().toLowerCase();
+        var iconMap = {pdf:'fa-file-pdf',doc:'fa-file-word',docx:'fa-file-word',txt:'fa-file-alt',zip:'fa-file-archive',rar:'fa-file-archive',jpg:'fa-file-image',jpeg:'fa-file-image',png:'fa-file-image'};
+        var ficon = iconMap[ext] || 'fa-file';
+        fileLink = '<a href="../'+esc(sub.file_path)+'" target="_blank" download="'+esc(fname)+'" '
+          + 'style="display:inline-flex;align-items:center;gap:6px;color:#1e40af;font-size:12px;font-weight:700;padding:6px 12px;background:#dbeafe;border-radius:8px;text-decoration:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" '
+          + 'title="'+esc(fname)+'">'
+          + '<i class="fa '+ficon+'" style="flex-shrink:0"></i>'+esc(fname)+'</a>';
+      } else {
+        fileLink = '<span style="color:#bbb;font-size:12px"><i class="fa fa-minus"></i> No file</span>';
+      }
+
+      html += '<tr style="background:#f8fffe">'
+        + '<td style="color:#aaa;font-size:12px;text-align:center">'+(i+1)+'</td>'
+        + '<td><div style="font-weight:700;font-size:13px;color:#1a202c">'+esc(st.full_name)+'</div>'
+        +     '<div style="font-size:11px;color:#888;margin-top:2px"><i class="fa fa-id-card" style="color:#28a745"></i> '+esc(st.student_id)+'</div></td>'
+        + '<td>'+badge+'</td>'
+        + '<td style="font-size:12px;color:#555;white-space:nowrap">'+new Date(sub.submitted_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</td>'
         + '<td>'+fileLink+'</td>'
-        + '<td style="font-size:12px;color:#666;max-width:140px">'+esc(sub.notes||'—')+'</td>'
-        + '<td><input type="text" class="grade-input" id="grade_'+sub.id+'" value="'+esc(sub.grade||'')+'" placeholder="e.g. 85"></td>'
+        + '<td style="font-size:12px;color:#666;max-width:140px;word-break:break-word">'+esc(sub.notes||'—')+'</td>'
+        + '<td><input type="text" class="grade-input" id="grade_'+sub.id+'" value="'+esc(sub.grade||'')+'" placeholder="0-100"></td>'
         + '<td><button class="btn-grade" onclick="gradeSubmission('+sub.id+','+a.id+')"><i class="fa fa-check"></i> Save</button></td>'
         + '</tr>';
     } else {
       html += '<tr class="no-sub-row">'
-        + '<td style="color:#aaa;font-size:12px">'+(i+1)+'</td>'
-        + '<td><div style="font-weight:700;font-size:13px">'+esc(st.full_name)+'</div><div style="font-size:11px;color:#888">'+esc(st.student_id)+'</div></td>'
-        + '<td><span class="badge" style="background:#f0f0f0;color:#aaa">Not Submitted</span></td>'
-        + '<td style="color:#bbb;font-size:12px">—</td>'
-        + '<td style="color:#bbb;font-size:12px">—</td>'
-        + '<td style="color:#bbb;font-size:12px">—</td>'
-        + '<td style="color:#bbb;font-size:12px">—</td>'
-        + '<td style="color:#bbb;font-size:12px">—</td>'
+        + '<td style="color:#ccc;font-size:12px;text-align:center">'+(i+1)+'</td>'
+        + '<td><div style="font-weight:600;font-size:13px;color:#aaa">'+esc(st.full_name)+'</div>'
+        +     '<div style="font-size:11px;color:#ccc;margin-top:2px"><i class="fa fa-id-card"></i> '+esc(st.student_id)+'</div></td>'
+        + '<td><span class="badge" style="background:#f5f5f5;color:#bbb"><i class="fa fa-times"></i> Not Submitted</span></td>'
+        + '<td style="color:#ddd;font-size:12px">—</td>'
+        + '<td style="color:#ddd;font-size:12px">—</td>'
+        + '<td style="color:#ddd;font-size:12px">—</td>'
+        + '<td style="color:#ddd;font-size:12px">—</td>'
+        + '<td style="color:#ddd;font-size:12px">—</td>'
         + '</tr>';
     }
   });

@@ -129,22 +129,26 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
       <input type="date" id="attDate" value="<?= date('Y-m-d') ?>">
     </div>
     <div class="ctrl-group">
-      <label><i class="fa fa-chalkboard"></i> Class / Subject</label>
+      <label><i class="fa fa-book"></i> Subject</label>
       <select id="attClass" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
-        <option value="">— Select Class —</option>
+        <option value="">— Select Subject —</option>
+        <option>Animal Husbandry</option>
+        <option>B.Tech Ed in IT</option>
+        <option>B.Tech Ed in Civil</option>
+        <option>Diploma in Civil</option>
+        <option>Diploma Electrical</option>
       </select>
     </div>
     <div class="ctrl-group">
-      <label><i class="fa fa-clock"></i> Period (optional)</label>
-      <select id="attPeriod">
-        <option value="">— Select Period —</option>
-        <option value="1st Period">1st Period</option>
-        <option value="2nd Period">2nd Period</option>
-        <option value="3rd Period">3rd Period</option>
-        <option value="4th Period">4th Period</option>
-        <option value="5th Period">5th Period</option>
-        <option value="6th Period">6th Period</option>
-        <option value="Full Day">Full Day</option>
+      <label><i class="fa fa-layer-group"></i> Semester</label>
+      <select id="attPeriod" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
+        <option value="">— Select Semester —</option>
+        <option>Semester 1</option>
+        <option>Semester 2</option>
+        <option>Semester 3</option>
+        <option>Semester 4</option>
+        <option>Semester 5</option>
+        <option>Semester 6</option>
       </select>
     </div>
     <button class="btn-load" onclick="loadStudents()"><i class="fa fa-users"></i> Load Students</button>
@@ -191,26 +195,36 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 var allStudents = [];
 var existingMap = {};
 
-// Load class list from DB on page load
-fetch('attendance-data.php?action=classes').then(r=>r.json()).then(function(res){
-  if (!res.success) return;
-  var sel = document.getElementById('attClass');
-  res.classes.forEach(function(c){
+// Load subjects (programs) and semesters
+window.addEventListener('DOMContentLoaded', function(){
+  var subjects = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+  var semesters = ['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6'];
+
+  var subSel = document.getElementById('attClass');
+  subjects.forEach(function(s){
     var opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
-    sel.appendChild(opt);
+    opt.value = s; opt.textContent = s;
+    subSel.appendChild(opt);
+  });
+
+  var semSel = document.getElementById('attPeriod');
+  semesters.forEach(function(s){
+    var opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    semSel.appendChild(opt);
   });
 });
 
 function loadStudents() {
   var date  = document.getElementById('attDate').value;
-  var cls   = document.getElementById('attClass').value.trim();
-  if (!date || !cls) { showAlert('Please select both date and class.','err'); return; }
+  var subj  = document.getElementById('attClass').value.trim();
+  var sem   = document.getElementById('attPeriod').value.trim();
+  if (!date || !subj || !sem) { showAlert('Please select date, subject and semester.','err'); return; }
 
   document.getElementById('tableWrap').innerHTML = '<div class="empty-state"><i class="fa fa-spinner fa-spin" style="color:#28a745"></i><p>Loading students...</p></div>';
   document.getElementById('btnSave').disabled = true;
 
-  // Load students + existing attendance in parallel
+  var cls = subj + ' ' + sem;
   Promise.all([
     fetch('attendance-data.php?action=students&class='+encodeURIComponent(cls)).then(r=>r.json()),
     fetch('attendance-data.php?action=existing&date='+encodeURIComponent(date)+'&class='+encodeURIComponent(cls)).then(r=>r.json())
@@ -222,7 +236,7 @@ function loadStudents() {
     renderTable(allStudents);
     updateStats();
     document.getElementById('btnSave').disabled = allStudents.length === 0;
-    document.getElementById('saveInfo').textContent = allStudents.length + ' students loaded for ' + date;
+    document.getElementById('saveInfo').textContent = allStudents.length + ' students — ' + subj + ' / ' + sem;
   }).catch(function(e){ showAlert('Network error: '+e.message,'err'); });
 }
 
@@ -314,9 +328,10 @@ function updateStats() {
 
 function saveAttendance() {
   var date  = document.getElementById('attDate').value;
-  var cls   = document.getElementById('attClass').value.trim();
-  var period= document.getElementById('attPeriod').value;
-  if (!date || !cls) { showAlert('Date and class are required.','err'); return; }
+  var subj  = document.getElementById('attClass').value.trim();
+  var sem   = document.getElementById('attPeriod').value.trim();
+  var cls   = subj + ' ' + sem;
+  if (!date || !subj || !sem) { showAlert('Date, subject and semester are required.','err'); return; }
   if (!allStudents.length) { showAlert('No students loaded.','err'); return; }
 
   var records = allStudents.map(function(s) {
@@ -339,7 +354,7 @@ function saveAttendance() {
   fetch('attendance-save.php', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({class_name:cls, date:date, period:period, records:records})
+    body: JSON.stringify({class_name:cls, date:date, period:'', records:records})
   })
   .then(function(r){ return r.json(); })
   .then(function(d) {
@@ -350,11 +365,6 @@ function saveAttendance() {
       // Reload existing map
       fetch('attendance-data.php?action=existing&date='+encodeURIComponent(date)+'&class='+encodeURIComponent(cls))
         .then(r=>r.json()).then(function(e){ if(e.success) existingMap=e.records; });
-    } else {
-      showAlert(d.message||'Save failed','err');
-    }
-  })
-  .catch(function(e){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Attendance'; showAlert('Network error: '+e.message,'err'); });
 }
 
 function showAlert(msg, type) {

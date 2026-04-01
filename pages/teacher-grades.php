@@ -111,6 +111,7 @@ try {
         <tr>
           <th>#</th>
           <th>Student Name</th>
+          <th>Roll No.</th>
           <th>Student ID</th>
           <th>Internal (40)</th>
           <th>External (60)</th>
@@ -120,7 +121,7 @@ try {
       </thead>
       <tbody id="gradesBody">
         <?php if(empty($students)): ?>
-        <tr><td colspan="7" style="text-align:center;padding:50px;color:#aaa">No students found.</td></tr>
+        <tr><td colspan="8" style="text-align:center;padding:50px;color:#aaa">No students found.</td></tr>
         <?php else: foreach($students as $i=>$s):
           $parts = explode(' ', $s['full_name']);
           $initials = strtoupper(substr($parts[0],0,1).(count($parts)>1?substr($parts[count($parts)-1],0,1):''));
@@ -128,6 +129,7 @@ try {
         <tr data-student-id="<?=$s['id']?>" data-student-db-id="<?=htmlspecialchars($s['student_id'])?>">
           <td><?=$i+1?></td>
           <td><div class="stu-info"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
+          <td style="font-weight:700;color:#004080"><?=$i+1?></td>
           <td><?=htmlspecialchars($s['student_id'])?></td>
           <td><input type="number" class="grade-input internal-input" min="0" max="40" placeholder="0-40" oninput="calcTotal(this)"></td>
           <td><input type="number" class="grade-input external-input" min="0" max="60" placeholder="0-60" oninput="calcTotal(this)"></td>

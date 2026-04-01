@@ -34,7 +34,12 @@ try {
     }
 
     $now = date('Y-m-d H:i:s');
-    $pendingAssign = $db->query("SELECT COUNT(*) FROM assignments WHERE due_date > '$now'")->fetchColumn();
+    $semester = $stuData['semester'] ?? '';
+    $semNum = is_numeric($semester) ? intval($semester) : intval(preg_replace('/[^0-9]/','',$semester));
+    $className = trim(($stuData['course'] ?? '') . ' Semester ' . $semNum);
+    $pendingStmt = $db->prepare("SELECT COUNT(*) FROM assignments WHERE due_date > ? AND class_name = ?");
+    $pendingStmt->execute([$now, $className]);
+    $pendingAssign = $pendingStmt->fetchColumn();
 
     $attStmt = $db->prepare("SELECT COUNT(*) as total, SUM(CASE WHEN status='present' OR status='late' THEN 1 ELSE 0 END) as present FROM attendance WHERE student_id=?");
     $attStmt->execute([$studentId]);

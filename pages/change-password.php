@@ -35,8 +35,8 @@ if ($newPassword !== $confirmPassword) {
     exit();
 }
 
-$table    = ($userType === 'teacher') ? 'teachers' : 'students';
-$userId   = $_SESSION['user_id'];
+$table  = ($_SESSION['user_type'] === 'teacher') ? 'teachers' : 'students';
+$userId = $_SESSION['user_id'];
 
 try {
     $conn = getDBConnection();

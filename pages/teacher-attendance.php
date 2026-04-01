@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header('Location: ../index.php'); exit();
@@ -8,8 +8,13 @@ $teacherId   = $_SESSION['user_id']   ?? 0;
 require_once '../includes/config.php';
 try {
     $db = getDBConnection();
-    $students = $db->query("SELECT id, full_name, student_id, course, semester FROM students WHERE status='active' ORDER BY full_name ASC")->fetchAll();
-} catch(Exception $e) { $students = []; }
+    $progRows = $db->query("SELECT DISTINCT title FROM programs WHERE status='active' ORDER BY title ASC")->fetchAll();
+    $programs = array_column($progRows, 'title');
+    if (empty($programs)) $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+} catch(Exception $e) {
+    $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+}
+$programsJson = json_encode($programs);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,7 +112,7 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 </style>
 </head>
 <body>
-<div class="top-bar"><marquee>SCTI Teacher Portal — Mark Attendance</marquee></div>
+<div class="top-bar"><marquee>SCTI Teacher Portal â€” Mark Attendance</marquee></div>
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
@@ -131,18 +136,16 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
     <div class="ctrl-group">
       <label><i class="fa fa-book"></i> Subject</label>
       <select id="attClass" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
-        <option value="">— Select Subject —</option>
-        <option>Animal Husbandry</option>
-        <option>B.Tech Ed in IT</option>
-        <option>B.Tech Ed in Civil</option>
-        <option>Diploma in Civil</option>
-        <option>Diploma Electrical</option>
+        <option value="">â€” Select Program â€”</option>
+        <?php foreach($programs as $p): ?>
+        <option><?=htmlspecialchars($p)?></option>
+        <?php endforeach; ?>
       </select>
     </div>
     <div class="ctrl-group">
       <label><i class="fa fa-layer-group"></i> Semester</label>
       <select id="attPeriod" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
-        <option value="">— Select Semester —</option>
+        <option value="">â€” Select Semester â€”</option>
         <option>Semester 1</option>
         <option>Semester 2</option>
         <option>Semester 3</option>
@@ -189,29 +192,18 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
   </div>
 </div>
 
-<footer>© 2025 SCTI — Teacher Portal</footer>
+<footer>Â© 2025 SCTI â€” Teacher Portal</footer>
 
 <script>
 var allStudents = [];
 var existingMap = {};
 
-// Load subjects (programs) and semesters
+// Load subjects (programs) and semesters from DB
 window.addEventListener('DOMContentLoaded', function(){
-  var subjects = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
   var semesters = ['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6'];
-
-  var subSel = document.getElementById('attClass');
-  subjects.forEach(function(s){
-    var opt = document.createElement('option');
-    opt.value = s; opt.textContent = s;
-    subSel.appendChild(opt);
-  });
-
   var semSel = document.getElementById('attPeriod');
   semesters.forEach(function(s){
-    var opt = document.createElement('option');
-    opt.value = s; opt.textContent = s;
-    semSel.appendChild(opt);
+    var opt = document.createElement('option'); opt.value = s; opt.textContent = s; semSel.appendChild(opt);
   });
 });
 
@@ -236,7 +228,7 @@ function loadStudents() {
     renderTable(allStudents);
     updateStats();
     document.getElementById('btnSave').disabled = allStudents.length === 0;
-    document.getElementById('saveInfo').textContent = allStudents.length + ' students — ' + subj + ' / ' + sem;
+    document.getElementById('saveInfo').textContent = allStudents.length + ' students â€” ' + subj + ' / ' + sem;
   }).catch(function(e){ showAlert('Network error: '+e.message,'err'); });
 }
 
@@ -362,11 +354,17 @@ function saveAttendance() {
     btn.innerHTML = '<i class="fa fa-save"></i> Save Attendance';
     if (d.success) {
       showAlert('<i class="fa fa-check-circle"></i> '+d.message, 'ok');
-      // Reload existing map
       fetch('attendance-data.php?action=existing&date='+encodeURIComponent(date)+'&class='+encodeURIComponent(cls))
-        .then(r=>r.json()).then(function(e){ if(e.success) existingMap=e.records; });
+        .then(function(r){ return r.json(); }).then(function(e){ if(e.success) existingMap=e.records; });
+    } else {
+      showAlert(d.message || 'Failed to save attendance.', 'err');
+    }
+  }).catch(function(e){
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa fa-save"></i> Save Attendance';
+    showAlert('Network error: '+e.message, 'err');
+  });
 }
-
 function showAlert(msg, type) {
   var el = document.getElementById('alertBox');
   el.innerHTML = msg;

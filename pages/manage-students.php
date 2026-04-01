@@ -103,10 +103,10 @@ try {
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-user-graduate"></i></div><div><div class="stat-val" id="sTotal">-</div><div class="stat-lbl">Total Students</div></div></div>
-  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">-</div><div class="stat-lbl">Active</div></div></div>
-  <div class="stat"><div class="stat-ico ico-orange"><i class="fa fa-layer-group"></i></div><div><div class="stat-val" id="sPrograms">-</div><div class="stat-lbl">Programs</div></div></div>
-  <div class="stat"><div class="stat-ico ico-grey"><i class="fa fa-user-slash"></i></div><div><div class="stat-val" id="sInactive">-</div><div class="stat-lbl">Inactive</div></div></div>
+  <div class="stat" onclick="filterByCard('')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="stat-ico ico-blue"><i class="fa fa-user-graduate"></i></div><div><div class="stat-val" id="sTotal">-</div><div class="stat-lbl">Total Students</div></div></div>
+  <div class="stat" onclick="filterByCard('active')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">-</div><div class="stat-lbl">Active</div></div></div>
+  <div class="stat" onclick="filterByCard('programs')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="stat-ico ico-orange"><i class="fa fa-layer-group"></i></div><div><div class="stat-val" id="sPrograms">-</div><div class="stat-lbl">Programs</div></div></div>
+  <div class="stat" onclick="filterByCard('inactive')" style="cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''"><div class="stat-ico ico-grey"><i class="fa fa-user-slash"></i></div><div><div class="stat-val" id="sInactive">-</div><div class="stat-lbl">Inactive</div></div></div>
 </div>
 
 <div class="layout">
@@ -420,6 +420,18 @@ function resetForm() {
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Add Student';
   document.getElementById('btnTxt').textContent  = 'Save Student';
   document.getElementById('formAlert').style.display = 'none';
+}
+
+function filterByCard(type) {
+  var statusSel = document.getElementById('filterStatus');
+  if (type === 'active') { statusSel.value = 'active'; }
+  else if (type === 'inactive') { statusSel.value = 'inactive'; }
+  else { statusSel.value = ''; }
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterProgram').value = '';
+  filterLocal();
+  // Scroll to table
+  document.querySelector('.content').scrollIntoView({behavior:'smooth'});
 }
 
 function loadStudents() {

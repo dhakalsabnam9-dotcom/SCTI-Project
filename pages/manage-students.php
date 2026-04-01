@@ -1,5 +1,19 @@
 ﻿<?php
 session_start();
+if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+    header('Location: ../index.php'); exit();
+}
+require_once '../includes/config.php';
+try {
+    $db = getDBConnection();
+    $progRows = $db->query("SELECT DISTINCT title FROM programs WHERE status='active' ORDER BY title ASC")->fetchAll();
+    $programs = array_column($progRows, 'title');
+    if (empty($programs)) $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+} catch(Exception $e) {
+    $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
+}
+?><?php
+session_start();
 if (!isset(<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {

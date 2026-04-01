@@ -13,7 +13,9 @@ try {
     $subjects = [];
     $progs = $db->query("SELECT content FROM programs WHERE status='active' AND content IS NOT NULL AND content != ''")->fetchAll();
     foreach ($progs as $p) {
-        $subjectList = array_filter(array_map('trim', explode('|', $p['content'])));
+        // Support both pipe (|) and comma (,) separators
+        $sep = strpos($p['content'], '|') !== false ? '|' : ',';
+        $subjectList = array_filter(array_map('trim', explode($sep, $p['content'])));
         foreach ($subjectList as $subj) {
             if ($subj && !in_array($subj, $subjects)) {
                 $subjects[] = $subj;

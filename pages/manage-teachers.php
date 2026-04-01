@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     header('Location: ../index.php'); exit();
@@ -123,7 +123,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 </head>
 <body>
 
-<div class="top-bar"><marquee>Teacher Manager — Add, edit and manage all teaching staff at SCTI</marquee></div>
+<div class="top-bar"><marquee>Teacher Manager â€” Add, edit and manage all teaching staff at SCTI</marquee></div>
 
 <div class="pg-header">
   <div>
@@ -138,10 +138,10 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 
 <!-- Stats -->
 <div class="stats">
-  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-chalkboard-teacher"></i></div><div><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Total Teachers</div></div></div>
-  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">—</div><div class="stat-lbl">Active</div></div></div>
-  <div class="stat"><div class="stat-ico ico-orange"><i class="fa fa-layer-group"></i></div><div><div class="stat-val" id="sDepts">—</div><div class="stat-lbl">Departments</div></div></div>
-  <div class="stat"><div class="stat-ico ico-grey"><i class="fa fa-user-slash"></i></div><div><div class="stat-val" id="sInactive">—</div><div class="stat-lbl">Inactive</div></div></div>
+  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-chalkboard-teacher"></i></div><div><div class="stat-val" id="sTotal">â€”</div><div class="stat-lbl">Total Teachers</div></div></div>
+  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">â€”</div><div class="stat-lbl">Active</div></div></div>
+  <div class="stat"><div class="stat-ico ico-orange"><i class="fa fa-layer-group"></i></div><div><div class="stat-val" id="sDepts">â€”</div><div class="stat-lbl">Departments</div></div></div>
+  <div class="stat"><div class="stat-ico ico-grey"><i class="fa fa-user-slash"></i></div><div><div class="stat-val" id="sInactive">â€”</div><div class="stat-lbl">Inactive</div></div></div>
 </div>
 
 <div class="layout">
@@ -295,14 +295,14 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>© 2025 SCTI — Admin Panel</footer>
+<footer>Â© 2025 SCTI â€” Admin Panel</footer>
 
 
 <script>
 var allTeachers = [];
 var deleteTargetId = 0;
 
-// ── AUTO-GENERATE ──────────────────────────────────────────────
+// â”€â”€ AUTO-GENERATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function autoGenerate() {
   genTeacherId();
   genUsername();
@@ -315,8 +315,8 @@ function updateCredBox() {
   var p = document.getElementById('fPassword').value.trim();
   var box = document.getElementById('credBox');
   if (u || p) {
-    document.getElementById('credUser').textContent = u || '—';
-    document.getElementById('credPass').textContent = p || '—';
+    document.getElementById('credUser').textContent = u || 'â€”';
+    document.getElementById('credPass').textContent = p || 'â€”';
     box.style.display = 'block';
   } else {
     box.style.display = 'none';
@@ -364,7 +364,7 @@ function genPassword() {
   updateCredBox();
 }
 
-// ── SAVE (Create / Update) ─────────────────────────────────────
+// â”€â”€ SAVE (Create / Update) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function saveTeacher() {
   var name     = document.getElementById('fName').value.trim();
   var tid      = document.getElementById('fTeacherId').value.trim();
@@ -415,7 +415,7 @@ function saveTeacher() {
   .catch(function(){ btn.disabled=false; showAlert('Network error.','err'); });
 }
 
-// ── EDIT ──────────────────────────────────────────────────────
+// â”€â”€ EDIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function editTeacher(id) {
   var t = allTeachers.find(function(x){ return String(x.id) === String(id); });
   if (!t) return;
@@ -447,7 +447,7 @@ function editTeacher(id) {
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-// ── TOGGLE STATUS ─────────────────────────────────────────────
+// â”€â”€ TOGGLE STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toggleStatus(id, currentStatus) {
   var newStatus = currentStatus === 'active' ? 'inactive' : 'active';
   var t = allTeachers.find(function(x){ return String(x.id) === String(id); });
@@ -469,7 +469,7 @@ function toggleStatus(id, currentStatus) {
   .catch(function(){ toast('Network error','err'); });
 }
 
-// ── DELETE ────────────────────────────────────────────────────
+// â”€â”€ DELETE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function askDelete(id, name) {
   deleteTargetId = id;
   document.getElementById('delName').textContent = name;
@@ -494,7 +494,7 @@ function confirmDelete() {
   .catch(function(){ toast('Network error.','err'); });
 }
 
-// ── RESET FORM ────────────────────────────────────────────────
+// â”€â”€ RESET FORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function resetForm() {
   document.getElementById('fId').value = '0';
   ['fName','fTeacherId','fUsername','fPassword','fEmail','fPhone','fQual','fExp','fDesignation','fAddress','fSubjects']
@@ -509,7 +509,18 @@ function resetForm() {
   document.getElementById('formAlert').style.display = 'none';
 }
 
-// ── LOAD & RENDER ─────────────────────────────────────────────
+// â”€â”€ LOAD & RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function filterByCard(type) {
+  var statusSel = document.getElementById('filterStatus');
+  if (type === 'active')   { statusSel.value = 'active'; }
+  else if (type === 'inactive') { statusSel.value = 'inactive'; }
+  else { statusSel.value = ''; }
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterDept').value = '';
+  filterLocal();
+  document.querySelector('.content').scrollIntoView({behavior:'smooth'});
+}
+
 function loadTeachers() {
   var grid = document.getElementById('tgrid');
   grid.innerHTML = '<div class="empty"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div>';
@@ -573,14 +584,14 @@ function buildCard(t) {
     + '<div class="tcard-head">'
     +   '<div class="tcard-avatar"><i class="fa fa-user-tie"></i></div>'
     +   '<div class="tcard-name">'+esc(t.name)+'</div>'
-    +   '<div class="tcard-dept">'+esc(t.department||'—')+'</div>'
+    +   '<div class="tcard-dept">'+esc(t.department||'â€”')+'</div>'
     + '</div>'
     + '<div class="tcard-body">'
-    +   '<div class="tcard-row"><i class="fa fa-id-badge"></i><span>'+esc(t.teacher_id||'—')+'</span></div>'
-    +   '<div class="tcard-row"><i class="fa fa-user"></i><span>'+esc(t.username||'—')+'</span></div>'
-    +   '<div class="tcard-row"><i class="fa fa-envelope"></i><span>'+esc(t.email||'—')+'</span></div>'
-    +   '<div class="tcard-row"><i class="fa fa-graduation-cap"></i><span>'+esc(t.qualification||'—')+'</span></div>'
-    +   '<div class="tcard-row"><i class="fa fa-clock"></i><span>'+esc(t.experience||'—')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-id-badge"></i><span>'+esc(t.teacher_id||'â€”')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-user"></i><span>'+esc(t.username||'â€”')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-envelope"></i><span>'+esc(t.email||'â€”')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-graduation-cap"></i><span>'+esc(t.qualification||'â€”')+'</span></div>'
+    +   '<div class="tcard-row"><i class="fa fa-clock"></i><span>'+esc(t.experience||'â€”')+'</span></div>'
     +   '<span class="tbdg '+bdgClass+'">'+cap(t.status)+'</span>'
     +   (tags ? '<div class="tags">'+tags+'</div>' : '')
     +   '<div class="tcard-actions">'
@@ -591,7 +602,7 @@ function buildCard(t) {
     + '</div></div>';
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
+// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function showAlert(msg, type) {
   var el = document.getElementById('formAlert');
   el.className = 'alert alert-' + (type==='ok' ? 'ok' : 'err');

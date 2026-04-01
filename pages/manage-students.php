@@ -12,15 +12,7 @@ try {
 } catch(Exception $e) {
     $programs = ['Animal Husbandry','B.Tech Ed in IT','B.Tech Ed in Civil','Diploma in Civil','Diploma Electrical'];
 }
-?><?php
-session_start();
-if (!isset(<?php
-session_start();
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    header('Location: ../index.php'); exit();
-}
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">

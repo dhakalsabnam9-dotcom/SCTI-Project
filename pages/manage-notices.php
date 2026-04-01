@@ -196,6 +196,11 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
         </select>
       </div>
     </div>
+    <div class="fg" id="createdByBox" style="display:none;background:#f8f9fa;border-radius:8px;padding:10px 12px;border-left:3px solid #004080">
+      <label style="color:#004080"><i class="fa fa-user-shield"></i> Created By</label>
+      <div id="createdByName" style="font-weight:700;color:#333;font-size:13px;margin-top:4px">—</div>
+      <div id="createdAtTime" style="font-size:11px;color:#999;margin-top:2px"></div>
+    </div>
     <button class="btn-submit" onclick="saveNotice()"><i class="fa fa-save"></i> <span id="btnTxt">Save Notice</span></button>
     <button class="btn-reset" onclick="resetForm()"><i class="fa fa-times"></i> Cancel / Reset</button>
   </div>
@@ -325,6 +330,7 @@ function resetForm() {
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Notice';
   document.getElementById('btnTxt').textContent  = 'Save Notice';
   document.getElementById('formAlert').style.display = 'none';
+  document.getElementById('createdByBox').style.display = 'none';
 }
 
 function editNotice(id) {
@@ -343,6 +349,17 @@ function editNotice(id) {
   document.querySelectorAll('.aud-tag').forEach(function(t){ t.classList.toggle('selected', t.dataset.val === aud); });
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-edit"></i> Edit Notice';
   document.getElementById('btnTxt').textContent  = 'Update Notice';
+  // Show created by info
+  var cbBox = document.getElementById('createdByBox');
+  var cbName = document.getElementById('createdByName');
+  var cbTime = document.getElementById('createdAtTime');
+  if (n.created_by_name) {
+    cbName.textContent = n.created_by_name;
+    cbTime.textContent = n.created_at ? 'Created: ' + fmtDate(n.created_at) : '';
+    cbBox.style.display = 'block';
+  } else {
+    cbBox.style.display = 'none';
+  }
   document.querySelector('.panel').scrollTop = 0;
 }
 

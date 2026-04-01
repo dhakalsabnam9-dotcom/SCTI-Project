@@ -4,6 +4,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     header('Location: ../index.php'); exit();
 }
 ?>
+<?php $adminName = $_SESSION['full_name'] ?? $_SESSION['username'] ?? 'Admin'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,9 +197,9 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
         </select>
       </div>
     </div>
-    <div class="fg" id="createdByBox" style="display:none;background:#f8f9fa;border-radius:8px;padding:10px 12px;border-left:3px solid #004080">
+    <div class="fg" style="background:#f0f4ff;border-radius:8px;padding:10px 12px;border-left:3px solid #004080">
       <label style="color:#004080"><i class="fa fa-user-shield"></i> Created By</label>
-      <div id="createdByName" style="font-weight:700;color:#333;font-size:13px;margin-top:4px">—</div>
+      <div id="createdByName" style="font-weight:700;color:#333;font-size:13px;margin-top:4px"><?= htmlspecialchars($adminName) ?></div>
       <div id="createdAtTime" style="font-size:11px;color:#999;margin-top:2px"></div>
     </div>
     <button class="btn-submit" onclick="saveNotice()"><i class="fa fa-save"></i> <span id="btnTxt">Save Notice</span></button>
@@ -330,7 +331,8 @@ function resetForm() {
   document.getElementById('formTitle').innerHTML = '<i class="fa fa-plus-circle"></i> Create Notice';
   document.getElementById('btnTxt').textContent  = 'Save Notice';
   document.getElementById('formAlert').style.display = 'none';
-  document.getElementById('createdByBox').style.display = 'none';
+  document.getElementById('createdByName').textContent = '<?= htmlspecialchars() ?>';
+  document.getElementById('createdAtTime').textContent = '';
 }
 
 function editNotice(id) {

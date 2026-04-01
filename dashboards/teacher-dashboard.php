@@ -257,7 +257,7 @@ function timeAgo($dt) {
         <li class="assign-item" onclick="window.location.href='../pages/teacher-assignments.php'">
           <div>
             <div style="font-weight:600;color:#333"><?=htmlspecialchars($a['title'])?></div>
-            <small style="color:#666"><i class="fa fa-calendar" style="color:#004080"></i> Due: <?=date('M d, Y', strtotime($a['due_date']))?> &nbsp;|&nbsp; <?=htmlspecialchars($a['subject'] ?? 'General')?></small>
+            <small style="color:#666"><i class="fa fa-calendar" style="color:#004080"></i> Due: <?=date('M d, Y', strtotime($a['due_date']))?> &nbsp;|&nbsp; <?=htmlspecialchars($a['class_name'] ?? 'General')?></small>
           </div>
           <span class="assign-badge <?=strtotime($a['due_date']) > time() ? 'badge-active' : 'badge-overdue'?>"><?=strtotime($a['due_date']) > time() ? 'Active' : 'Overdue'?></span>
         </li>

@@ -16,15 +16,15 @@ try {
 
 $fullName      = $t['full_name']        ?? ($_SESSION['full_name'] ?? 'Teacher');
 $username      = $t['username']         ?? ($_SESSION['username']  ?? 'teacher');
-$email         = $t['email']            ?? 'â€”';
-$phone         = $t['phone']            ?? 'â€”';
-$address       = $t['address']          ?? 'â€”';
-$department    = $t['department']       ?? 'â€”';
-$designation   = $t['designation']      ?? 'â€”';
-$teacherDbId   = $t['teacher_id']       ?? 'â€”';
-$qualification = $t['qualification']    ?? 'â€”';
-$expYears      = $t['experience']        ?? 'â€”';
-$joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at'])) : 'â€”';
+$email         = $t['email']            ?? '"”';
+$phone         = $t['phone']            ?? '"”';
+$address       = $t['address']          ?? '"”';
+$department    = $t['department']       ?? '"”';
+$designation   = $t['designation']      ?? '"”';
+$teacherDbId   = $t['teacher_id']       ?? '"”';
+$qualification = $t['qualification']    ?? '"”';
+$expYears      = $t['experience']        ?? '"”';
+$joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at'])) : '"”';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,12 +96,12 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
       <div class="profile-card">
         <div class="avatar"><i class="fa fa-user-tie"></i></div>
         <div class="profile-name"><?=htmlspecialchars($fullName)?></div>
-        <div class="profile-role"><?=htmlspecialchars($designation !== 'â€”' ? $designation : 'Teacher')?></div>
+        <div class="profile-role"><?=htmlspecialchars($designation !== '"”' ? $designation : 'Teacher')?></div>
         <div class="profile-stats">
           <div class="pstat"><div class="num"><?=$totalAssignments?></div><div class="lbl">Assignments</div></div>
           <div class="pstat"><div class="num"><?=$totalStudents?></div><div class="lbl">Students</div></div>
-          <div class="pstat"><div class="num"><?=htmlspecialchars($expYears !== 'â€”' ? $expYears : 'â€”')?></div><div class="lbl">Yrs Exp.</div></div>
-          <div class="pstat"><div class="num"><?=htmlspecialchars($department !== 'â€”' ? $department : 'â€”')?></div><div class="lbl">Dept.</div></div>
+          <div class="pstat"><div class="num"><?=htmlspecialchars($expYears !== '"”' ? $expYears : '"”')?></div><div class="lbl">Yrs Exp.</div></div>
+          <div class="pstat"><div class="num"><?=htmlspecialchars($department !== '"”' ? $department : '"”')?></div><div class="lbl">Dept.</div></div>
         </div>
       </div>
     </div>
@@ -130,7 +130,7 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
           <div class="info-item"><label>Employee ID</label><span><?=htmlspecialchars($teacherDbId)?></span></div>
           <div class="info-item"><label>Department</label><span><?=htmlspecialchars($department)?></span></div>
           <div class="info-item"><label>Qualification</label><span><?=htmlspecialchars($qualification)?></span></div>
-          <div class="info-item"><label>Experience</label><span><?=($expYears !== 'â€”' ? htmlspecialchars($expYears).' Years' : 'â€”')?></span></div>
+          <div class="info-item"><label>Experience</label><span><?=($expYears !== '"”' ? htmlspecialchars($expYears).' Years' : '"”')?></span></div>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ $joinedDate    = !empty($t['created_at']) ? date('M Y', strtotime($t['created_at
     </div>
   </div>
 </div>
-<footer class="footer"><p>Â© 2025 SCTI - Teacher Portal</p></footer>
+<footer class="footer"><p>© 2025 SCTI - Teacher Portal</p></footer>
 
 <div class="toast toast-ok" id="toastOk"><i class="fa fa-check-circle"></i><span id="toastOkMsg">Saved!</span></div>
 <div class="toast toast-err" id="toastErr"><i class="fa fa-times-circle"></i><span id="toastErrMsg">Error</span></div>

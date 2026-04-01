@@ -112,7 +112,7 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
 </style>
 </head>
 <body>
-<div class="top-bar"><marquee>SCTI Teacher Portal â€” Mark Attendance</marquee></div>
+<div class="top-bar"><marquee>SCTI Teacher Portal "” Mark Attendance</marquee></div>
 <div class="pg-header">
   <div>
     <h1><i class="fa fa-calendar-check"></i> Mark Attendance</h1>
@@ -136,7 +136,7 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
     <div class="ctrl-group">
       <label><i class="fa fa-book"></i> Subject</label>
       <select id="attClass" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
-        <option value="">â€” Select Program â€”</option>
+        <option value="">"” Select Program "”</option>
         <?php foreach($programs as $p): ?>
         <option><?=htmlspecialchars($p)?></option>
         <?php endforeach; ?>
@@ -145,7 +145,7 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
     <div class="ctrl-group">
       <label><i class="fa fa-layer-group"></i> Semester</label>
       <select id="attPeriod" style="padding:10px 13px;border:2px solid #e0e6ef;border-radius:9px;font-size:13px;font-family:inherit;transition:.2s;background:white">
-        <option value="">â€” Select Semester â€”</option>
+        <option value="">"” Select Semester "”</option>
         <option>Semester 1</option>
         <option>Semester 2</option>
         <option>Semester 3</option>
@@ -192,7 +192,7 @@ footer{background:#00264d;color:white;text-align:center;padding:12px;font-size:1
   </div>
 </div>
 
-<footer>Â© 2025 SCTI â€” Teacher Portal</footer>
+<footer>© 2025 SCTI "” Teacher Portal</footer>
 
 <script>
 var allStudents = [];
@@ -228,7 +228,7 @@ function loadStudents() {
     renderTable(allStudents);
     updateStats();
     document.getElementById('btnSave').disabled = allStudents.length === 0;
-    document.getElementById('saveInfo').textContent = allStudents.length + ' students â€” ' + subj + ' / ' + sem;
+    document.getElementById('saveInfo').textContent = allStudents.length + ' students "” ' + subj + ' / ' + sem;
   }).catch(function(e){ showAlert('Network error: '+e.message,'err'); });
 }
 

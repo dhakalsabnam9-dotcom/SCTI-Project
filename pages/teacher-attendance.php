@@ -85,6 +85,10 @@ td{padding:12px 16px;font-size:13px;color:#333;vertical-align:middle}
 .late-reason-wrap{display:none;margin-top:6px}
 .late-reason-wrap input{width:100%;padding:7px 11px;border:2px solid #fed7aa;border-radius:8px;font-size:12px;font-family:inherit;outline:none;transition:.2s}
 .late-reason-wrap input:focus{border-color:#fd7e14;box-shadow:0 0 0 3px rgba(253,126,20,.1)}
+/* Absent reason input */
+.absent-reason-wrap{display:none;margin-top:6px}
+.absent-reason-wrap input{width:100%;padding:7px 11px;border:2px solid #fca5a5;border-radius:8px;font-size:12px;font-family:inherit;outline:none;transition:.2s}
+.absent-reason-wrap input:focus{border-color:#dc3545;box-shadow:0 0 0 3px rgba(220,53,69,.1)}
 /* Remarks */
 .remarks-input{width:100%;padding:7px 11px;border:2px solid #e0e6ef;border-radius:8px;font-size:12px;font-family:inherit;outline:none;transition:.2s}
 .remarks-input:focus{border-color:#28a745;box-shadow:0 0 0 3px rgba(40,167,69,.1)}
@@ -283,7 +287,9 @@ function radioBtn(sid, val, checked) {
 
 function onStatusChange(sid, val) {
   var lrWrap = document.getElementById('lr_'+sid);
-  if (lrWrap) lrWrap.style.display = val==='late' ? 'block' : 'none';
+  var arWrap = document.getElementById('ar_'+sid);
+  if (lrWrap) lrWrap.style.display = val==='late'   ? 'block' : 'none';
+  if (arWrap) arWrap.style.display = val==='absent' ? 'block' : 'none';
   updateStats();
 }
 
@@ -334,7 +340,8 @@ function saveAttendance() {
     return {
       student_id:  s.id,
       status:      status,
-      late_reason: lrInput ? lrInput.value.trim() : '',
+      late_reason:   lrInput ? lrInput.value.trim() : '',
+      absent_reason: (function(){ var a=document.getElementById('arInput_'+s.id); return a?a.value.trim():''; })(),
       remarks:     remInput ? remInput.value.trim() : ''
     };
   });

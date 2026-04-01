@@ -27,21 +27,22 @@ try {
     $saved = 0;
 
     foreach ($records as $rec) {
-        $sid         = intval($rec['student_id'] ?? 0);
-        $status      = in_array($rec['status'] ?? '', ['present','absent','late']) ? $rec['status'] : 'present';
-        $remark      = trim($rec['remarks'] ?? '');
-        $late_reason = trim($rec['late_reason'] ?? '');
+        $sid          = intval($rec['student_id'] ?? 0);
+        $status       = in_array($rec['status'] ?? '', ['present','absent','late']) ? $rec['status'] : 'present';
+        $remark       = trim($rec['remarks'] ?? '');
+        $late_reason  = trim($rec['late_reason'] ?? '');
+        $absent_reason= trim($rec['absent_reason'] ?? '');
 
         if (!$sid) continue;
 
-        $upd = $db->prepare("UPDATE attendance SET status=?, remarks=?, late_reason=?, class_name=?, period=?, marked_by=?
+        $upd = $db->prepare("UPDATE attendance SET status=?, remarks=?, late_reason=?, absent_reason=?, class_name=?, period=?, marked_by=?
                               WHERE student_id=? AND attendance_date=?");
-        $upd->execute([$status, $remark, $late_reason, $class_name, $period, $teacher_id, $sid, $date]);
+        $upd->execute([$status, $remark, $late_reason, $absent_reason, $class_name, $period, $teacher_id, $sid, $date]);
 
         if ($upd->rowCount() === 0) {
-            $ins = $db->prepare("INSERT INTO attendance (student_id, class_name, attendance_date, period, status, remarks, late_reason, marked_by)
-                                 VALUES (?,?,?,?,?,?,?,?)");
-            $ins->execute([$sid, $class_name, $date, $period, $status, $remark, $late_reason, $teacher_id]);
+            $ins = $db->prepare("INSERT INTO attendance (student_id, class_name, attendance_date, period, status, remarks, late_reason, absent_reason, marked_by)
+                                 VALUES (?,?,?,?,?,?,?,?,?)");
+            $ins->execute([$sid, $class_name, $date, $period, $status, $remark, $late_reason, $absent_reason, $teacher_id]);
         }
         $saved++;
     }

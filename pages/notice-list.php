@@ -11,16 +11,15 @@ try {
     $all      = ($status === 'all');
 
     if ($all && !$audience) {
-        $stmt = $db->query("SELECT * FROM notices ORDER BY created_at DESC");
+        $stmt = $db->query("SELECT n.*, a.full_name as created_by_name FROM notices n LEFT JOIN admins a ON a.id=n.created_by ORDER BY n.created_at DESC");
     } elseif ($audience && !$all) {
-        // audience filter: show notices for this audience OR 'all'
-        $stmt = $db->prepare("SELECT * FROM notices WHERE status=? AND (audience=? OR audience='all') ORDER BY priority='urgent' DESC, created_at DESC");
+        $stmt = $db->prepare("SELECT n.*, a.full_name as created_by_name FROM notices n LEFT JOIN admins a ON a.id=n.created_by WHERE n.status=? AND (n.audience=? OR n.audience='all') ORDER BY n.priority='urgent' DESC, n.created_at DESC");
         $stmt->execute([$status, $audience]);
     } elseif ($audience && $all) {
-        $stmt = $db->prepare("SELECT * FROM notices WHERE audience=? OR audience='all' ORDER BY created_at DESC");
+        $stmt = $db->prepare("SELECT n.*, a.full_name as created_by_name FROM notices n LEFT JOIN admins a ON a.id=n.created_by WHERE n.audience=? OR n.audience='all' ORDER BY n.created_at DESC");
         $stmt->execute([$audience]);
     } else {
-        $stmt = $db->prepare("SELECT * FROM notices WHERE status=? ORDER BY created_at DESC");
+        $stmt = $db->prepare("SELECT n.*, a.full_name as created_by_name FROM notices n LEFT JOIN admins a ON a.id=n.created_by WHERE n.status=? ORDER BY n.created_at DESC");
         $stmt->execute([$status]);
     }
     $notices = $stmt->fetchAll();

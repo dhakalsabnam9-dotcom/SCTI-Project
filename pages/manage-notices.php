@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     header('Location: ../index.php'); exit();
@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;}
     .top-bar{background:#00264d;color:white;padding:7px 20px;font-size:13px;}
-    /* ── HEADER ── */
+    /* â”€â”€ HEADER â”€â”€ */
     .pg-header{background:linear-gradient(135deg,#004080,#0059b3);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 18px rgba(0,64,128,.25);}
     .pg-header h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 3px;}
     .pg-header .bc{font-size:12px;color:rgba(255,255,255,.75);}
@@ -24,7 +24,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .btn-hdr{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;transition:.2s;text-decoration:none;}
     .btn-hdr.ghost{background:rgba(255,255,255,.18);color:#fff;}
     .btn-hdr.ghost:hover{background:rgba(255,255,255,.32);}
-    /* ── STATS ── */
+    /* â”€â”€ STATS â”€â”€ */
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 28px;background:#fff;border-bottom:1px solid #e9ecef;}
     .stat{display:flex;align-items:center;gap:12px;background:#f8f9fa;border-radius:10px;padding:12px 16px;}
     .stat-ico{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;}
@@ -34,12 +34,12 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .ico-grey{background:linear-gradient(135deg,#6c757d,#495057);}
     .stat-val{font-size:24px;font-weight:700;color:#222;line-height:1;}
     .stat-lbl{font-size:11px;color:#999;margin-top:2px;}
-    /* ── LAYOUT ── */
+    /* â”€â”€ LAYOUT â”€â”€ */
     .layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 170px);}
     .panel{background:#fff;border-right:1px solid #e9ecef;padding:22px;overflow-y:auto;}
     .panel h3{font-size:15px;color:#004080;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #e8f0fe;display:flex;align-items:center;gap:8px;}
     .content{padding:22px;overflow-y:auto;}
-    /* ── FORM ── */
+    /* â”€â”€ FORM â”€â”€ */
     .fg{margin-bottom:13px;}
     .fg label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;}
     .fc{width:100%;padding:9px 12px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;transition:.2s;}
@@ -53,14 +53,14 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .alert{padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;}
     .alert-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
     .alert-err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-    /* ── TOOLBAR ── */
+    /* â”€â”€ TOOLBAR â”€â”€ */
     .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
     .toolbar select,.toolbar input{padding:9px 13px;border:2px solid #dee2e6;border-radius:8px;font-size:13px;font-family:inherit;}
     .toolbar input{flex:1;min-width:160px;}
     .toolbar select:focus,.toolbar input:focus{outline:none;border-color:#004080;}
     .btn-refresh{padding:9px 16px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.2s;}
     .btn-refresh:hover{transform:translateY(-1px);}
-    /* ── NOTICE GRID ── */
+    /* â”€â”€ NOTICE GRID â”€â”€ */
     .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
     .ncard{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:.25s;border-top:4px solid #004080;}
     .ncard:hover{transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,64,128,.18);}
@@ -90,7 +90,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .nbtn-del:hover{background:#dc3545;color:#fff;}
     .empty{text-align:center;padding:60px 20px;color:#ccc;grid-column:1/-1;}
     .empty i{font-size:56px;display:block;margin-bottom:12px;}
-    /* ── AUDIENCE TAGS ── */
+    /* â”€â”€ AUDIENCE TAGS â”€â”€ */
     .aud-tag{cursor:pointer;display:inline-flex;align-items:center;}
     .aud-tag span{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:2px solid #dee2e6;background:#f8f9fa;color:#555;transition:.2s;display:flex;align-items:center;gap:5px;}
     .aud-tag:hover span{border-color:#004080;color:#004080;}
@@ -104,7 +104,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     .nbdg-aud-student{background:#cce5ff;color:#004085;}
     .nbdg-aud-teacher{background:#d4edda;color:#155724;}
     .nbdg-aud-emergency{background:#f8d7da;color:#721c24;}
-    /* ── TOAST ── */
+    /* â”€â”€ TOAST â”€â”€ */
     .toast{position:fixed;bottom:22px;right:22px;color:white;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:99999;display:none;}
     .toast.ok{background:#28a745;}
     .toast.err{background:#dc3545;}
@@ -113,7 +113,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
   </style>
 </head>
 <body>
-<div class="top-bar"><marquee>Notice Manager — Create and manage notices for the SCTI website</marquee></div>
+<div class="top-bar"><marquee>Notice Manager â€” Create and manage notices for the SCTI website</marquee></div>
 
 <!-- HEADER -->
 <div class="pg-header">
@@ -128,10 +128,10 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 
 <!-- STATS -->
 <div class="stats">
-  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-bullhorn"></i></div><div><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Total Notices</div></div></div>
-  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">—</div><div class="stat-lbl">Active</div></div></div>
-  <div class="stat"><div class="stat-ico ico-red"><i class="fa fa-exclamation-circle"></i></div><div><div class="stat-val" id="sUrgent">—</div><div class="stat-lbl">Urgent</div></div></div>
-  <div class="stat"><div class="stat-ico ico-grey"><i class="fa fa-archive"></i></div><div><div class="stat-val" id="sInactive">—</div><div class="stat-lbl">Inactive</div></div></div>
+  <div class="stat"><div class="stat-ico ico-blue"><i class="fa fa-bullhorn"></i></div><div><div class="stat-val" id="sTotal">â€”</div><div class="stat-lbl">Total Notices</div></div></div>
+  <div class="stat"><div class="stat-ico ico-green"><i class="fa fa-check-circle"></i></div><div><div class="stat-val" id="sActive">â€”</div><div class="stat-lbl">Active</div></div></div>
+  <div class="stat"><div class="stat-ico ico-red"><i class="fa fa-exclamation-circle"></i></div><div><div class="stat-val" id="sUrgent">â€”</div><div class="stat-lbl">Urgent</div></div></div>
+  <div class="stat"><div class="stat-ico ico-grey"><i class="fa fa-archive"></i></div><div><div class="stat-val" id="sInactive">â€”</div><div class="stat-lbl">Inactive</div></div></div>
 </div>
 
 <!-- LAYOUT -->
@@ -225,12 +225,12 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
 </div><!-- /layout -->
 
 <div class="toast" id="toast"></div>
-<footer>© 2025 SCTI — Admin Panel</footer>
+<footer>Â© 2025 SCTI â€” Admin Panel</footer>
 
 <script>
 var allNotices = [];
 
-/* ── LOAD ── */
+/* â”€â”€ LOAD â”€â”€ */
 function loadNotices() {
   var status = document.getElementById('filterStatus').value;
   var grid = document.getElementById('ngrid');
@@ -301,7 +301,7 @@ function buildCard(n) {
     +   '</div>'
     +   '<div class="ncard-title">' + esc(n.title) + '</div>'
     +   '<div class="ncard-desc">' + esc(n.description) + '</div>'
-    +   '<div class="ncard-meta"><i class="fa fa-calendar"></i> ' + dt + '</div>'
+    +   '<div class="ncard-meta"><i class="fa fa-calendar"></i> ' + dt + '&nbsp;&nbsp;<i class="fa fa-user" style="color:#28a745"></i> ' + esc(n.created_by_name||'Admin') + '</div>'
     +   '<div class="ncard-actions">'
     +     '<button class="nbtn nbtn-edit" onclick="editNotice(' + id + ')"><i class="fa fa-edit"></i> Edit</button>'
     +     '<button class="nbtn nbtn-tog"  onclick="toggleNotice(' + id + ',\'' + st + '\')"><i class="fa ' + ti + '"></i> ' + tl + '</button>'
@@ -311,7 +311,7 @@ function buildCard(n) {
     + '</div>';
 }
 
-/* ── FORM ── */
+/* â”€â”€ FORM â”€â”€ */
 function resetForm() {
   document.getElementById('fId').value    = '0';
   document.getElementById('fTitle').value = '';
@@ -374,7 +374,7 @@ function saveNotice() {
   .catch(function(e){ showAlert('Network error: ' + e.message,'err'); });
 }
 
-/* ── TOGGLE ── */
+/* â”€â”€ TOGGLE â”€â”€ */
 function toggleNotice(id, curStatus) {
   var newStatus = curStatus==='active' ? 'inactive' : 'active';
   var n = allNotices.find(function(x){ return String(x.id)===String(id); });
@@ -389,13 +389,13 @@ function toggleNotice(id, curStatus) {
     .then(function(r){ return r.text(); })
     .then(function(txt){
       var d; try { d=JSON.parse(txt); } catch(e){ toast('Server error','err'); return; }
-      if (d.success) { toast('Status → ' + newStatus,'ok'); loadNotices(); }
+      if (d.success) { toast('Status â†’ ' + newStatus,'ok'); loadNotices(); }
       else toast(d.message||'Failed','err');
     })
     .catch(function(e){ toast('Network error: ' + e.message,'err'); });
 }
 
-/* ── DELETE ── */
+/* â”€â”€ DELETE â”€â”€ */
 function deleteNotice(id) {
   if (!confirm('Delete this notice? This cannot be undone.')) return;
   fetch('notice-delete.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:parseInt(id)})})
@@ -408,7 +408,7 @@ function deleteNotice(id) {
     .catch(function(e){ toast('Network error: ' + e.message,'err'); });
 }
 
-/* ── HELPERS ── */
+/* â”€â”€ HELPERS â”€â”€ */
 function showAlert(msg, type) {
   var el = document.getElementById('formAlert');
   el.className = 'alert alert-' + type;

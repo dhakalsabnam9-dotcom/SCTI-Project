@@ -24,13 +24,24 @@ try {
     }
     sort($subjects);
     
-    // Fallback to hardcoded if no programs found
+    // Get distinct semesters from students
+    $semesters = [];
+    $semRows = $db->query("SELECT DISTINCT semester FROM students WHERE status='active' AND semester IS NOT NULL AND semester != '' ORDER BY semester ASC")->fetchAll();
+    foreach ($semRows as $sr) {
+        $sem = trim($sr['semester']);
+        if (is_numeric($sem)) $sem = 'Semester ' . $sem;
+        if ($sem && !in_array($sem, $semesters)) $semesters[] = $sem;
+    }
+    if (empty($semesters)) $semesters = ['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6'];
+
+    // Fallback subjects
     if (empty($subjects)) {
         $subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
     }
-} catch(Exception $e) { 
-    $students = []; 
-    $subjects = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
+} catch(Exception $e) {
+    $students  = [];
+    $subjects  = ['Programming Fundamentals','Database Management','Web Development','Data Structures'];
+    $semesters = ['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6'];
 }
 ?>
 <!DOCTYPE html>
@@ -90,6 +101,13 @@ try {
 
   <div class="controls">
     <div class="ctrl-group">
+      <label><i class="fa fa-layer-group"></i> Semester</label>
+      <select class="ctrl-input" id="semesterSel">
+        <option value="">-- All Semesters --</option>
+        <?php foreach($semesters as $sem) echo '<option value="'.htmlspecialchars($sem).'">'.htmlspecialchars($sem).'</option>'; ?>
+      </select>
+    </div>
+    <div class="ctrl-group">
       <label><i class="fa fa-book"></i> Subject</label>
       <select class="ctrl-input" id="subjectSel">
         <?php foreach($subjects as $s) echo '<option value="'.htmlspecialchars($s).'">'.htmlspecialchars($s).'</option>'; ?>
@@ -126,7 +144,7 @@ try {
           $parts = explode(' ', $s['full_name']);
           $initials = strtoupper(substr($parts[0],0,1).(count($parts)>1?substr($parts[count($parts)-1],0,1):''));
         ?>
-        <tr data-student-id="<?=$s['id']?>" data-student-db-id="<?=htmlspecialchars($s['student_id'])?>">
+        <tr data-student-id="<?=$s['id']?>" data-student-db-id="<?=htmlspecialchars($s['student_id'])?>" data-semester="<?=htmlspecialchars(is_numeric(trim($s['semester']??'')) ? 'Semester '.trim($s['semester']) : trim($s['semester']??''))?>">
           <td><?=$i+1?></td>
           <td><div class="stu-info"><div class="avatar"><?=htmlspecialchars($initials)?></div><span><?=htmlspecialchars($s['full_name'])?></span></div></td>
           <td style="font-weight:700;color:#004080"><?=$i+1?></td>
@@ -151,6 +169,7 @@ try {
 
 <script>
 var subjects   = <?=json_encode($subjects)?>;
+var semesters  = <?=json_encode($semesters)?>;
 
 function getGrade(total) {
   if (total === '' || isNaN(total)) return {label:'—', cls:'g-na'};
@@ -180,8 +199,15 @@ function calcTotal(inp) {
 function loadSubjectGrades() {
   var subj = document.getElementById('subjectSel').value;
   var exam = document.getElementById('examType').value;
+  var sem  = document.getElementById('semesterSel').value;
 
-  // Show loading state on all inputs
+  // Filter rows by semester first
+  document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
+    var rowSem = row.dataset.semester || '';
+    row.style.display = (!sem || rowSem === sem) ? '' : 'none';
+  });
+
+  // Clear inputs
   document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
     row.querySelector('.internal-input').value = '';
     row.querySelector('.internal-input').placeholder = '...';
@@ -191,7 +217,10 @@ function loadSubjectGrades() {
     row.querySelector('.grade-cell').innerHTML = '—';
   });
 
-  fetch('grade-get.php?subject=' + encodeURIComponent(subj) + '&exam_type=' + encodeURIComponent(exam))
+  var url = 'grade-get.php?subject=' + encodeURIComponent(subj) + '&exam_type=' + encodeURIComponent(exam);
+  if (sem) url += '&semester=' + encodeURIComponent(sem);
+
+  fetch(url)
     .then(function(r){ return r.json(); })
     .then(function(res){
       document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
@@ -216,12 +245,15 @@ function loadSubjectGrades() {
 
 document.getElementById('subjectSel').addEventListener('change', loadSubjectGrades);
 document.getElementById('examType').addEventListener('change', loadSubjectGrades);
+document.getElementById('semesterSel').addEventListener('change', loadSubjectGrades);
 
 function saveGrades() {
   var subject  = document.getElementById('subjectSel').value;
   var examType = document.getElementById('examType').value;
+  var semester = document.getElementById('semesterSel').value;
   var records  = [];
   document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
+    if (row.style.display === 'none') return; // skip filtered-out rows
     var internal = row.querySelector('.internal-input').value;
     var external = row.querySelector('.external-input').value;
     if (internal === '' && external === '') return;
@@ -237,17 +269,31 @@ function saveGrades() {
   btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
   fetch('grade-save.php', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({subject:subject, exam_type:examType, records:records})
+    body: JSON.stringify({subject:subject, exam_type:examType, semester:semester, records:records})
   })
   .then(function(r){ return r.json(); })
   .then(function(res){
     btn.disabled = false; btn.innerHTML = '<i class="fa fa-save"></i> Save Grades';
     if (res.success) {
       showToast('ok', res.message || 'Grades saved!');
-      loadSubjectGrades(); // refresh from server to confirm saved values
+      resetGradeFields();
     } else { showToast('err', res.message || 'Save failed.'); }
   })
   .catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa fa-save"></i> Save Grades'; showToast('err','Network error.'); });
+}
+
+function resetGradeFields() {
+  document.getElementById('subjectSel').selectedIndex = 0;
+  document.getElementById('examType').selectedIndex = 0;
+  document.getElementById('semesterSel').selectedIndex = 0;
+  document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
+    row.querySelector('.internal-input').value = '';
+    row.querySelector('.internal-input').placeholder = '0-40';
+    row.querySelector('.external-input').value = '';
+    row.querySelector('.external-input').placeholder = '0-60';
+    row.querySelector('.total-cell').textContent = '—';
+    row.querySelector('.grade-cell').innerHTML = '—';
+  });
 }
 
 function showToast(type, msg) {

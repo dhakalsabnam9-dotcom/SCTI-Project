@@ -30,17 +30,30 @@ try {
     // ── Teacher mode: return grade map for a subject/exam_type ───────────────
     $subject   = trim($_GET['subject']   ?? '');
     $exam_type = trim($_GET['exam_type'] ?? '');
+    $semester  = trim($_GET['semester']  ?? '');
 
     if (!$subject || !$exam_type) {
         ob_end_clean();
         echo json_encode(['success'=>false,'message'=>'Subject and exam type required']); exit();
     }
 
-    $stmt = $db->prepare(
-        "SELECT student_id, student_db_id, internal_marks, external_marks
-         FROM grades WHERE subject=? AND exam_type=?"
-    );
-    $stmt->execute([$subject, $exam_type]);
+    if ($semester) {
+        $stmt = $db->prepare(
+            "SELECT g.student_id, g.student_db_id, g.internal_marks, g.external_marks
+             FROM grades g
+             JOIN students s ON s.id = g.student_id
+             WHERE g.subject=? AND g.exam_type=?
+             AND (s.semester=? OR s.semester=?)"
+        );
+        $semNum = preg_replace('/[^0-9]/', '', $semester);
+        $stmt->execute([$subject, $exam_type, $semester, $semNum]);
+    } else {
+        $stmt = $db->prepare(
+            "SELECT student_id, student_db_id, internal_marks, external_marks
+             FROM grades WHERE subject=? AND exam_type=?"
+        );
+        $stmt->execute([$subject, $exam_type]);
+    }
     $rows = $stmt->fetchAll();
 
     $map = [];

@@ -13,7 +13,7 @@ if (!$data) { ob_end_clean(); echo json_encode(['success'=>false,'message'=>'No 
 
 $class_name  = trim($data['class_name'] ?? '');
 $date        = trim($data['date'] ?? '');
-$period      = trim($data['period'] ?? '');
+$period      = trim($data['period'] ?? '') ?: null;  // normalize empty string to NULL
 $records     = $data['records'] ?? [];
 $teacher_id  = $_SESSION['user_id'] ?? null;
 
@@ -35,15 +35,18 @@ try {
 
         if (!$sid) continue;
 
-        $upd = $db->prepare("UPDATE attendance SET status=?, remarks=?, late_reason=?, absent_reason=?, class_name=?, period=?, marked_by=?
-                              WHERE student_id=? AND attendance_date=?");
-        $upd->execute([$status, $remark, $late_reason, $absent_reason, $class_name, $period, $teacher_id, $sid, $date]);
-
-        if ($upd->rowCount() === 0) {
-            $ins = $db->prepare("INSERT INTO attendance (student_id, class_name, attendance_date, period, status, remarks, late_reason, absent_reason, marked_by)
-                                 VALUES (?,?,?,?,?,?,?,?,?)");
-            $ins->execute([$sid, $class_name, $date, $period, $status, $remark, $late_reason, $absent_reason, $teacher_id]);
-        }
+        // Use INSERT ... ON DUPLICATE KEY UPDATE to handle unique constraint gracefully
+        $upsert = $db->prepare("INSERT INTO attendance (student_id, class_name, attendance_date, period, status, remarks, late_reason, absent_reason, marked_by)
+                                VALUES (?,?,?,?,?,?,?,?,?)
+                                ON DUPLICATE KEY UPDATE
+                                  status=VALUES(status),
+                                  remarks=VALUES(remarks),
+                                  late_reason=VALUES(late_reason),
+                                  absent_reason=VALUES(absent_reason),
+                                  class_name=VALUES(class_name),
+                                  period=VALUES(period),
+                                  marked_by=VALUES(marked_by)");
+        $upsert->execute([$sid, $class_name, $date, $period, $status, $remark, $late_reason, $absent_reason, $teacher_id]);
         $saved++;
     }
 

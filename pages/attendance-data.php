@@ -63,8 +63,9 @@ try {
         $rows  = $stmt->fetchAll();
         $map   = [];
         foreach ($rows as $r) $map[$r['student_id']] = $r;
+        $already_marked = count($map) > 0;
         ob_end_clean();
-        echo json_encode(['success'=>true,'records'=>$map]); exit();
+        echo json_encode(['success'=>true,'records'=>$map,'already_marked'=>$already_marked,'count'=>count($map)]); exit();
     }
 
     // ── 3. Individual student chart data ─────────────────────────────────────

@@ -225,7 +225,11 @@ function timeAgo($dt) {
         <i class="fa fa-chart-line"></i>
         <div><span>Enter Grades</span><span class="btn-sub">Update marks</span></div>
       </a>
-      <a href="../pages/teacher-assignments.php" class="action-btn" style="background:linear-gradient(135deg,#6f42c1,#e83e8c)">
+      <a href="../pages/teacher-grade-chart.php" class="action-btn" style="background:linear-gradient(135deg,#6f42c1,#e83e8c)">
+        <i class="fa fa-chart-bar"></i>
+        <div><span>Grade Charts</span><span class="btn-sub">View analytics</span></div>
+      </a>
+      <a href="../pages/teacher-assignments.php" class="action-btn" style="background:linear-gradient(135deg,#e83e8c,#6f42c1)">
         <?php if ($ungradedCount > 0): ?><span class="badge-pill"><?=$ungradedCount?></span><?php endif; ?>
         <i class="fa fa-file-alt"></i>
         <div><span>Assignments</span><span class="btn-sub"><?=$ungradedCount?> to grade</span></div>

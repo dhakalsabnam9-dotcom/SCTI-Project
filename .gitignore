@@ -4,7 +4,7 @@
 *.suo
 *.user
 
-# Kiro
+# Editor config
 .kiro/
 
 # OS

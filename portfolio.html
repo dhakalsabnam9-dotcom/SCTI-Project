@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SCTI — School Management System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#2563eb;--green:#10b981;--orange:#f59e0b;--purple:#8b5cf6;--teal:#06b6d4;--red:#ef4444;
+  --bg:#030712;--bg2:#0a0f1e;--bg3:#0f172a;--surface:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:#fff;overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
+::selection{background:rgba(37,99,235,.4);color:#fff}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(#2563eb,#8b5cf6);border-radius:4px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 40px;height:64px;display:flex;justify-content:space-between;align-items:center;background:rgba(3,7,18,.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:.3s}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#2563eb,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:white}
+.nav-brand-text{font-size:16px;font-weight:800;color:white;letter-spacing:-.3px}
+.nav-links{display:flex;gap:32px;font-size:13px;font-weight:500;color:rgba(255,255,255,.5)}
+.nav-links a{transition:.2s;position:relative}
+.nav-links a:hover{color:white}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:linear-gradient(90deg,#2563eb,#8b5cf6);transform:scaleX(0);transition:.2s}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-btn{padding:8px 20px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:8px;font-size:13px;font-weight:600;color:white;transition:.2s;border:1px solid rgba(37,99,235,.3)}
+.nav-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(37,99,235,.4)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 20px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:var(--bg)}
+.hero-orb1{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.12) 0%,transparent 70%);top:-200px;left:-200px;animation:float1 8s ease-in-out infinite}
+.hero-orb2{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 70%);bottom:-100px;right:-100px;animation:float2 10s ease-in-out infinite}
+.hero-orb3{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:float3 6s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,20px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,30px)}}
+@keyframes float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.1)}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:80px 80px}
+.hero-content{position:relative;z-index:1;max-width:900px;margin:0 auto}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);padding:6px 18px;border-radius:30px;font-size:12px;font-weight:600;color:#93c5fd;margin-bottom:28px;letter-spacing:.5px}
+.hero-pill-dot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:ping 1.5s ease-in-out infinite}
+@keyframes ping{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.hero h1{font-size:clamp(40px,7vw,80px);font-weight:900;line-height:1;letter-spacing:-3px;margin-bottom:24px}
+.hero h1 .t1{display:block;color:rgba(255,255,255,.95)}
+.hero h1 .t2{display:block;background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 40%,#f472b6 80%,#fb923c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% auto;animation:shimmer 4s linear infinite}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+.hero-desc{font-size:clamp(15px,2vw,19px);color:rgba(255,255,255,.5);max-width:580px;margin:0 auto 40px;font-weight:400;line-height:1.7}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+.btn-hero-primary{padding:15px 36px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:12px;font-size:15px;font-weight:700;color:white;display:inline-flex;align-items:center;gap:10px;transition:.3s;box-shadow:0 0 40px rgba(37,99,235,.3);border:1px solid rgba(255,255,255,.1)}
+.btn-hero-primary:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(37,99,235,.5)}
+.btn-hero-secondary{padding:15px 36px;background:rgba(255,255,255,.06);border-radius:12px;font-size:15px;font-weight:700;color:rgba(255,255,255,.8);display:inline-flex;align-items:center;gap:10px;transition:.3s;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.btn-hero-secondary:hover{transform:translateY(-3px);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25)}
+.hero-stack{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.stack-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:7px 16px;border-radius:30px;font-size:12px;font-weight:600;color:rgba(255,255,255,.6);transition:.2s}
+.stack-chip:hover{background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2)}
+.stack-chip i{font-size:13px}
+
+/* STATS */
+.stats-wrap{padding:60px 20px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.stats-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border-radius:20px;overflow:hidden;border:1px solid var(--border)}
+.stat-item{background:var(--bg2);padding:36px 20px;text-align:center;transition:.3s;position:relative;overflow:hidden}
+.stat-item::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.02),transparent);opacity:0;transition:.3s}
+.stat-item:hover{background:rgba(255,255,255,.04)}
+.stat-item:hover::before{opacity:1}
+.stat-num{font-size:48px;font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:6px}
+.stat-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35)}
+.sn1{background:linear-gradient(135deg,#60a5fa,#2563eb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sn2{background:linear-gradient(135deg,#34d399,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sn3{background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sn4{background:linear-gradient(135deg,#c084fc,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sn5{background:linear-gradient(135deg,#22d3ee,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* SECTION COMMON */
+.section{padding:100px 20px}
+.max-w{max-width:1100px;margin:0 auto}
+.sec-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.35);margin-bottom:14px}
+.sec-label::before,.sec-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1);width:30px}
+.sec-title{font-size:clamp(26px,4vw,44px);font-weight:900;letter-spacing:-1.5px;color:white;margin-bottom:12px}
+.sec-title span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-sub{font-size:15px;color:rgba(255,255,255,.4);max-width:480px}
+
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;margin-top:50px}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:.4s;display:block;position:relative;overflow:hidden;cursor:pointer}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:20px 20px 0 0;opacity:0;transition:.4s}
+.feat-card::after{content:'';position:absolute;inset:0;border-radius:20px;opacity:0;transition:.4s;pointer-events:none}
+.feat-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.15)}
+.feat-card:hover::before{opacity:1}
+.feat-card:hover::after{opacity:1}
+.fc1::before{background:linear-gradient(90deg,#2563eb,#60a5fa)}.fc1::after{box-shadow:inset 0 0 0 1px rgba(37,99,235,.3),0 24px 60px rgba(37,99,235,.12)}
+.fc2::before{background:linear-gradient(90deg,#10b981,#34d399)}.fc2::after{box-shadow:inset 0 0 0 1px rgba(16,185,129,.3),0 24px 60px rgba(16,185,129,.12)}
+.fc3::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}.fc3::after{box-shadow:inset 0 0 0 1px rgba(245,158,11,.3),0 24px 60px rgba(245,158,11,.12)}
+.fc4::before{background:linear-gradient(90deg,#8b5cf6,#c084fc)}.fc4::after{box-shadow:inset 0 0 0 1px rgba(139,92,246,.3),0 24px 60px rgba(139,92,246,.12)}
+.fc5::before{background:linear-gradient(90deg,#06b6d4,#22d3ee)}.fc5::after{box-shadow:inset 0 0 0 1px rgba(6,182,212,.3),0 24px 60px rgba(6,182,212,.12)}
+.fc6::before{background:linear-gradient(90deg,#ef4444,#f87171)}.fc6::after{box-shadow:inset 0 0 0 1px rgba(239,68,68,.3),0 24px 60px rgba(239,68,68,.12)}
+.feat-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;position:relative}
+.fi1{background:rgba(37,99,235,.15);color:#60a5fa}
+.fi2{background:rgba(16,185,129,.15);color:#34d399}
+.fi3{background:rgba(245,158,11,.15);color:#fbbf24}
+.fi4{background:rgba(139,92,246,.15);color:#c084fc}
+.fi5{background:rgba(6,182,212,.15);color:#22d3ee}
+.fi6{background:rgba(239,68,68,.15);color:#f87171}
+.feat-card h3{font-size:16px;font-weight:700;color:white;margin-bottom:8px;letter-spacing:-.3px}
+.feat-card p{font-size:13px;color:rgba(255,255,255,.45);line-height:1.65;margin-bottom:18px}
+.feat-tags{display:flex;flex-wrap:wrap;gap:6px}
+.feat-tag{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);transition:.2s}
+.feat-card:hover .feat-tag{background:rgba(255,255,255,.09);color:rgba(255,255,255,.7)}
+
+/* ROLES */
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:50px}
+.role-card{border-radius:20px;overflow:hidden;transition:.4s;display:block;cursor:pointer;position:relative;border:1px solid var(--border)}
+.role-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.2)}
+.role-card:hover .role-glow{opacity:1}
+.role-glow{position:absolute;inset:0;border-radius:20px;opacity:0;transition:.4s;pointer-events:none}
+.rg1{box-shadow:0 0 0 1px rgba(37,99,235,.5),0 24px 60px rgba(37,99,235,.2)}
+.rg2{box-shadow:0 0 0 1px rgba(16,185,129,.5),0 24px 60px rgba(16,185,129,.2)}
+.rg3{box-shadow:0 0 0 1px rgba(245,158,11,.5),0 24px 60px rgba(245,158,11,.2)}
+.role-top{padding:32px 28px;position:relative;overflow:hidden}
+.role-top::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.07)}
+.role-top::after{content:'';position:absolute;bottom:-30px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)}
+.rt1{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 60%,#3b82f6 100%)}
+.rt2{background:linear-gradient(135deg,#064e3b 0%,#10b981 60%,#34d399 100%)}
+.rt3{background:linear-gradient(135deg,#78350f 0%,#d97706 60%,#fbbf24 100%)}
+.role-top-icon{font-size:40px;margin-bottom:16px;position:relative;z-index:1;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3))}
+.role-top h3{font-size:24px;font-weight:800;margin-bottom:4px;position:relative;z-index:1;letter-spacing:-.5px}
+.role-top p{font-size:13px;opacity:.75;position:relative;z-index:1;font-weight:500}
+.role-bottom{background:rgba(10,15,30,.6);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);padding:22px 24px}
+.role-feat{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;color:rgba(255,255,255,.65);font-weight:500;transition:.2s}
+.role-feat:last-child{border-bottom:none}
+.role-card:hover .role-feat{color:rgba(255,255,255,.8)}
+.role-feat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rd1{background:#60a5fa;box-shadow:0 0 6px rgba(96,165,250,.6)}
+.rd2{background:#34d399;box-shadow:0 0 6px rgba(52,211,153,.6)}
+.rd3{background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,.6)}
+
+/* PAGES */
+.pages-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:50px}
+.page-card{border-radius:20px;overflow:hidden;transition:.4s;display:block;cursor:pointer;background:var(--surface);border:1px solid var(--border)}
+.page-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.2);box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.page-thumb{height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.page-thumb i{font-size:56px;color:rgba(255,255,255,.9);position:relative;z-index:1;filter:drop-shadow(0 8px 24px rgba(0,0,0,.4));transition:.4s}
+.page-card:hover .page-thumb i{transform:scale(1.15) translateY(-4px)}
+.page-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.5))}
+.page-thumb::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.05);opacity:0;transition:.4s}
+.page-card:hover .page-thumb::before{opacity:1}
+.pt1{background:linear-gradient(135deg,#1e3a8a,#2563eb,#3b82f6)}
+.pt2{background:linear-gradient(135deg,#064e3b,#10b981,#34d399)}
+.pt3{background:linear-gradient(135deg,#78350f,#f59e0b,#fbbf24)}
+.pt4{background:linear-gradient(135deg,#4c1d95,#8b5cf6,#a78bfa)}
+.pt5{background:linear-gradient(135deg,#164e63,#06b6d4,#22d3ee)}
+.pt6{background:linear-gradient(135deg,#7f1d1d,#ef4444,#f87171)}
+.page-info{padding:20px 22px}
+.page-info h4{font-size:15px;font-weight:700;color:white;margin-bottom:5px;letter-spacing:-.3px}
+.page-info p{font-size:12px;color:rgba(255,255,255,.45);line-height:1.55;margin-bottom:14px}
+.page-cta{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#60a5fa;transition:.3s}
+.page-card:hover .page-cta{gap:10px;color:#93c5fd}
+
+/* FOOTER */
+.footer{background:var(--bg);border-top:1px solid var(--border);padding:80px 20px 48px;text-align:center;position:relative;overflow:hidden}
+.footer::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.06) 0%,transparent 70%);pointer-events:none}
+.footer-logo{font-size:32px;font-weight:900;letter-spacing:-1.5px;margin-bottom:10px}
+.footer-logo span{background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.footer-tagline{font-size:14px;color:rgba(255,255,255,.3);margin-bottom:36px;font-weight:400}
+.footer-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+.fbtn{padding:14px 32px;border-radius:12px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:9px;transition:.3s;letter-spacing:.2px}
+.fb1{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white;box-shadow:0 4px 24px rgba(37,99,235,.3);border:1px solid rgba(37,99,235,.4)}
+.fb1:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(37,99,235,.5)}
+.fb2{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 4px 24px rgba(16,185,129,.3);border:1px solid rgba(16,185,129,.4)}
+.fb2:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(16,185,129,.5)}
+.footer-divider{width:60px;height:1px;background:rgba(255,255,255,.1);margin:0 auto 24px}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.18);letter-spacing:.5px}
+
+/* ANIMATIONS */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease}
+.reveal.show{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+
+@media(max-width:768px){nav .nav-links{display:none}.hero h1{letter-spacing:-1px}.stats-inner{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo-icon">S</div>
+    <span class="nav-brand-text">SCTI Portal</span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#roles">Roles</a>
+    <a href="#pages">Pages</a>
+  </div>
+  <a href="pages/login-simple.php" class="nav-btn"><i class="fa fa-sign-in-alt"></i> Login</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb1"></div>
+    <div class="hero-orb2"></div>
+    <div class="hero-orb3"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-pill"><span class="hero-pill-dot"></span> Full-Stack PHP Project &nbsp;·&nbsp; Live System</div>
+    <h1>
+      <span class="t1">School Management</span>
+      <span class="t2">Made Simple</span>
+    </h1>
+    <p class="hero-desc">A complete web-based management platform for Sindhuli Community Technical Institute — attendance, grades, assignments, and analytics all in one place.</p>
+    <div class="hero-actions">
+      <a href="index.php" target="_blank" class="btn-hero-primary"><i class="fa fa-play"></i> Live Demo</a>
+      <a href="pages/login-simple.php" class="btn-hero-secondary"><i class="fa fa-sign-in-alt"></i> Login Portal</a>
+    </div>
+    <div class="hero-stack">
+      <span class="stack-chip"><i class="fa fa-code" style="color:#818cf8"></i> PHP 8</span>
+      <span class="stack-chip"><i class="fa fa-database" style="color:#34d399"></i> MySQL</span>
+      <span class="stack-chip"><i class="fa fa-js" style="color:#fbbf24"></i> JavaScript</span>
+      <span class="stack-chip"><i class="fa fa-chart-bar" style="color:#f472b6"></i> Chart.js</span>
+      <span class="stack-chip"><i class="fa fa-server" style="color:#f87171"></i> Apache</span>
+      <span class="stack-chip"><i class="fa fa-mobile-alt" style="color:#60a5fa"></i> Responsive</span>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-wrap">
+  <div class="stats-inner">
+    <div class="stat-item reveal"><div class="stat-num sn1">3</div><div class="stat-lbl">User Roles</div></div>
+    <div class="stat-item reveal reveal-delay-1"><div class="stat-num sn2">80+</div><div class="stat-lbl">PHP Pages</div></div>
+    <div class="stat-item reveal reveal-delay-2"><div class="stat-num sn3">15+</div><div class="stat-lbl">DB Tables</div></div>
+    <div class="stat-item reveal reveal-delay-3"><div class="stat-num sn4">20+</div><div class="stat-lbl">Features</div></div>
+    <div class="stat-item reveal"><div class="stat-num sn5">100%</div><div class="stat-lbl">Custom Built</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section" id="features" style="background:var(--bg2)">
+  <div class="max-w">
+    <div class="reveal">
+      <div class="sec-label">What it does</div>
+      <h2 class="sec-title">Core <span>Features</span></h2>
+      <p class="sec-sub">Everything needed to manage a technical institute — from attendance to analytics</p>
+    </div>
+    <div class="feat-grid">
+      <a href="pages/login-simple.php" class="feat-card fc1 reveal reveal-delay-1">
+        <div class="feat-icon-wrap fi1"><i class="fa fa-calendar-check"></i></div>
+        <h3>Attendance Management</h3>
+        <p>Mark and track student attendance with duplicate prevention, toast notifications, and visual analytics.</p>
+        <div class="feat-tags"><span class="feat-tag">By Class</span><span class="feat-tag">By Semester</span><span class="feat-tag">Present/Absent/Late</span><span class="feat-tag">Charts</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="feat-card fc2 reveal reveal-delay-2">
+        <div class="feat-icon-wrap fi2"><i class="fa fa-star"></i></div>
+        <h3>Grade Management</h3>
+        <p>Enter, view and analyze student grades by subject, exam type and semester with visual charts.</p>
+        <div class="feat-tags"><span class="feat-tag">Internal/External</span><span class="feat-tag">Auto GPA</span><span class="feat-tag">Grade Charts</span><span class="feat-tag">Filters</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="feat-card fc3 reveal reveal-delay-3">
+        <div class="feat-icon-wrap fi3"><i class="fa fa-file-alt"></i></div>
+        <h3>Assignment System</h3>
+        <p>Create assignments, accept student submissions, and grade them all in one place.</p>
+        <div class="feat-tags"><span class="feat-tag">File Upload</span><span class="feat-tag">Due Dates</span><span class="feat-tag">Grading</span><span class="feat-tag">Feedback</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="feat-card fc4 reveal reveal-delay-1">
+        <div class="feat-icon-wrap fi4"><i class="fa fa-book-open"></i></div>
+        <h3>Course Materials</h3>
+        <p>Teachers upload study materials, students download them from their dashboard.</p>
+        <div class="feat-tags"><span class="feat-tag">Upload</span><span class="feat-tag">Download</span><span class="feat-tag">By Subject</span><span class="feat-tag">Library</span></div>
+      </a>
+      <a href="pages/notice-board.php" class="feat-card fc5 reveal reveal-delay-2">
+        <div class="feat-icon-wrap fi5"><i class="fa fa-bullhorn"></i></div>
+        <h3>Notice Board</h3>
+        <p>Admin posts notices visible to students and teachers with audience targeting.</p>
+        <div class="feat-tags"><span class="feat-tag">Role-Based</span><span class="feat-tag">Ticker</span><span class="feat-tag">Dashboard Widget</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="feat-card fc6 reveal reveal-delay-3">
+        <div class="feat-icon-wrap fi6"><i class="fa fa-chart-line"></i></div>
+        <h3>Analytics & Charts</h3>
+        <p>Visual dashboards for attendance trends, grade distributions, and student performance.</p>
+        <div class="feat-tags"><span class="feat-tag">Attendance Rate</span><span class="feat-tag">Grade Donut</span><span class="feat-tag">Per Student</span></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ROLES -->
+<div class="section" id="roles" style="background:var(--bg)">
+  <div class="max-w">
+    <div class="reveal">
+      <div class="sec-label">Who uses it</div>
+      <h2 class="sec-title">Three <span>User Roles</span></h2>
+      <p class="sec-sub">Each role has a dedicated dashboard and tailored feature set</p>
+    </div>
+    <div class="roles-grid">
+      <a href="dashboards/admin-dashboard.php" class="role-card reveal reveal-delay-1">
+        <div class="role-glow rg1"></div>
+        <div class="role-top rt1">
+          <i class="fa fa-user-shield role-top-icon"></i>
+          <h3>Admin</h3>
+          <p>Full system control</p>
+        </div>
+        <div class="role-bottom">
+          <div class="role-feat"><span class="role-feat-dot rd1"></span> Manage students & teachers</div>
+          <div class="role-feat"><span class="role-feat-dot rd1"></span> Manage programs & subjects</div>
+          <div class="role-feat"><span class="role-feat-dot rd1"></span> Post notices & manage gallery</div>
+          <div class="role-feat"><span class="role-feat-dot rd1"></span> View all reports & contacts</div>
+        </div>
+      </a>
+      <a href="dashboards/teacher-dashboard.php" class="role-card reveal reveal-delay-2">
+        <div class="role-glow rg2"></div>
+        <div class="role-top rt2">
+          <i class="fa fa-chalkboard-teacher role-top-icon"></i>
+          <h3>Teacher</h3>
+          <p>Teaching & assessment</p>
+        </div>
+        <div class="role-bottom">
+          <div class="role-feat"><span class="role-feat-dot rd2"></span> Mark attendance by class</div>
+          <div class="role-feat"><span class="role-feat-dot rd2"></span> Enter & view grades</div>
+          <div class="role-feat"><span class="role-feat-dot rd2"></span> Create assignments & upload materials</div>
+          <div class="role-feat"><span class="role-feat-dot rd2"></span> View analytics charts</div>
+        </div>
+      </a>
+      <a href="dashboards/student-dashboard.php" class="role-card reveal reveal-delay-3">
+        <div class="role-glow rg3"></div>
+        <div class="role-top rt3">
+          <i class="fa fa-user-graduate role-top-icon"></i>
+          <h3>Student</h3>
+          <p>Learning & tracking</p>
+        </div>
+        <div class="role-bottom">
+          <div class="role-feat"><span class="role-feat-dot rd3"></span> View own grades & GPA</div>
+          <div class="role-feat"><span class="role-feat-dot rd3"></span> View attendance record</div>
+          <div class="role-feat"><span class="role-feat-dot rd3"></span> Submit assignments & download materials</div>
+          <div class="role-feat"><span class="role-feat-dot rd3"></span> View notices & manage profile</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="section" id="pages" style="background:var(--bg2)">
+  <div class="max-w">
+    <div class="reveal">
+      <div class="sec-label">Explore</div>
+      <h2 class="sec-title">Key <span>Pages</span></h2>
+      <p class="sec-sub">Click any card to explore — login required to access</p>
+    </div>
+    <div class="pages-grid">
+      <a href="pages/login-simple.php" class="page-card reveal reveal-delay-1">
+        <div class="page-thumb pt1"><i class="fa fa-tachometer-alt"></i></div>
+        <div class="page-info"><h4>Teacher Dashboard</h4><p>Quick actions, student list, recent activity and stats at a glance.</p><span class="page-cta"><i class="fa fa-arrow-right"></i> View Page</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="page-card reveal reveal-delay-2">
+        <div class="page-thumb pt2"><i class="fa fa-calendar-check"></i></div>
+        <div class="page-info"><h4>Attendance Marking</h4><p>Mark attendance by class and semester with bulk actions and duplicate protection.</p><span class="page-cta"><i class="fa fa-arrow-right"></i> View Page</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="page-card reveal reveal-delay-3">
+        <div class="page-thumb pt3"><i class="fa fa-star"></i></div>
+        <div class="page-info"><h4>Grade Entry</h4><p>Enter internal and external marks per subject, exam type and semester.</p><span class="page-cta"><i class="fa fa-arrow-right"></i> View Page</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="page-card reveal reveal-delay-1">
+        <div class="page-thumb pt4"><i class="fa fa-chart-bar"></i></div>
+        <div class="page-info"><h4>Grade Charts</h4><p>Visual analytics for grades — individual and all-students overview with filters.</p><span class="page-cta"><i class="fa fa-arrow-right"></i> View Page</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="page-card reveal reveal-delay-2">
+        <div class="page-thumb pt5"><i class="fa fa-chart-line"></i></div>
+        <div class="page-info"><h4>Attendance Charts</h4><p>Attendance trends, rate per student, donut breakdown and daily trend charts.</p><span class="page-cta"><i class="fa fa-arrow-right"></i> View Page</span></div>
+      </a>
+      <a href="pages/login-simple.php" class="page-card reveal reveal-delay-3">
+        <div class="page-thumb pt6"><i class="fa fa-user-graduate"></i></div>
+        <div class="page-info"><h4>Student Grades View</h4><p>Students see their own grades grouped by subject with GPA and exam type filters.</p><span class="page-cta"><i class="fa fa-arrow-right"></i> View Page</span></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-logo"><span>SCTI</span></div>
+  <p class="footer-tagline">Sindhuli Community Technical Institute &mdash; School Management System</p>
+  <div class="footer-btns">
+    <a href="index.php" target="_blank" class="fbtn fb1"><i class="fa fa-globe"></i> Visit Website</a>
+    <a href="pages/login-simple.php" class="fbtn fb2"><i class="fa fa-sign-in-alt"></i> Login Portal</a>
+  </div>
+  <div class="footer-divider"></div>
+  <p class="footer-copy">&copy; 2025 SCTI &mdash; All rights reserved</p>
+</div>
+
+<script>
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('show'); });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+</script>
+</body>
+</html>

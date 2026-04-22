@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// Force no-cache headers from PHP directly (works even without mod_headers)
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+
 // Check if user is already logged in and redirect to appropriate dashboard
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_SESSION['user_type'])) {
     switch($_SESSION['user_type']) {
@@ -14,6 +20,12 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
             header("Location: dashboards/admin-dashboard.php");
             exit();
     }
+}
+
+// Returns filemtime-based version string for cache busting
+function assetV($path) {
+    $full = __DIR__ . '/' . $path;
+    return file_exists($full) ? filemtime($full) : time();
 }
 ?>
 <!DOCTYPE html>
@@ -29,8 +41,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- External CSS -->
-  <link rel="stylesheet" href="assets/css/style.css?v=36">
+  <!-- CSS (inlined — never cached) -->
+  <style><?php readfile(__DIR__ . '/assets/css/style.css'); ?></style>
   <style>
     .header {
       background: #004080 !important;
@@ -221,16 +233,20 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
   <p>© 2025 Sindhuli Community Technical Institute (SCTI)</p>
 </footer>
 
-<!-- ===== JAVASCRIPT ===== -->
-<script src="assets/js/menu.js"></script>
-<script src="assets/js/pages/home.js"></script>
-<script src="assets/js/pages/programs.js"></script>
-<script src="assets/js/pages/gallery.js"></script>
-<script src="assets/js/pages/notices.js"></script>
-<script src="assets/js/pages/contact.js"></script>
-<script src="assets/js/pages/login.js"></script>
-<script src="assets/js/pages.js"></script>
-<script src="assets/js/app.js"></script>
+<!-- ===== JAVASCRIPT (inlined — never cached) ===== -->
+<script>
+<?php
+readfile(__DIR__ . '/assets/js/menu.js');
+readfile(__DIR__ . '/assets/js/pages/home.js');
+readfile(__DIR__ . '/assets/js/pages/programs.js');
+readfile(__DIR__ . '/assets/js/pages/gallery.js');
+readfile(__DIR__ . '/assets/js/pages/notices.js');
+readfile(__DIR__ . '/assets/js/pages/contact.js');
+readfile(__DIR__ . '/assets/js/pages/login.js');
+readfile(__DIR__ . '/assets/js/pages.js');
+readfile(__DIR__ . '/assets/js/app.js');
+?>
+</script>
 <script>
 // Reload content area on nav click since home is pre-rendered
 document.addEventListener('DOMContentLoaded', function(){

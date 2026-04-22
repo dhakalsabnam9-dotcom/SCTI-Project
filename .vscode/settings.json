@@ -1,3 +1,11 @@
 {
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.(php|js|css|html)$",
+                "cmd": "powershell -Command \"robocopy '${workspaceFolder}' 'C:/xampp/htdocs/scti-school' /E /XD .git .kiro .vscode node_modules /XF '*.kiro.hook' /NFL /NDL /NJH /NJS /NC /NS /NP | Out-Null; exit 0\""
+            }
+        ]
+    }
 }

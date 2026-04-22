@@ -202,9 +202,17 @@ function loadSubjectGrades() {
   var sem  = document.getElementById('semesterSel').value;
 
   // Filter rows by semester first
+  var visibleIndex = 1;
   document.querySelectorAll('#gradesBody tr[data-student-id]').forEach(function(row) {
     var rowSem = row.dataset.semester || '';
-    row.style.display = (!sem || rowSem === sem) ? '' : 'none';
+    var visible = !sem || rowSem === sem;
+    row.style.display = visible ? '' : 'none';
+    if (visible) {
+      var cells = row.querySelectorAll('td');
+      cells[0].textContent = visibleIndex;   // # column
+      cells[2].textContent = visibleIndex;   // Roll No. column
+      visibleIndex++;
+    }
   });
 
   // Clear inputs

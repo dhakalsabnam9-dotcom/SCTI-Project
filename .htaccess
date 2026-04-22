@@ -1,15 +1,28 @@
 # Set index.php as the default directory index
-DirectoryIndex index.php index.html
+DirectoryIndex index.php
 
 # Enable PHP error reporting (disable in production)
 php_flag display_errors on
 php_value error_reporting E_ALL
 
-# Security headers
 <IfModule mod_headers.c>
+    # Security headers
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
+
+    # No caching for HTML/PHP
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+
+    # JS/CSS: revalidate on every request
+    <FilesMatch "\.(js|css)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+        Header set Pragma "no-cache"
+    </FilesMatch>
 </IfModule>
 
 # Prevent directory browsing
@@ -18,8 +31,4 @@ Options -Indexes
 # Enable URL rewriting
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
-    # Redirect index.html to index.php
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+index\.html [NC]
-    RewriteRule ^index\.html$ index.php [R=301,L]
 </IfModule>

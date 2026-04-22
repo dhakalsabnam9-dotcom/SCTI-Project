@@ -1,0 +1,23 @@
+# IDE / editor
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Kiro
+.kiro/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+error_log
+
+# Uploads (keep folder, ignore contents)
+uploads/gallery/*
+uploads/materials/*
+!uploads/gallery/.gitkeep
+!uploads/gallery/thumbnails/.gitkeep
+!uploads/materials/.gitkeep

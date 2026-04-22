@@ -1,1 +1,913 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body></body></html>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCTI Portal — School Management System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#070d1a;color:#e2e8f0;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#070d1a}::-webkit-scrollbar-thumb{background:linear-gradient(#0059b3,#a78bfa);border-radius:3px}
+.hdr{position:sticky;top:0;z-index:999;background:rgba(7,13,26,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,100,200,.18)}
+.hdr-in{max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-ic{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#004080,#0059b3);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 0 18px rgba(0,100,255,.35)}
+.logo-t{font-size:19px;font-weight:800;background:linear-gradient(90deg,#66b3ff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-s{font-size:11px;color:rgba(255,255,255,.45);display:block;margin-top:-3px}
+.nav{display:flex;gap:2px}
+.nav a{color:rgba(255,255,255,.65);text-decoration:none;padding:7px 13px;border-radius:7px;font-size:13px;font-weight:600;transition:.2s}
+.nav a:hover,.nav a.active{background:rgba(0,100,255,.15);color:#66b3ff}
+.nav a.live{background:linear-gradient(135deg,#e63946,#b5121e);color:#fff;padding:7px 16px}
+.nav a.live:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(230,57,70,.4)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:none;background:none}
+.hamburger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:.3s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob-nav{display:none;position:fixed;top:66px;left:0;right:0;background:rgba(7,13,26,.98);backdrop-filter:blur(20px);z-index:998;padding:14px 20px 20px;flex-direction:column;gap:3px;border-bottom:1px solid rgba(0,100,200,.15)}
+.mob-nav.open{display:flex}
+.mob-nav a{color:rgba(255,255,255,.8);text-decoration:none;padding:11px 14px;border-radius:8px;font-size:14px;font-weight:600;transition:.2s;border-bottom:1px solid rgba(255,255,255,.05)}
+.mob-nav a:hover{background:rgba(0,100,255,.15);color:#66b3ff}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;background:radial-gradient(ellipse at 50% 0%,rgba(0,70,180,.22) 0%,transparent 65%)}
+.hero-content{position:relative;z-index:1;max-width:860px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,100,255,.1);border:1px solid rgba(0,150,255,.28);padding:7px 20px;border-radius:30px;font-size:13px;font-weight:600;margin-bottom:26px;color:#66b3ff}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font-size:clamp(34px,6vw,68px);font-weight:900;line-height:1.1;margin-bottom:18px;letter-spacing:-1px}
+.hero h1 .w1{display:block;color:#fff}
+.hero h1 .w2{display:block;background:linear-gradient(90deg,#66b3ff,#a78bfa,#66b3ff);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:sh 3s linear infinite}
+@keyframes sh{0%{background-position:0%}100%{background-position:200%}}
+.hero p{font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.6);max-width:620px;margin:0 auto 38px;line-height:1.8}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.btn-p{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;text-decoration:none;padding:14px 30px;border-radius:10px;font-size:15px;font-weight:700;box-shadow:0 4px 22px rgba(0,80,180,.4);transition:.3s;border:1px solid rgba(0,150,255,.25)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,80,180,.55)}
+.btn-d{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e63946,#b5121e);color:#fff;text-decoration:none;padding:14px 30px;border-radius:10px;font-size:15px;font-weight:700;box-shadow:0 4px 22px rgba(230,57,70,.4);transition:.3s}
+.btn-d:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(230,57,70,.55)}
+.btn-g{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff;text-decoration:none;padding:14px 30px;border-radius:10px;font-size:15px;font-weight:700;transition:.3s}
+.btn-g:hover{background:rgba(255,255,255,.11);transform:translateY(-3px)}
+.hero-stats{display:flex;border:1px solid rgba(0,100,200,.18);border-radius:16px;background:rgba(255,255,255,.025);backdrop-filter:blur(10px);overflow:hidden;max-width:680px;margin:0 auto}
+.hs{flex:1;text-align:center;padding:22px 12px;border-right:1px solid rgba(0,100,200,.12)}
+.hs:last-child{border-right:none}
+.hs .n{font-size:30px;font-weight:900;background:linear-gradient(135deg,#66b3ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hs .l{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;text-transform:uppercase;letter-spacing:.8px}
+.sec{padding:96px 24px;position:relative;z-index:1}
+.sec-alt{background:rgba(0,0,0,.25)}
+.wrap{max-width:1280px;margin:0 auto}
+.sec-hd{text-align:center;margin-bottom:64px}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(0,100,255,.1);border:1px solid rgba(0,150,255,.22);color:#66b3ff;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 16px;border-radius:30px;margin-bottom:14px}
+.sec-hd h2{font-size:clamp(24px,3.5vw,42px);color:#fff;font-weight:900;margin-bottom:12px;letter-spacing:-.5px}
+.sec-hd p{color:rgba(255,255,255,.5);font-size:16px;max-width:540px;margin:0 auto}
+</style>
+<style>
+.stats-banner{background:linear-gradient(135deg,rgba(0,30,80,.7),rgba(0,50,130,.5));border:1px solid rgba(0,100,200,.18);border-radius:20px;padding:56px 40px}
+.stats-inner{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:28px;text-align:center}
+.sb-num{font-size:44px;font-weight:900;background:linear-gradient(135deg,#66b3ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.sb-lbl{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;text-transform:uppercase;letter-spacing:.8px}
+.cred-wrap{background:linear-gradient(135deg,rgba(0,40,100,.35),rgba(0,20,60,.55));border:1px solid rgba(0,100,200,.22);border-radius:20px;padding:44px;backdrop-filter:blur(10px)}
+.cred-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;margin-top:28px}
+.cred-card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:26px;text-align:center;transition:.3s;position:relative;overflow:hidden}
+.cred-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cc)}
+.cred-card:hover{transform:translateY(-6px);border-color:rgba(0,150,255,.28);background:rgba(0,100,255,.07)}
+.cred-card .ri{font-size:38px;margin-bottom:12px;display:block}
+.cred-card h4{font-size:15px;font-weight:700;color:#fff;margin-bottom:16px}
+.cred-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.cred-row:last-child{border-bottom:none}
+.cred-row .lbl{color:rgba(255,255,255,.45);font-weight:500}
+.cred-row .val{font-family:monospace;background:rgba(0,100,255,.14);border:1px solid rgba(0,150,255,.18);padding:3px 9px;border-radius:6px;color:#66b3ff;font-weight:700;font-size:12px;cursor:pointer;transition:.2s}
+.cred-row .val:hover{background:rgba(0,100,255,.32);color:#fff}
+.cred-note{text-align:center;margin-top:18px;font-size:13px;color:rgba(255,255,255,.4)}
+.scenes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:26px}
+.scard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:18px;overflow:hidden;transition:.35s;cursor:pointer;position:relative}
+.scard:hover{transform:translateY(-8px);border-color:rgba(0,150,255,.28);box-shadow:0 22px 60px rgba(0,0,0,.45)}
+.scard-head{padding:26px 26px 18px;position:relative}
+.scard-num{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:rgba(255,255,255,.35)}
+.scard-icon{width:58px;height:58px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin-bottom:16px}
+.scard-head h3{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px}
+.scard-head .tbadge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);padding:3px 10px;border-radius:20px;font-size:11px;color:rgba(255,255,255,.45);font-weight:600}
+.scard-body{padding:0 26px 22px}
+.scard-body p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:14px}
+.scard-steps{list-style:none;margin-bottom:14px}
+.scard-steps li{font-size:13px;color:rgba(255,255,255,.6);padding:6px 0;display:flex;align-items:flex-start;gap:9px;border-bottom:1px solid rgba(255,255,255,.04)}
+.scard-steps li:last-child{border-bottom:none}
+.scard-steps li .sd{width:20px;height:20px;border-radius:50%;background:var(--sc,rgba(0,100,255,.28));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px}
+.scard-quote{background:rgba(0,100,255,.07);border-left:3px solid #0059b3;border-radius:0 8px 8px 0;padding:12px 14px;font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.6}
+.scard-foot{padding:14px 26px;background:rgba(0,0,0,.18);border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.stag{background:rgba(0,100,255,.1);border:1px solid rgba(0,150,255,.18);color:#66b3ff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+.scard-foot .exp{color:#66b3ff;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;opacity:.65;transition:.2s}
+.scard:hover .exp{opacity:1}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px}
+.fcard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:30px 26px;transition:.35s;cursor:pointer;position:relative;overflow:hidden}
+.fcard::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac);transform:scaleX(0);transform-origin:left;transition:.35s}
+.fcard:hover::after{transform:scaleX(1)}
+.fcard:hover{transform:translateY(-7px);border-color:rgba(0,150,255,.22);box-shadow:0 18px 48px rgba(0,0,0,.35);background:rgba(0,100,255,.055)}
+.fic{width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:23px;color:#fff;margin-bottom:18px}
+.fcard h3{font-size:16px;color:#fff;font-weight:700;margin-bottom:7px}
+.fcard>p{color:rgba(255,255,255,.48);font-size:13px;margin-bottom:14px;line-height:1.6}
+.flist{list-style:none}
+.flist li{font-size:13px;color:rgba(255,255,255,.58);padding:5px 0;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.04)}
+.flist li:last-child{border-bottom:none}
+.flist li i{color:#22c55e;font-size:10px;flex-shrink:0}
+.click-hint{margin-top:14px;font-size:12px;color:#66b3ff;font-weight:600;display:flex;align-items:center;gap:5px;opacity:.65}
+.fcard:hover .click-hint{opacity:1}
+.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:26px}
+.rcard{border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.07);transition:.35s;cursor:pointer}
+.rcard:hover{transform:translateY(-8px);box-shadow:0 22px 56px rgba(0,0,0,.5)}
+.rcard-head{padding:30px 26px 22px;color:#fff;position:relative;overflow:hidden}
+.rcard-head::after{content:'';position:absolute;right:-16px;bottom:-16px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.05)}
+.rcard-head.adm{background:linear-gradient(135deg,#001a3d,#003580)}
+.rcard-head.tch{background:linear-gradient(135deg,#0d3320,#1a6b3c)}
+.rcard-head.stu{background:linear-gradient(135deg,#2d1060,#5b21b6)}
+.rcard-head i{font-size:38px;margin-bottom:12px;display:block;opacity:.9}
+.rcard-head h3{font-size:22px;font-weight:800;margin-bottom:5px}
+.rcard-head p{font-size:13px;opacity:.72}
+.rcard-body{background:rgba(255,255,255,.025);padding:22px 26px;border-top:1px solid rgba(255,255,255,.06)}
+.rcard-body ul{list-style:none}
+.rcard-body ul li{font-size:13px;color:rgba(255,255,255,.62);padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:9px}
+.rcard-body ul li:last-child{border-bottom:none}
+.rcard-body ul li i{width:16px;text-align:center;flex-shrink:0;opacity:.75}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:16px}
+.tcard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:26px 16px;text-align:center;transition:.3s}
+.tcard:hover{transform:translateY(-6px);border-color:rgba(0,150,255,.28);background:rgba(0,100,255,.07);box-shadow:0 12px 36px rgba(0,0,0,.3)}
+.tcard .ti{font-size:42px;margin-bottom:10px;display:block}
+.tcard h4{font-size:14px;color:#fff;font-weight:700;margin-bottom:3px}
+.tcard p{font-size:12px;color:rgba(255,255,255,.4)}
+.sec-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.sec-item{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px;display:flex;align-items:flex-start;gap:14px;transition:.3s;border-left:3px solid #0059b3}
+.sec-item:hover{background:rgba(0,100,255,.07);border-left-color:#66b3ff;transform:translateX(4px)}
+.sec-item i{font-size:21px;color:#66b3ff;margin-top:2px;flex-shrink:0}
+.sec-item h4{font-size:14px;color:#fff;font-weight:700;margin-bottom:4px}
+.sec-item p{font-size:13px;color:rgba(255,255,255,.48);line-height:1.6}
+.install-grid{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:start}
+.install-steps{list-style:none;counter-reset:steps}
+.install-steps li{counter-increment:steps;display:flex;gap:16px;margin-bottom:26px;align-items:flex-start}
+.install-steps li::before{content:counter(steps);min-width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;box-shadow:0 4px 14px rgba(0,80,180,.4)}
+.install-steps li .sc h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.install-steps li .sc p{font-size:13px;color:rgba(255,255,255,.48);line-height:1.6}
+.code-block{background:#0d1117;border:1px solid rgba(0,100,200,.18);border-radius:14px;padding:26px;overflow-x:auto}
+.code-block pre{color:#79c0ff;font-family:'Courier New',monospace;font-size:13px;line-height:1.9;white-space:pre}
+.req-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:11px;margin-top:22px}
+.req-item{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:11px;font-size:13px;font-weight:600;color:rgba(255,255,255,.75)}
+.req-item i{color:#66b3ff;font-size:17px;width:18px;text-align:center}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.about-text p{font-size:15px;color:rgba(255,255,255,.58);line-height:1.85;margin-bottom:16px}
+.about-badges{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.abadge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,100,255,.1);border:1px solid rgba(0,150,255,.18);color:#66b3ff;font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px}
+.about-hl{display:flex;flex-direction:column;gap:14px}
+.ahl{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;display:flex;align-items:flex-start;gap:14px;border-left:3px solid var(--ac,#0059b3);transition:.3s}
+.ahl:hover{background:rgba(0,100,255,.065);transform:translateX(4px)}
+.ahl i{font-size:20px;color:var(--ac,#66b3ff);margin-top:2px;flex-shrink:0}
+.ahl h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
+.ahl p{font-size:13px;color:rgba(255,255,255,.48)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.overlay.on{display:flex}
+.modal{background:#0c1526;border:1px solid rgba(0,100,200,.22);border-radius:20px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 30px 90px rgba(0,0,0,.65);animation:pop .22s ease}
+@keyframes pop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.m-head{padding:30px 30px 20px;display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.m-ic{width:58px;height:58px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;flex-shrink:0}
+.m-title h3{font-size:21px;color:#fff;font-weight:800;margin-bottom:4px}
+.m-title p{font-size:13px;color:rgba(255,255,255,.48)}
+.m-close{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);font-size:19px;color:rgba(255,255,255,.45);cursor:pointer;padding:7px 9px;border-radius:8px;transition:.2s;flex-shrink:0}
+.m-close:hover{color:#fff;background:rgba(255,255,255,.1);transform:rotate(90deg)}
+.m-body{padding:24px 30px 30px}
+.m-body h4{font-size:11px;font-weight:700;color:#66b3ff;text-transform:uppercase;letter-spacing:1px;margin:20px 0 9px}
+.m-body h4:first-child{margin-top:0}
+.m-list{list-style:none}
+.m-list li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px;color:rgba(255,255,255,.62);display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.m-list li:last-child{border-bottom:none}
+.m-list li i{color:#66b3ff;margin-top:2px;flex-shrink:0;width:15px}
+.m-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.tag{background:rgba(0,100,255,.1);border:1px solid rgba(0,150,255,.18);color:#66b3ff;font-size:12px;font-weight:600;padding:3px 11px;border-radius:20px}
+.m-foot{padding:16px 30px;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:flex-end;border-radius:0 0 20px 20px}
+.m-foot button{background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.m-foot button:hover{opacity:.85;transform:translateY(-1px)}
+.footer{background:rgba(0,0,0,.35);border-top:1px solid rgba(0,100,200,.15);padding:52px 24px 28px}
+.footer-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:44px}
+.footer-brand p{font-size:14px;color:rgba(255,255,255,.45);margin-top:12px;line-height:1.75}
+.footer-col h5{color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:8px}
+.footer-col ul li a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:.2s}
+.footer-col ul li a:hover{color:#66b3ff}
+.footer-bot{max-width:1280px;margin:28px auto 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.footer-bot p{font-size:13px;color:rgba(255,255,255,.35)}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(70px);background:#0c1526;border:1px solid rgba(0,150,255,.3);color:#66b3ff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:99999;transition:.3s;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.btt{position:fixed;bottom:26px;right:26px;width:44px;height:44px;background:linear-gradient(135deg,#004080,#0059b3);color:#fff;border:none;border-radius:50%;font-size:17px;cursor:pointer;box-shadow:0 4px 16px rgba(0,80,180,.4);transition:.3s;opacity:0;pointer-events:none;z-index:900;display:flex;align-items:center;justify-content:center}
+.btt.vis{opacity:1;pointer-events:all}
+.btt:hover{transform:translateY(-3px)}
+@media(max-width:900px){.install-grid,.about-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.nav{display:none}.hamburger{display:flex}.footer-in{grid-template-columns:1fr;gap:26px}.footer-bot{flex-direction:column;text-align:center}.hero-stats{flex-wrap:wrap}}
+@media(max-width:480px){.hero{padding:80px 16px 56px}.sec{padding:64px 16px}.cred-wrap{padding:24px 16px}}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-in">
+    <a href="#" class="logo">
+      <div class="logo-ic"><i class="fas fa-graduation-cap"></i></div>
+      <div><span class="logo-t">SCTI Portal</span><span class="logo-s">School Management System</span></div>
+    </a>
+    <nav class="nav">
+      <a href="#demo">Demo</a>
+      <a href="#scenes">Walkthrough</a>
+      <a href="#features">Features</a>
+      <a href="#roles">Roles</a>
+      <a href="#tech">Tech</a>
+      <a href="#security">Security</a>
+      <a href="#install">Install</a>
+      <a href="#about">About</a>
+      <a href="index.php" target="_blank" class="live"><i class="fas fa-play-circle"></i> Live App</a>
+      <a href="https://github.com" target="_blank" style="color:rgba(255,255,255,.7);text-decoration:none;padding:7px 13px;border-radius:7px;font-size:13px;font-weight:600;transition:.2s;border:1px solid rgba(255,255,255,.15);display:inline-flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(255,255,255,.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,.7)'"><i class="fab fa-github"></i> GitHub</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<nav class="mob-nav" id="mob-nav">
+  <a href="#demo" onclick="closeMob()">Demo Credentials</a>
+  <a href="#scenes" onclick="closeMob()">Walkthrough</a>
+  <a href="#features" onclick="closeMob()">Features</a>
+  <a href="#roles" onclick="closeMob()">Roles</a>
+  <a href="#tech" onclick="closeMob()">Tech Stack</a>
+  <a href="#security" onclick="closeMob()">Security</a>
+  <a href="#install" onclick="closeMob()">Install</a>
+  <a href="#about" onclick="closeMob()">About</a>
+  <a href="index.php" target="_blank"><i class="fas fa-play-circle"></i> Live App</a>
+  <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub Repo</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span><i class="fas fa-school"></i> Sindhuli Community Technical Institute</div>
+    <h1><span class="w1">SCTI School</span><span class="w2">Management System</span></h1>
+    <p>A complete web-based academic portal — managing students, teachers, attendance, assignments, grades, notices, gallery, and more in one unified platform.</p>
+    <div class="hero-btns">
+      <a href="index.php" class="btn-d" target="_blank"><i class="fas fa-play-circle"></i> View Live App</a>
+      <a href="#scenes" class="btn-p"><i class="fas fa-film"></i> Demo Walkthrough</a>
+      <a href="#features" class="btn-g"><i class="fas fa-th-large"></i> Explore Features</a>
+      <a href="https://github.com" target="_blank" class="btn-g" style="border-color:rgba(255,255,255,.25)"><i class="fab fa-github"></i> GitHub</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="n">3</div><div class="l">User Roles</div></div>
+      <div class="hs"><div class="n">88+</div><div class="l">PHP Pages</div></div>
+      <div class="hs"><div class="n">12+</div><div class="l">Modules</div></div>
+      <div class="hs"><div class="n">50+</div><div class="l">Features</div></div>
+      <div class="hs"><div class="n">100%</div><div class="l">Responsive</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BANNER -->
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="stats-banner">
+      <div class="stats-inner">
+        <div><div class="sb-num">124+</div><div class="sb-lbl">Students Managed</div></div>
+        <div><div class="sb-num">12+</div><div class="sb-lbl">Teachers</div></div>
+        <div><div class="sb-num">8</div><div class="sb-lbl">Programs</div></div>
+        <div><div class="sb-num">88</div><div class="sb-lbl">PHP Pages</div></div>
+        <div><div class="sb-num">12</div><div class="sb-lbl">DB Tables</div></div>
+        <div><div class="sb-num">30d</div><div class="sb-lbl">Remember Me</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO CREDENTIALS -->
+<section class="sec" id="demo">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-key"></i> Try It Now</span>
+      <h2>Demo Credentials</h2>
+      <p>Click any value to copy it instantly. Use these to explore all three dashboards.</p>
+    </div>
+    <div class="cred-wrap">
+      <div class="cred-grid">
+        <div class="cred-card" style="--cc:linear-gradient(90deg,#004080,#0059b3)">
+          <span class="ri">🛡️</span>
+          <h4>Admin</h4>
+          <div class="cred-row"><span class="lbl">Username</span><span class="val" onclick="copyText('admin')">admin</span></div>
+          <div class="cred-row"><span class="lbl">Password</span><span class="val" onclick="copyText('admin123')">admin123</span></div>
+          <div class="cred-row"><span class="lbl">Access</span><span style="font-size:12px;color:rgba(255,255,255,.5)">Full System</span></div>
+        </div>
+        <div class="cred-card" style="--cc:linear-gradient(90deg,#1a6b3c,#28a745)">
+          <span class="ri">👨‍🏫</span>
+          <h4>Teacher</h4>
+          <div class="cred-row"><span class="lbl">Username</span><span class="val" onclick="copyText('bibek.bhandari')">bibek.bhandari</span></div>
+          <div class="cred-row"><span class="lbl">Password</span><span class="val" onclick="copyText('teacher123')">teacher123</span></div>
+          <div class="cred-row"><span class="lbl">Access</span><span style="font-size:12px;color:rgba(255,255,255,.5)">Classes & Grades</span></div>
+        </div>
+        <div class="cred-card" style="--cc:linear-gradient(90deg,#5b21b6,#7c3aed)">
+          <span class="ri">🎓</span>
+          <h4>Student</h4>
+          <div class="cred-row"><span class="lbl">Username</span><span class="val" onclick="copyText('john.doe')">john.doe</span></div>
+          <div class="cred-row"><span class="lbl">Password</span><span class="val" onclick="copyText('student123')">student123</span></div>
+          <div class="cred-row"><span class="lbl">Access</span><span style="font-size:12px;color:rgba(255,255,255,.5)">Student Portal</span></div>
+        </div>
+      </div>
+      <p class="cred-note"><i class="fas fa-info-circle" style="color:#f59e0b;margin-right:5px"></i> First-time teacher &amp; student logins redirect to a forced password change screen.</p>
+    </div>
+  </div>
+</section>
+<!-- DEMO WALKTHROUGH SCENES -->
+<section class="sec sec-alt" id="scenes">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-film"></i> Demo Script</span>
+      <h2>Full Demo Walkthrough</h2>
+      <p>6 scenes covering every feature — from public pages to all three dashboards</p>
+    </div>
+    <div class="scenes-grid">
+
+      <!-- Scene 1 -->
+      <div class="scard" tabindex="0" onclick="openModal('s1')" onkeydown="if(event.key==='Enter')openModal('s1')">
+        <div class="scard-head">
+          <div class="scard-num">01</div>
+          <div class="scard-icon" style="background:linear-gradient(135deg,#0891b2,#06b6d4)"><i class="fas fa-globe"></i></div>
+          <h3>Public Landing Page</h3>
+          <span class="tbadge"><i class="fas fa-clock"></i> 0:00 – 1:00</span>
+        </div>
+        <div class="scard-body">
+          <p>The public-facing homepage — no login required. Anyone can browse programs, gallery, notices, and contact the institute.</p>
+          <ul class="scard-steps">
+            <li><span class="sd" style="--sc:rgba(8,145,178,.35)">1</span>Open homepage — header, logo, nav menu</li>
+            <li><span class="sd" style="--sc:rgba(8,145,178,.35)">2</span>Scrolling notice ticker at top</li>
+            <li><span class="sd" style="--sc:rgba(8,145,178,.35)">3</span>Programs page — B.Tech IT, Diploma Civil, etc.</li>
+            <li><span class="sd" style="--sc:rgba(8,145,178,.35)">4</span>Gallery — public photo albums with lightbox</li>
+            <li><span class="sd" style="--sc:rgba(8,145,178,.35)">5</span>Notice Board — public notices</li>
+            <li><span class="sd" style="--sc:rgba(8,145,178,.35)">6</span>Contact Us — form with validation</li>
+          </ul>
+          <div class="scard-quote">"Anyone can browse programs, view the gallery, read notices, and reach out — no login required."</div>
+        </div>
+        <div class="scard-foot">
+          <div class="tag-row" style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="stag">Homepage</span><span class="stag">Programs</span><span class="stag">Gallery</span><span class="stag">Notices</span><span class="stag">Contact</span>
+          </div>
+          <span class="exp"><i class="fas fa-expand-alt"></i> Details</span>
+        </div>
+      </div>
+
+      <!-- Scene 2 -->
+      <div class="scard" tabindex="0" onclick="openModal('s2')" onkeydown="if(event.key==='Enter')openModal('s2')">
+        <div class="scard-head">
+          <div class="scard-num">02</div>
+          <div class="scard-icon" style="background:linear-gradient(135deg,#004080,#0059b3)"><i class="fas fa-user-shield"></i></div>
+          <h3>Admin Dashboard</h3>
+          <span class="tbadge"><i class="fas fa-clock"></i> 1:00 – 3:00</span>
+        </div>
+        <div class="scard-body">
+          <p>Full system control — manage students, teachers, programs, notices, gallery, and contact messages from one dashboard.</p>
+          <ul class="scard-steps">
+            <li><span class="sd" style="--sc:rgba(0,64,128,.4)">1</span>Login as Admin — stat cards overview</li>
+            <li><span class="sd" style="--sc:rgba(0,64,128,.4)">2</span>Manage Students — list, search, add with auto-credentials</li>
+            <li><span class="sd" style="--sc:rgba(0,64,128,.4)">3</span>Manage Teachers — teacher list</li>
+            <li><span class="sd" style="--sc:rgba(0,64,128,.4)">4</span>Manage Programs — active programs with subjects</li>
+            <li><span class="sd" style="--sc:rgba(0,64,128,.4)">5</span>Manage Notices — audience targeting (All/Students/Teachers/Emergency)</li>
+            <li><span class="sd" style="--sc:rgba(0,64,128,.4)">6</span>Gallery upload + View Contact Messages</li>
+          </ul>
+          <div class="scard-quote">"The admin has full control — manage everything and see it all happening in real time."</div>
+        </div>
+        <div class="scard-foot">
+          <div class="tag-row" style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="stag">Students</span><span class="stag">Teachers</span><span class="stag">Notices</span><span class="stag">Gallery</span><span class="stag">Reports</span>
+          </div>
+          <span class="exp"><i class="fas fa-expand-alt"></i> Details</span>
+        </div>
+      </div>
+
+      <!-- Scene 3 -->
+      <div class="scard" tabindex="0" onclick="openModal('s3')" onkeydown="if(event.key==='Enter')openModal('s3')">
+        <div class="scard-head">
+          <div class="scard-num">03</div>
+          <div class="scard-icon" style="background:linear-gradient(135deg,#1a6b3c,#28a745)"><i class="fas fa-chalkboard-teacher"></i></div>
+          <h3>Teacher Features</h3>
+          <span class="tbadge"><i class="fas fa-clock"></i> 3:00 – 6:30</span>
+        </div>
+        <div class="scard-body">
+          <p>Mark attendance, create and grade assignments, upload materials, enter grades, and view analytics — all from one place.</p>
+          <ul class="scard-steps">
+            <li><span class="sd" style="--sc:rgba(26,107,60,.4)">1</span>Login as Teacher — dashboard stats + ungraded badge</li>
+            <li><span class="sd" style="--sc:rgba(26,107,60,.4)">2</span>Mark Attendance — Present/Absent/Late + late reason</li>
+            <li><span class="sd" style="--sc:rgba(26,107,60,.4)">3</span>Attendance Charts — visual analytics</li>
+            <li><span class="sd" style="--sc:rgba(26,107,60,.4)">4</span>Create Assignment — title, description, due date, class</li>
+            <li><span class="sd" style="--sc:rgba(26,107,60,.4)">5</span>Grade Submissions — marks + feedback</li>
+            <li><span class="sd" style="--sc:rgba(26,107,60,.4)">6</span>Enter Grades (internal + external) + Grade Charts</li>
+          </ul>
+          <div class="scard-quote">"Teachers have everything to manage their classes — attendance, assignments, grading, and materials."</div>
+        </div>
+        <div class="scard-foot">
+          <div class="tag-row" style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="stag">Attendance</span><span class="stag">Assignments</span><span class="stag">Grading</span><span class="stag">Materials</span><span class="stag">Analytics</span>
+          </div>
+          <span class="exp"><i class="fas fa-expand-alt"></i> Details</span>
+        </div>
+      </div>
+
+      <!-- Scene 4 -->
+      <div class="scard" tabindex="0" onclick="openModal('s4')" onkeydown="if(event.key==='Enter')openModal('s4')">
+        <div class="scard-head">
+          <div class="scard-num">04</div>
+          <div class="scard-icon" style="background:linear-gradient(135deg,#5b21b6,#7c3aed)"><i class="fas fa-user-graduate"></i></div>
+          <h3>Student Features</h3>
+          <span class="tbadge"><i class="fas fa-clock"></i> 6:30 – 9:30</span>
+        </div>
+        <div class="scard-body">
+          <p>A clean, focused portal — attendance, grades, assignments, timetable, library, and profile management all in one place.</p>
+          <ul class="scard-steps">
+            <li><span class="sd" style="--sc:rgba(91,33,182,.4)">1</span>Login as Student — forced password change on first login</li>
+            <li><span class="sd" style="--sc:rgba(91,33,182,.4)">2</span>Dashboard — Attendance %, GPA, Pending Assignments</li>
+            <li><span class="sd" style="--sc:rgba(91,33,182,.4)">3</span>Attendance history — warning if below 75%</li>
+            <li><span class="sd" style="--sc:rgba(91,33,182,.4)">4</span>My Grades — internal, external, total, grade letter, GPA</li>
+            <li><span class="sd" style="--sc:rgba(91,33,182,.4)">5</span>Submit Assignment — file upload</li>
+            <li><span class="sd" style="--sc:rgba(91,33,182,.4)">6</span>Timetable, Library (download materials), Profile edit</li>
+          </ul>
+          <div class="scard-quote">"Students get a clean, focused view — attendance, grades, assignments, and study materials."</div>
+        </div>
+        <div class="scard-foot">
+          <div class="tag-row" style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="stag">Attendance</span><span class="stag">Grades</span><span class="stag">Assignments</span><span class="stag">Library</span><span class="stag">Timetable</span>
+          </div>
+          <span class="exp"><i class="fas fa-expand-alt"></i> Details</span>
+        </div>
+      </div>
+
+      <!-- Scene 5 -->
+      <div class="scard" tabindex="0" onclick="openModal('s5')" onkeydown="if(event.key==='Enter')openModal('s5')">
+        <div class="scard-head">
+          <div class="scard-num">05</div>
+          <div class="scard-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b)"><i class="fas fa-bell"></i></div>
+          <h3>Notice Board & Remember Me</h3>
+          <span class="tbadge"><i class="fas fa-clock"></i> 9:30 – 11:00</span>
+        </div>
+        <div class="scard-body">
+          <p>Secure 30-day persistent login with Remember Me token. Role-filtered notices with emergency highlighting.</p>
+          <ul class="scard-steps">
+            <li><span class="sd" style="--sc:rgba(180,83,9,.4)">1</span>Check Remember Me checkbox at login</li>
+            <li><span class="sd" style="--sc:rgba(180,83,9,.4)">2</span>Close browser — reopen — auto-login works</li>
+            <li><span class="sd" style="--sc:rgba(180,83,9,.4)">3</span>Notice Board — role-filtered notices</li>
+            <li><span class="sd" style="--sc:rgba(180,83,9,.4)">4</span>Emergency notices — distinct red styling</li>
+            <li><span class="sd" style="--sc:rgba(180,83,9,.4)">5</span>Priority levels — Normal / High / Urgent</li>
+          </ul>
+          <div class="scard-quote">"Remember Me keeps users logged in securely for 30 days. Emergency notices stand out immediately."</div>
+        </div>
+        <div class="scard-foot">
+          <div class="tag-row" style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="stag">Remember Me</span><span class="stag">30-day Token</span><span class="stag">Emergency</span><span class="stag">Audience Filter</span>
+          </div>
+          <span class="exp"><i class="fas fa-expand-alt"></i> Details</span>
+        </div>
+      </div>
+
+      <!-- Scene 6 -->
+      <div class="scard" tabindex="0" onclick="openModal('s6')" onkeydown="if(event.key==='Enter')openModal('s6')">
+        <div class="scard-head">
+          <div class="scard-num">06</div>
+          <div class="scard-icon" style="background:linear-gradient(135deg,#e63946,#b5121e)"><i class="fas fa-flag-checkered"></i></div>
+          <h3>System Summary</h3>
+          <span class="tbadge"><i class="fas fa-clock"></i> 11:00 – 12:00</span>
+        </div>
+        <div class="scard-body">
+          <p>Everything a technical institute needs — unified, role-based, secure, and built for real day-to-day operations.</p>
+          <ul class="scard-steps">
+            <li><span class="sd" style="--sc:rgba(230,57,70,.35)">✓</span>Student &amp; teacher management with CRUD</li>
+            <li><span class="sd" style="--sc:rgba(230,57,70,.35)">✓</span>Daily attendance with analytics</li>
+            <li><span class="sd" style="--sc:rgba(230,57,70,.35)">✓</span>Assignment creation, submission &amp; grading</li>
+            <li><span class="sd" style="--sc:rgba(230,57,70,.35)">✓</span>Internal + external marks, GPA calculation</li>
+            <li><span class="sd" style="--sc:rgba(230,57,70,.35)">✓</span>Course materials upload &amp; download</li>
+            <li><span class="sd" style="--sc:rgba(230,57,70,.35)">✓</span>Notices, gallery, contact — public &amp; private</li>
+          </ul>
+          <div class="scard-quote">"One unified system — role-based, secure, and built to handle the day-to-day operations of the institution."</div>
+        </div>
+        <div class="scard-foot">
+          <div class="tag-row" style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="stag">Unified</span><span class="stag">Role-Based</span><span class="stag">Secure</span><span class="stag">Production-Ready</span>
+          </div>
+          <span class="exp"><i class="fas fa-expand-alt"></i> Details</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- FEATURES -->
+<section class="sec" id="features">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-th-large"></i> What's Inside</span>
+      <h2>Core Modules</h2>
+      <p>Click any card to explore the full details of each module</p>
+    </div>
+    <div class="feat-grid">
+      <div class="fcard" tabindex="0" onclick="openModal('auth')" onkeydown="if(event.key==='Enter')openModal('auth')" style="--ac:linear-gradient(90deg,#004080,#0059b3)">
+        <div class="fic" style="background:linear-gradient(135deg,#004080,#0059b3)"><i class="fas fa-shield-alt"></i></div>
+        <h3>Authentication & Access</h3>
+        <p>Secure role-based login with session management, Remember Me, and forced password change.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> 3 role-based dashboards</li>
+          <li><i class="fas fa-check-circle"></i> First-login forced password change</li>
+          <li><i class="fas fa-check-circle"></i> Remember Me (30-day token)</li>
+          <li><i class="fas fa-check-circle"></i> Forgot password flow</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('attendance')" onkeydown="if(event.key==='Enter')openModal('attendance')" style="--ac:linear-gradient(90deg,#e67e00,#ffc107)">
+        <div class="fic" style="background:linear-gradient(135deg,#e67e00,#ffc107)"><i class="fas fa-calendar-check"></i></div>
+        <h3>Attendance System</h3>
+        <p>Daily per-subject attendance with history, analytics charts, and low-attendance warnings.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Present / Absent / Late marking</li>
+          <li><i class="fas fa-check-circle"></i> Late reason notes</li>
+          <li><i class="fas fa-check-circle"></i> Attendance history & percentage</li>
+          <li><i class="fas fa-check-circle"></i> Analytics charts</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('assignments')" onkeydown="if(event.key==='Enter')openModal('assignments')" style="--ac:linear-gradient(90deg,#1a9e5c,#20c997)">
+        <div class="fic" style="background:linear-gradient(135deg,#1a9e5c,#20c997)"><i class="fas fa-tasks"></i></div>
+        <h3>Assignments</h3>
+        <p>Teachers create assignments with due dates; students submit files; teachers grade and give feedback.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Create with due date & class</li>
+          <li><i class="fas fa-check-circle"></i> File upload submissions</li>
+          <li><i class="fas fa-check-circle"></i> Grading & feedback</li>
+          <li><i class="fas fa-check-circle"></i> Ungraded counter badge</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('grades')" onkeydown="if(event.key==='Enter')openModal('grades')" style="--ac:linear-gradient(90deg,#6f42c1,#c44dff)">
+        <div class="fic" style="background:linear-gradient(135deg,#6f42c1,#c44dff)"><i class="fas fa-chart-bar"></i></div>
+        <h3>Grades & GPA</h3>
+        <p>Internal and external marks entry, grade letter assignment, GPA calculation, and distribution charts.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Internal + external marks</li>
+          <li><i class="fas fa-check-circle"></i> Grade letter (A, B, C…)</li>
+          <li><i class="fas fa-check-circle"></i> GPA on 4-point scale</li>
+          <li><i class="fas fa-check-circle"></i> Grade distribution charts</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('notices')" onkeydown="if(event.key==='Enter')openModal('notices')" style="--ac:linear-gradient(90deg,#0891b2,#06b6d4)">
+        <div class="fic" style="background:linear-gradient(135deg,#0891b2,#06b6d4)"><i class="fas fa-bullhorn"></i></div>
+        <h3>Notice Board</h3>
+        <p>Admin publishes notices with audience targeting — All, Students, Teachers, or Emergency alerts.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Audience targeting (4 types)</li>
+          <li><i class="fas fa-check-circle"></i> Priority levels (Normal/High/Urgent)</li>
+          <li><i class="fas fa-check-circle"></i> Category filters</li>
+          <li><i class="fas fa-check-circle"></i> Emergency notice highlight</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('gallery')" onkeydown="if(event.key==='Enter')openModal('gallery')" style="--ac:linear-gradient(90deg,#dc2626,#f87171)">
+        <div class="fic" style="background:linear-gradient(135deg,#dc2626,#f87171)"><i class="fas fa-images"></i></div>
+        <h3>Photo Gallery</h3>
+        <p>Upload and organize school photos by category with thumbnail generation and a lightbox viewer.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Category-based albums</li>
+          <li><i class="fas fa-check-circle"></i> Thumbnail generation</li>
+          <li><i class="fas fa-check-circle"></i> Lightbox + keyboard nav</li>
+          <li><i class="fas fa-check-circle"></i> Public gallery page</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('materials')" onkeydown="if(event.key==='Enter')openModal('materials')" style="--ac:linear-gradient(90deg,#0f766e,#14b8a6)">
+        <div class="fic" style="background:linear-gradient(135deg,#0f766e,#14b8a6)"><i class="fas fa-book-open"></i></div>
+        <h3>Course Materials</h3>
+        <p>Teachers upload study materials; students download them from their library section.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Upload PDFs & documents</li>
+          <li><i class="fas fa-check-circle"></i> Organized by subject/class</li>
+          <li><i class="fas fa-check-circle"></i> Student download access</li>
+          <li><i class="fas fa-check-circle"></i> Admin management</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('programs')" onkeydown="if(event.key==='Enter')openModal('programs')" style="--ac:linear-gradient(90deg,#b45309,#f59e0b)">
+        <div class="fic" style="background:linear-gradient(135deg,#b45309,#f59e0b)"><i class="fas fa-university"></i></div>
+        <h3>Programs & Subjects</h3>
+        <p>Manage academic programs with subject lists, duration, affiliation, and assessment methods.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> B.Tech IT, Civil, Diploma courses</li>
+          <li><i class="fas fa-check-circle"></i> Subject listing per program</li>
+          <li><i class="fas fa-check-circle"></i> Active / Upcoming status</li>
+          <li><i class="fas fa-check-circle"></i> Public program page</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+      <div class="fcard" tabindex="0" onclick="openModal('contact')" onkeydown="if(event.key==='Enter')openModal('contact')" style="--ac:linear-gradient(90deg,#004080,#0059b3)">
+        <div class="fic" style="background:linear-gradient(135deg,#004080,#0059b3)"><i class="fas fa-envelope"></i></div>
+        <h3>Contact & Inquiries</h3>
+        <p>Public contact form with validation; admin views and manages all submitted inquiries.</p>
+        <ul class="flist">
+          <li><i class="fas fa-check-circle"></i> Name, phone, email, message</li>
+          <li><i class="fas fa-check-circle"></i> Real-time form validation</li>
+          <li><i class="fas fa-check-circle"></i> Character counter (1000 max)</li>
+          <li><i class="fas fa-check-circle"></i> Admin inbox view</li>
+        </ul>
+        <div class="click-hint"><i class="fas fa-mouse-pointer"></i> Click to explore</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USER ROLES -->
+<section class="sec sec-alt" id="roles">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-users"></i> User Roles</span>
+      <h2>Three Powerful Dashboards</h2>
+      <p>Each role gets a tailored experience with exactly the tools they need</p>
+    </div>
+    <div class="role-grid">
+      <div class="rcard" onclick="openModal('admin-role')">
+        <div class="rcard-head adm">
+          <i class="fas fa-user-shield"></i>
+          <h3>Admin</h3>
+          <p>Full system control — manage everything from one dashboard</p>
+        </div>
+        <div class="rcard-body">
+          <ul>
+            <li><i class="fas fa-users" style="color:#66b3ff"></i> Manage Students (CRUD + auto-credentials)</li>
+            <li><i class="fas fa-chalkboard-teacher" style="color:#66b3ff"></i> Manage Teachers</li>
+            <li><i class="fas fa-book" style="color:#66b3ff"></i> Manage Programs & Subjects</li>
+            <li><i class="fas fa-bullhorn" style="color:#66b3ff"></i> Publish Notices (audience targeting)</li>
+            <li><i class="fas fa-images" style="color:#66b3ff"></i> Manage Gallery</li>
+            <li><i class="fas fa-envelope" style="color:#66b3ff"></i> View Contact Messages</li>
+            <li><i class="fas fa-chart-line" style="color:#66b3ff"></i> Real-time Activity Feed</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rcard" onclick="openModal('teacher-role')">
+        <div class="rcard-head tch">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <h3>Teacher</h3>
+          <p>Manage classes, track performance, and engage students</p>
+        </div>
+        <div class="rcard-body">
+          <ul>
+            <li><i class="fas fa-calendar-check" style="color:#4ade80"></i> Mark Daily Attendance</li>
+            <li><i class="fas fa-tasks" style="color:#4ade80"></i> Create & Grade Assignments</li>
+            <li><i class="fas fa-star" style="color:#4ade80"></i> Enter Internal & External Marks</li>
+            <li><i class="fas fa-book-open" style="color:#4ade80"></i> Upload Course Materials</li>
+            <li><i class="fas fa-chart-bar" style="color:#4ade80"></i> Attendance & Grade Analytics</li>
+            <li><i class="fas fa-user-plus" style="color:#4ade80"></i> Add Students to System</li>
+            <li><i class="fas fa-bell" style="color:#4ade80"></i> View Teacher Notices</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rcard" onclick="openModal('student-role')">
+        <div class="rcard-head stu">
+          <i class="fas fa-user-graduate"></i>
+          <h3>Student</h3>
+          <p>Track progress, submit work, and access all learning resources</p>
+        </div>
+        <div class="rcard-body">
+          <ul>
+            <li><i class="fas fa-calendar-alt" style="color:#c4b5fd"></i> View Attendance & Percentage</li>
+            <li><i class="fas fa-chart-bar" style="color:#c4b5fd"></i> View Grades & GPA</li>
+            <li><i class="fas fa-file-upload" style="color:#c4b5fd"></i> Submit Assignments</li>
+            <li><i class="fas fa-download" style="color:#c4b5fd"></i> Download Course Materials</li>
+            <li><i class="fas fa-clock" style="color:#c4b5fd"></i> View Class Timetable</li>
+            <li><i class="fas fa-user-edit" style="color:#c4b5fd"></i> Edit Profile & Change Password</li>
+            <li><i class="fas fa-bell" style="color:#c4b5fd"></i> View Student Notices</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- TECH STACK -->
+<section class="sec" id="tech">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-code"></i> Built With</span>
+      <h2>Tech Stack</h2>
+      <p>Solid, proven technologies — no unnecessary complexity</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tcard"><span class="ti">🐘</span><h4>PHP 7.4+</h4><p>Backend logic & routing</p></div>
+      <div class="tcard"><span class="ti">🗄️</span><h4>MySQL</h4><p>Relational database</p></div>
+      <div class="tcard"><span class="ti">🔒</span><h4>PDO</h4><p>Secure DB access</p></div>
+      <div class="tcard"><span class="ti">🌐</span><h4>HTML5</h4><p>Semantic markup</p></div>
+      <div class="tcard"><span class="ti">🎨</span><h4>CSS3</h4><p>Responsive styling</p></div>
+      <div class="tcard"><span class="ti">⚡</span><h4>Vanilla JS</h4><p>No framework needed</p></div>
+      <div class="tcard"><span class="ti">🔣</span><h4>Font Awesome</h4><p>Icon library 6.5.1</p></div>
+      <div class="tcard"><span class="ti">��️</span><h4>Apache</h4><p>XAMPP / WAMP server</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="sec sec-alt" id="security">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-lock"></i> Security</span>
+      <h2>Built Secure by Default</h2>
+      <p>Every layer of the system is protected against common vulnerabilities</p>
+    </div>
+    <div class="sec-list">
+      <div class="sec-item"><i class="fas fa-database"></i><div><h4>SQL Injection Prevention</h4><p>All queries use PDO prepared statements — no raw SQL with user input.</p></div></div>
+      <div class="sec-item"><i class="fas fa-key"></i><div><h4>Password Hashing</h4><p>Passwords stored with PHP's password_hash() and verified with password_verify().</p></div></div>
+      <div class="sec-item"><i class="fas fa-user-lock"></i><div><h4>Role-Based Access Control</h4><p>Every protected page checks session role — unauthorized access redirects to login.</p></div></div>
+      <div class="sec-item"><i class="fas fa-cookie-bite"></i><div><h4>HTTPOnly Session Cookies</h4><p>Session cookies are HTTPOnly, preventing JavaScript access to session data.</p></div></div>
+      <div class="sec-item"><i class="fas fa-clock"></i><div><h4>Remember Me Token</h4><p>Secure 30-day token stored in DB — not the password — for persistent login.</p></div></div>
+      <div class="sec-item"><i class="fas fa-ban"></i><div><h4>Account Status Check</h4><p>Inactive accounts are blocked at login — no access even with correct credentials.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALLATION -->
+<section class="sec" id="install">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-download"></i> Getting Started</span>
+      <h2>Installation Guide</h2>
+      <p>Get the portal running locally in under 5 minutes</p>
+    </div>
+    <div style="margin-bottom:36px">
+      <h3 style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px"><i class="fas fa-check-circle" style="color:#22c55e;margin-right:8px"></i>Requirements</h3>
+      <div class="req-grid">
+        <div class="req-item"><i class="fas fa-server"></i> Apache (XAMPP/WAMP)</div>
+        <div class="req-item"><i class="fab fa-php"></i> PHP 7.4+</div>
+        <div class="req-item"><i class="fas fa-database"></i> MySQL 5.7+</div>
+        <div class="req-item"><i class="fas fa-globe"></i> Modern Browser</div>
+      </div>
+    </div>
+    <div class="install-grid">
+      <div>
+        <ol class="install-steps">
+          <li><div class="sc"><h4>Clone / Copy the project</h4><p>Place the project folder inside your web server root (e.g. <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px">C:/xampp/htdocs/scti</code>).</p></div></li>
+          <li><div class="sc"><h4>Create the database</h4><p>Open phpMyAdmin, create a database named <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px">scti_school</code>, then import <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px">database/setup/database-setup.sql</code>.</p></div></li>
+          <li><div class="sc"><h4>Configure the connection</h4><p>Edit <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px">includes/config.php</code> with your database host, name, user, and password.</p></div></li>
+          <li><div class="sc"><h4>Open in browser</h4><p>Navigate to <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px">http://localhost/scti</code> and log in with the demo credentials above.</p></div></li>
+          <li><div class="sc"><h4>Run migrations (optional)</h4><p>Apply SQL files in <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px">database/migrations/</code> for sample data and extra features.</p></div></li>
+        </ol>
+      </div>
+      <div>
+        <div class="code-block">
+          <pre><span style="color:#6a8fa8"># 1. Place project in web root</span>
+C:/xampp/htdocs/scti/
+
+<span style="color:#6a8fa8"># 2. Import database</span>
+<span style="color:#79c0ff">database</span>/setup/database-setup.sql
+
+<span style="color:#6a8fa8"># 3. Edit config.php</span>
+<span style="color:#79c0ff">define</span>(<span style="color:#a5d6a7">'DB_HOST'</span>, <span style="color:#a5d6a7">'localhost'</span>);
+<span style="color:#79c0ff">define</span>(<span style="color:#a5d6a7">'DB_NAME'</span>, <span style="color:#a5d6a7">'scti_school'</span>);
+<span style="color:#79c0ff">define</span>(<span style="color:#a5d6a7">'DB_USER'</span>, <span style="color:#a5d6a7">'root'</span>);
+<span style="color:#79c0ff">define</span>(<span style="color:#a5d6a7">'DB_PASS'</span>, <span style="color:#a5d6a7">''</span>);
+
+<span style="color:#6a8fa8"># 4. Open in browser</span>
+http://localhost/scti</pre>
+        </div>
+        <div style="margin-top:14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 16px;font-size:13px;color:rgba(255,255,255,.6)">
+          <i class="fas fa-lightbulb" style="margin-right:6px;color:#f59e0b"></i>
+          <strong style="color:#f59e0b">Tip:</strong> Run migration files in <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">database/migrations/</code> to add sample students, teacher columns, and other enhancements.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec sec-alt" id="about">
+  <div class="wrap">
+    <div class="sec-hd">
+      <span class="eyebrow"><i class="fas fa-info-circle"></i> About the Project</span>
+      <h2>Built for SCTI</h2>
+      <p>A real-world system for a real institution</p>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p><strong style="color:#fff">Sindhuli Community Technical Institute (SCTI)</strong> is a nonprofit technical institute in Sindhuli, Nepal — supported by DCC Sindhuli, Kamalamai Municipality, and CTEVT.</p>
+        <p>This portal was built to replace manual, paper-based processes with a unified digital system — covering everything from student enrollment and daily attendance to assignment grading and course material distribution.</p>
+        <p>The system serves three distinct user roles — Admin, Teacher, and Student — each with a tailored dashboard and exactly the tools they need. No bloat, no unnecessary complexity.</p>
+        <div class="about-badges">
+          <span class="abadge"><i class="fas fa-map-marker-alt"></i> Sindhuli, Nepal</span>
+          <span class="abadge"><i class="fas fa-university"></i> CTEVT Affiliated</span>
+          <span class="abadge"><i class="fas fa-heart"></i> Nonprofit Institute</span>
+          <span class="abadge"><i class="fas fa-code"></i> Open Source</span>
+        </div>
+      </div>
+      <div class="about-hl">
+        <div class="ahl" style="--ac:#0059b3"><i class="fas fa-bolt"></i><div><h4>No Framework Overhead</h4><p>Pure PHP, MySQL, HTML, CSS, and Vanilla JS — fast, lightweight, and easy to deploy on any Apache server.</p></div></div>
+        <div class="ahl" style="--ac:#1a9e5c"><i class="fas fa-users"></i><div><h4>Multi-Role Architecture</h4><p>Admin, Teacher, and Student each get a dedicated dashboard with role-specific features and access control.</p></div></div>
+        <div class="ahl" style="--ac:#6f42c1"><i class="fas fa-mobile-alt"></i><div><h4>Fully Responsive</h4><p>Works on desktops, tablets, and mobile phones — no separate mobile app needed.</p></div></div>
+        <div class="ahl" style="--ac:#e67e00"><i class="fas fa-shield-alt"></i><div><h4>Secure by Default</h4><p>PDO prepared statements, password hashing, RBAC, HTTPOnly cookies, and account status checks on every request.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-in">
+    <div class="footer-brand">
+      <div class="logo"><div class="logo-ic"><i class="fas fa-graduation-cap"></i></div><div><span class="logo-t">SCTI Portal</span></div></div>
+      <p>A web-based academic management system for Sindhuli Community Technical Institute — a nonprofit technical institute supported by DCC Sindhuli, Kamalamai Municipality, and CTEVT.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Modules</h5>
+      <ul>
+        <li><a href="#features">Authentication</a></li>
+        <li><a href="#features">Attendance</a></li>
+        <li><a href="#features">Assignments</a></li>
+        <li><a href="#features">Grades &amp; GPA</a></li>
+        <li><a href="#features">Notice Board</a></li>
+        <li><a href="#features">Gallery</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Quick Links</h5>
+      <ul>
+        <li><a href="index.php" target="_blank">Live App</a></li>
+        <li><a href="#demo">Demo Credentials</a></li>
+        <li><a href="#scenes">Demo Walkthrough</a></li>
+        <li><a href="#install">Installation Guide</a></li>
+        <li><a href="#about">About SCTI</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="https://github.com" target="_blank"><i class="fab fa-github" style="margin-right:5px"></i>GitHub Repo</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bot">
+    <p>© 2025 Sindhuli Community Technical Institute (SCTI). All rights reserved.</p>
+    <p>Built with PHP · MySQL · HTML · CSS · Vanilla JS</p>
+    <a href="https://github.com" target="_blank" style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);text-decoration:none;padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;transition:.2s" onmouseover="this.style.background='rgba(255,255,255,.12)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.color='rgba(255,255,255,.6)'"><i class="fab fa-github"></i> View on GitHub</a>
+  </div>
+</footer>
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="m-head">
+      <div class="m-ic" id="m-ic"></div>
+      <div class="m-title"><h3 id="m-title"></h3><p id="m-sub"></p></div>
+      <button class="m-close" onclick="closeModalDirect()" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="m-body" id="m-body"></div>
+    <div class="m-foot"><button onclick="closeModalDirect()">Close</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<button class="btt" id="btt" aria-label="Back to top"><i class="fas fa-chevron-up"></i></button>
+
+<script>
+const modals = {
+  s1:{icon:'fas fa-globe',color:'linear-gradient(135deg,#0891b2,#06b6d4)',title:'Scene 1 — Public Landing Page',sub:'0:00 – 1:00 | No login required',body:`<h4>What to Show</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Open http://localhost/scti — header with SCTI logo and navigation</li><li><i class="fas fa-circle-dot"></i>Scrolling notice ticker at the very top</li><li><i class="fas fa-circle-dot"></i>Hero banner with campus image</li><li><i class="fas fa-circle-dot"></i>Click Programs — B.Tech IT, B.Tech Civil, Diploma Civil, Diploma Animal Science</li><li><i class="fas fa-circle-dot"></i>Click Gallery — public photo albums with lightbox viewer</li><li><i class="fas fa-circle-dot"></i>Click Notice Board — public notices visible without login</li><li><i class="fas fa-circle-dot"></i>Click Contact Us — form with real-time validation</li></ul><h4>Key Message</h4><ul class="m-list"><li><i class="fas fa-quote-left"></i>"Anyone can browse programs, view the gallery, read notices, and reach out through the contact form — no login required."</li></ul><div class="m-tags"><span class="tag">Public Access</span><span class="tag">Programs</span><span class="tag">Gallery</span><span class="tag">Notices</span><span class="tag">Contact Form</span></div>`},
+  s2:{icon:'fas fa-user-shield',color:'linear-gradient(135deg,#004080,#0059b3)',title:'Scene 2 — Admin Dashboard',sub:'1:00 – 3:00 | Full system control',body:`<h4>Login</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Click Login → Select Admin → Enter admin / admin123</li></ul><h4>Dashboard Overview</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Stat cards: Total Students, Teachers, Programs, Notices, Gallery Images, Contact Messages</li><li><i class="fas fa-circle-dot"></i>Real-time Activity Feed at the bottom</li></ul><h4>Key Actions</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Manage Students — list with search, Add Student with auto-generated credentials (username, password, student ID)</li><li><i class="fas fa-circle-dot"></i>Manage Teachers — teacher list</li><li><i class="fas fa-circle-dot"></i>Manage Programs — active programs with full subject lists</li><li><i class="fas fa-circle-dot"></i>Manage Notices — Add Notice with audience targeting: All / Students / Teachers / Emergency</li><li><i class="fas fa-circle-dot"></i>Manage Gallery — image upload with categories</li><li><i class="fas fa-circle-dot"></i>View Contact Messages — submitted contact forms</li></ul><div class="m-tags"><span class="tag">CRUD Students</span><span class="tag">CRUD Teachers</span><span class="tag">Notices</span><span class="tag">Gallery</span><span class="tag">Activity Feed</span></div>`},
+  s3:{icon:'fas fa-chalkboard-teacher',color:'linear-gradient(135deg,#1a6b3c,#28a745)',title:'Scene 3 — Teacher Features',sub:'3:00 – 6:30 | Classes, grades, materials',body:`<h4>Login</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Login as Teacher → bibek.bhandari / teacher123</li><li><i class="fas fa-circle-dot"></i>Dashboard stats: Total Students, My Assignments, Course Materials, Ungraded Submissions (with red badge)</li></ul><h4>Attendance</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Click Mark Attendance → Select class, subject, date</li><li><i class="fas fa-circle-dot"></i>Mark students: Present / Absent / Late</li><li><i class="fas fa-circle-dot"></i>Add late reason note for a late student</li><li><i class="fas fa-circle-dot"></i>Save attendance</li><li><i class="fas fa-circle-dot"></i>Click Attendance Charts — visual analytics</li></ul><h4>Assignments & Grades</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Create Assignment — title, description, due date, class</li><li><i class="fas fa-circle-dot"></i>View Submissions — grade a submission with marks + feedback</li><li><i class="fas fa-circle-dot"></i>Enter Grades — internal + external marks per student</li><li><i class="fas fa-circle-dot"></i>Grade Charts — distribution visuals</li></ul><h4>Materials & Profile</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Course Materials — upload PDFs, manage by subject</li><li><i class="fas fa-circle-dot"></i>My Profile — teacher profile page</li></ul><div class="m-tags"><span class="tag">Attendance</span><span class="tag">Assignments</span><span class="tag">Grading</span><span class="tag">Materials</span><span class="tag">Analytics</span></div>`},
+  s4:{icon:'fas fa-user-graduate',color:'linear-gradient(135deg,#5b21b6,#7c3aed)',title:'Scene 4 — Student Features',sub:'6:30 – 9:30 | Full student portal',body:`<h4>Login & First Login</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Login as Student → john.doe / student123</li><li><i class="fas fa-circle-dot"></i>If first login — forced password change screen appears</li></ul><h4>Dashboard</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Stat cards: Enrolled Subjects, Attendance Rate % (warning badge if below 75%), Current GPA, Pending Assignments</li></ul><h4>Key Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Attendance — full history, percentage, low-attendance warning</li><li><i class="fas fa-circle-dot"></i>My Grades — subject-wise: internal, external, total, grade letter, GPA on 4.0 scale</li><li><i class="fas fa-circle-dot"></i>Assignments — pending list with due dates, submit with file upload</li><li><i class="fas fa-circle-dot"></i>Timetable — class schedule view</li><li><i class="fas fa-circle-dot"></i>Library — download course materials uploaded by teachers</li><li><i class="fas fa-circle-dot"></i>My Profile — edit phone, email, address; Change Password</li></ul><div class="m-tags"><span class="tag">Attendance</span><span class="tag">Grades GPA</span><span class="tag">Assignments</span><span class="tag">Library</span><span class="tag">Timetable</span></div>`},
+  s5:{icon:'fas fa-bell',color:'linear-gradient(135deg,#b45309,#f59e0b)',title:'Scene 5 — Notice Board & Remember Me',sub:'9:30 – 11:00 | Persistent login + notices',body:`<h4>Remember Me</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>At login, check the Remember Me checkbox</li><li><i class="fas fa-circle-dot"></i>Log in as student</li><li><i class="fas fa-circle-dot"></i>Close the browser tab completely</li><li><i class="fas fa-circle-dot"></i>Reopen http://localhost/scti — auto-login works (30-day secure token)</li></ul><h4>Notice Board</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Navigate to Notice Board</li><li><i class="fas fa-circle-dot"></i>Notices are filtered by audience — students only see relevant notices</li><li><i class="fas fa-circle-dot"></i>Emergency notices highlighted with distinct red styling</li><li><i class="fas fa-circle-dot"></i>Priority levels: Normal / High / Urgent</li><li><i class="fas fa-circle-dot"></i>Search and filter by category</li></ul><div class="m-tags"><span class="tag">Remember Me</span><span class="tag">30-day Token</span><span class="tag">Emergency Notices</span><span class="tag">Audience Filter</span></div>`},
+  s6:{icon:'fas fa-flag-checkered',color:'linear-gradient(135deg,#e63946,#b5121e)',title:'Scene 6 — System Summary',sub:'11:00 – 12:00 | Wrap up',body:`<h4>What This System Covers</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Student & teacher management with full CRUD and auto-credential generation</li><li><i class="fas fa-circle-dot"></i>Daily per-subject attendance with analytics and warnings</li><li><i class="fas fa-circle-dot"></i>Assignment creation, file submission, grading, and feedback</li><li><i class="fas fa-circle-dot"></i>Internal + external marks, grade letters, GPA on 4.0 scale</li><li><i class="fas fa-circle-dot"></i>Course materials upload and download library</li><li><i class="fas fa-circle-dot"></i>Targeted notices, public gallery, contact form with admin inbox</li><li><i class="fas fa-circle-dot"></i>Role-based access control, PDO security, HTTPOnly cookies</li></ul><h4>Key Message</h4><ul class="m-list"><li><i class="fas fa-quote-left"></i>"One unified system — role-based, secure, and built to handle the day-to-day operations of the institution."</li></ul><div class="m-tags"><span class="tag">Unified Platform</span><span class="tag">Role-Based</span><span class="tag">Secure</span><span class="tag">Production-Ready</span></div>`},
+  auth:{icon:'fas fa-shield-alt',color:'linear-gradient(135deg,#004080,#0059b3)',title:'Authentication & Access Control',sub:'Secure role-based login system',body:`<h4>Login System</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Role selector: Admin, Teacher, Student</li><li><i class="fas fa-circle-dot"></i>Username + password login with visibility toggle</li><li><i class="fas fa-circle-dot"></i>Remember Me — 30-day secure token stored in DB</li><li><i class="fas fa-circle-dot"></i>Forgot password recovery flow</li><li><i class="fas fa-circle-dot"></i>First-login forced password change screen</li></ul><h4>Access Control</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Every protected page validates session role</li><li><i class="fas fa-circle-dot"></i>Unauthorized access redirects to login instantly</li><li><i class="fas fa-circle-dot"></i>Account status check — inactive accounts blocked</li><li><i class="fas fa-circle-dot"></i>No-cache headers prevent back-button access after logout</li></ul><div class="m-tags"><span class="tag">PHP Sessions</span><span class="tag">RBAC</span><span class="tag">Remember Me</span><span class="tag">HTTPOnly Cookies</span></div>`},
+  attendance:{icon:'fas fa-calendar-check',color:'linear-gradient(135deg,#e67e00,#ffc107)',title:'Attendance System',sub:'Daily per-subject attendance with analytics',body:`<h4>Teacher Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Mark attendance: Present / Absent / Late per student</li><li><i class="fas fa-circle-dot"></i>Optional late reason note for each late student</li><li><i class="fas fa-circle-dot"></i>Select class, subject, and date before marking</li><li><i class="fas fa-circle-dot"></i>View attendance analytics charts</li></ul><h4>Student Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>View full attendance history by date</li><li><i class="fas fa-circle-dot"></i>Attendance percentage calculation</li><li><i class="fas fa-circle-dot"></i>Low-attendance warning badge if below 75%</li><li><i class="fas fa-circle-dot"></i>Dashboard stat card with live percentage</li></ul><div class="m-tags"><span class="tag">Present/Absent/Late</span><span class="tag">Late Reason</span><span class="tag">75% Warning</span><span class="tag">Charts</span></div>`},
+  assignments:{icon:'fas fa-tasks',color:'linear-gradient(135deg,#1a9e5c,#20c997)',title:'Assignment System',sub:'Create, submit, and grade assignments',body:`<h4>Teacher Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Create assignments with title, description, due date, class</li><li><i class="fas fa-circle-dot"></i>Edit and delete assignments</li><li><i class="fas fa-circle-dot"></i>View all student submissions per assignment</li><li><i class="fas fa-circle-dot"></i>Grade submissions with marks and feedback</li><li><i class="fas fa-circle-dot"></i>Ungraded submission counter badge on dashboard</li></ul><h4>Student Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>View pending assignments with due dates</li><li><i class="fas fa-circle-dot"></i>Submit assignments with file upload</li><li><i class="fas fa-circle-dot"></i>Active / Overdue status indicator</li><li><i class="fas fa-circle-dot"></i>Pending assignment count on dashboard</li></ul><div class="m-tags"><span class="tag">File Upload</span><span class="tag">Due Dates</span><span class="tag">Grading</span><span class="tag">Submissions</span></div>`},
+  grades:{icon:'fas fa-chart-bar',color:'linear-gradient(135deg,#6f42c1,#c44dff)',title:'Grades & GPA System',sub:'Internal/external marks, grade letters, and GPA',body:`<h4>Teacher Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Enter internal marks per student per subject</li><li><i class="fas fa-circle-dot"></i>Enter external marks per student per subject</li><li><i class="fas fa-circle-dot"></i>View grade distribution charts</li></ul><h4>Student Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>View subject-wise grades (internal, external, total)</li><li><i class="fas fa-circle-dot"></i>Grade letter assignment (A, B, C, D, F)</li><li><i class="fas fa-circle-dot"></i>GPA calculated on 4-point scale</li><li><i class="fas fa-circle-dot"></i>GPA displayed on dashboard stat card</li></ul><div class="m-tags"><span class="tag">Internal Marks</span><span class="tag">External Marks</span><span class="tag">GPA (4.0)</span><span class="tag">Grade Letters</span></div>`},
+  notices:{icon:'fas fa-bullhorn',color:'linear-gradient(135deg,#0891b2,#06b6d4)',title:'Notice Board',sub:'Targeted announcements for the whole institution',body:`<h4>Admin Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Create notices with title, description, category</li><li><i class="fas fa-circle-dot"></i>Audience targeting: All / Students / Teachers / Emergency</li><li><i class="fas fa-circle-dot"></i>Priority levels: Normal / High / Urgent</li><li><i class="fas fa-circle-dot"></i>Edit, deactivate, and delete notices</li></ul><h4>Public & User Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Public notice board (no login required)</li><li><i class="fas fa-circle-dot"></i>Role-filtered notices on dashboards</li><li><i class="fas fa-circle-dot"></i>Emergency notices highlighted with distinct styling</li><li><i class="fas fa-circle-dot"></i>Scrolling notice ticker on homepage</li></ul><div class="m-tags"><span class="tag">Audience Targeting</span><span class="tag">Emergency</span><span class="tag">Search & Filter</span><span class="tag">Ticker</span></div>`},
+  gallery:{icon:'fas fa-images',color:'linear-gradient(135deg,#dc2626,#f87171)',title:'Photo Gallery',sub:'Organized school photos with lightbox viewer',body:`<h4>Admin Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Upload images with title and description</li><li><i class="fas fa-circle-dot"></i>Organize into categories (Campus, Events, Students, Labs)</li><li><i class="fas fa-circle-dot"></i>Automatic thumbnail generation</li><li><i class="fas fa-circle-dot"></i>Edit metadata and delete images</li></ul><h4>Public Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Category-based album cards on public page</li><li><i class="fas fa-circle-dot"></i>Lightbox viewer with image navigation</li><li><i class="fas fa-circle-dot"></i>Keyboard navigation (arrow keys + ESC)</li><li><i class="fas fa-circle-dot"></i>Image counter (current / total)</li></ul><div class="m-tags"><span class="tag">Categories</span><span class="tag">Thumbnails</span><span class="tag">Lightbox</span><span class="tag">Keyboard Nav</span></div>`},
+  materials:{icon:'fas fa-book-open',color:'linear-gradient(135deg,#0f766e,#14b8a6)',title:'Course Materials',sub:'Upload and download study resources',body:`<h4>Teacher Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Upload PDFs, documents, and resources</li><li><i class="fas fa-circle-dot"></i>Organize by subject and class</li><li><i class="fas fa-circle-dot"></i>Edit and delete uploaded materials</li></ul><h4>Student Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Browse materials in Library section</li><li><i class="fas fa-circle-dot"></i>Download materials directly</li><li><i class="fas fa-circle-dot"></i>Filtered to enrolled program materials</li></ul><div class="m-tags"><span class="tag">File Upload</span><span class="tag">PDF Support</span><span class="tag">Download</span><span class="tag">Library</span></div>`},
+  programs:{icon:'fas fa-university',color:'linear-gradient(135deg,#b45309,#f59e0b)',title:'Programs & Subjects',sub:'Academic programs with full subject listings',body:`<h4>Admin Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Create and manage academic programs</li><li><i class="fas fa-circle-dot"></i>Set program code, affiliation, duration</li><li><i class="fas fa-circle-dot"></i>Add subject list per program</li><li><i class="fas fa-circle-dot"></i>Set status: Active / Upcoming</li></ul><h4>Public Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Public programs page (no login required)</li><li><i class="fas fa-circle-dot"></i>Filter by All / Active / Upcoming</li><li><i class="fas fa-circle-dot"></i>B.Tech IT, B.Tech Civil, Diploma Civil, Diploma Animal Science</li></ul><div class="m-tags"><span class="tag">B.Tech IT</span><span class="tag">B.Tech Civil</span><span class="tag">Diploma</span><span class="tag">CTEVT</span></div>`},
+  contact:{icon:'fas fa-envelope',color:'linear-gradient(135deg,#004080,#0059b3)',title:'Contact & Inquiries',sub:'Public contact form with admin inbox',body:`<h4>Contact Form</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Fields: Full Name, Phone, Email, Subject, Message</li><li><i class="fas fa-circle-dot"></i>Real-time validation with error messages</li><li><i class="fas fa-circle-dot"></i>Character counter for message (max 1000)</li><li><i class="fas fa-circle-dot"></i>Success / error alert on submission</li></ul><h4>Admin Features</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>View all submitted contact messages</li><li><i class="fas fa-circle-dot"></i>Contact message count on admin dashboard</li><li><i class="fas fa-circle-dot"></i>Delete contact messages</li></ul><div class="m-tags"><span class="tag">Form Validation</span><span class="tag">Admin Inbox</span><span class="tag">Google Maps</span></div>`},
+  'admin-role':{icon:'fas fa-user-shield',color:'linear-gradient(135deg,#001a3d,#004080)',title:'Admin Dashboard',sub:'Full system control from one place',body:`<h4>Dashboard Stats</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Total Students — click to manage</li><li><i class="fas fa-circle-dot"></i>Total Teachers — click to manage</li><li><i class="fas fa-circle-dot"></i>Active Programs — click to manage</li><li><i class="fas fa-circle-dot"></i>Active Notices — click to manage</li><li><i class="fas fa-circle-dot"></i>Contact Messages — click to view</li><li><i class="fas fa-circle-dot"></i>Gallery Images — click to manage</li></ul><h4>Quick Actions</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Manage Students, Teachers, Programs</li><li><i class="fas fa-circle-dot"></i>Manage Notices & Gallery</li><li><i class="fas fa-circle-dot"></i>View Reports & Settings</li></ul><h4>Activity Feed</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>New students registered</li><li><i class="fas fa-circle-dot"></i>Teachers added</li><li><i class="fas fa-circle-dot"></i>Notices published — with time-ago display</li></ul><div class="m-tags"><span class="tag">CRUD Students</span><span class="tag">CRUD Teachers</span><span class="tag">Activity Feed</span><span class="tag">Reports</span></div>`},
+  'teacher-role':{icon:'fas fa-chalkboard-teacher',color:'linear-gradient(135deg,#1a5c2e,#28a745)',title:'Teacher Dashboard',sub:'Everything needed to manage classes',body:`<h4>Dashboard Stats</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Total Active Students</li><li><i class="fas fa-circle-dot"></i>My Assignments count</li><li><i class="fas fa-circle-dot"></i>Course Materials uploaded</li><li><i class="fas fa-circle-dot"></i>Ungraded Submissions (alert badge)</li></ul><h4>Quick Actions</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Mark Attendance (today's record)</li><li><i class="fas fa-circle-dot"></i>Attendance Charts (analytics)</li><li><i class="fas fa-circle-dot"></i>Enter Grades / Grade Charts</li><li><i class="fas fa-circle-dot"></i>Assignments (with ungraded badge)</li><li><i class="fas fa-circle-dot"></i>Course Materials upload</li><li><i class="fas fa-circle-dot"></i>View Students / My Profile</li></ul><div class="m-tags"><span class="tag">Attendance</span><span class="tag">Grading</span><span class="tag">Materials</span><span class="tag">Analytics</span></div>`},
+  'student-role':{icon:'fas fa-user-graduate',color:'linear-gradient(135deg,#5b21b6,#7c3aed)',title:'Student Dashboard',sub:'A focused view of everything that matters',body:`<h4>Dashboard Stats</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Enrolled Subjects count</li><li><i class="fas fa-circle-dot"></i>Attendance Rate % (warning if below 75%)</li><li><i class="fas fa-circle-dot"></i>Current GPA (4-point scale)</li><li><i class="fas fa-circle-dot"></i>Pending Assignments count</li></ul><h4>Quick Actions</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>Attendance (with % and warning badge)</li><li><i class="fas fa-circle-dot"></i>My Grades (with GPA display)</li><li><i class="fas fa-circle-dot"></i>Assignments (with pending count)</li><li><i class="fas fa-circle-dot"></i>Timetable / Library / My Profile</li></ul><h4>Widgets</h4><ul class="m-list"><li><i class="fas fa-circle-dot"></i>My Courses card with subject list</li><li><i class="fas fa-circle-dot"></i>Recent Notices (student-filtered)</li><li><i class="fas fa-circle-dot"></i>Profile edit form</li><li><i class="fas fa-circle-dot"></i>Academic Summary (Grades + Attendance tabs)</li></ul><div class="m-tags"><span class="tag">Attendance</span><span class="tag">Grades</span><span class="tag">Assignments</span><span class="tag">Library</span></div>`}
+};
+
+function openModal(key){
+  const d=modals[key];if(!d)return;
+  document.getElementById('m-ic').style.background=d.color;
+  document.getElementById('m-ic').innerHTML='<i class="'+d.icon+'"></i>';
+  document.getElementById('m-title').textContent=d.title;
+  document.getElementById('m-sub').textContent=d.sub;
+  document.getElementById('m-body').innerHTML=d.body;
+  document.getElementById('overlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeModalDirect(){document.getElementById('overlay').classList.remove('on');document.body.style.overflow='';}
+function closeModal(e){if(e.target===document.getElementById('overlay'))closeModalDirect();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
+
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast('Copied: '+t));}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+function closeMob(){document.getElementById('mob-nav').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
+document.getElementById('hamburger').addEventListener('click',function(){this.classList.toggle('open');document.getElementById('mob-nav').classList.toggle('open');});
+
+const btt=document.getElementById('btt');
+window.addEventListener('scroll',()=>{btt.classList.toggle('vis',window.scrollY>400);},{passive:true});
+btt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-130)cur=s.id;});
+  navLinks.forEach(a=>{a.classList.remove('active');if(a.getAttribute('href')==='#'+cur)a.classList.add('active');});
+},{passive:true});
+</script>
+</body>
+</html>
+
